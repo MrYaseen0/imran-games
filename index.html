@@ -769,6 +769,9 @@ renderCart();
 /* deep link — opening /#product/<id>-<slug> lands straight on that product */
 function handleDeepLink(){var hp=productFromHash();if(hp)setTimeout(function(){openModal(hp.id)},400)}
 window.addEventListener("hashchange",function(){var p2=productFromHash();if(p2&&currentId!==p2.id)openModal(p2.id);else if(!p2&&modal.classList.contains("open"))modal.classList.remove("open")});
+/* ===== boot: load live products, then subscribe to realtime updates ===== */
+loadProducts();
+subscribeRealtime();
 
 
 </script>
