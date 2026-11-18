@@ -545,6 +545,11 @@ footer{margin-top:44px;background:#070912;border-top:1px solid var(--line)}
    <p style="color:#B9BFD6;font-size:13px;margin:0 0 8px">Edit the price, old price or stock, then press Save. Delete asks first. Every change goes live on the shop right away.</p>
    <div id="adminList"></div>
   </div>
+  <div style="background:#12152A;border:1px solid #2A2F45;border-radius:16px;padding:20px;margin-top:24px">
+   <h3 style="margin:0 0 6px;font-size:18px">History — Audit Log (<span id="auditCount">0</span>)</h3>
+   <p style="color:#B9BFD6;font-size:13px;margin:0 0 8px">Every sign-in, sign-out, add, edit and delete — newest first, times in Pakistan time (PKT).</p>
+   <div id="auditList"><p style="color:#B9BFD6;font-size:13px;margin:0">Loading history…</p></div>
+  </div>
   <div style="margin-top:16px"><button class="btn btn-ghost" id="adminLock" type="button">Log Out</button></div>
  </div>
 </div></section>
@@ -833,14 +838,72 @@ async function sbWrite(method,path,body){
   return data;
 }
 function slugify(s){return String(s||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,60)||"item"}
+/* ===== AUDIT LOG — every admin event is recorded in Supabase audit_log ===== */
+var SB_AUDIT=SB_URL+"/rest/v1/audit_log";
+var ADMIN_IP=null;
+async function getAdminIP(){
+  if(ADMIN_IP)return ADMIN_IP;
+  try{
+    var ctl=new AbortController();var to=setTimeout(function(){ctl.abort()},3000);
+    var r=await fetch("https://api.ipify.org?format=json",{signal:ctl.signal});
+    clearTimeout(to);
+    var j=await r.json();ADMIN_IP=(j&&j.ip)||"unknown";
+  }catch(e){ADMIN_IP="unknown";}
+  return ADMIN_IP;
+}
+async function currentActorEmail(){
+  try{if(sb){var s=await sb.auth.getSession();if(s&&s.data&&s.data.session&&s.data.session.user)return s.data.session.user.email}}catch(e){}
+  return null;
+}
+async function logAudit(action,entity,recordId,recordName,details){
+  try{
+    var email=await currentActorEmail();if(!email)return;
+    var ip=await getAdminIP();
+    var headers=await sbHeaders();
+    await fetch(SB_AUDIT,{method:"POST",headers:headers,body:JSON.stringify({actor_email:email,action:action,entity:entity||"product",record_id:recordId||null,record_name:recordName||null,details:details||{},ip_address:ip,user_agent:navigator.userAgent||null})});
+  }catch(e){/* audit must never block an admin action */}
+}
+async function logFailedLogin(email){
+  try{
+    var ip=await getAdminIP();
+    await fetch(SB_URL+"/rest/v1/rpc/log_failed_login",{method:"POST",headers:{"apikey":SB_ANON,"Authorization":"Bearer "+SB_ANON,"Content-Type":"application/json"},body:JSON.stringify({p_email:email,p_ip:ip,p_ua:navigator.userAgent||null})});
+  }catch(e){}
+}
+function fmtPKT(iso){
+  try{return new Date(iso).toLocaleString("en-GB",{timeZone:"Asia/Karachi",day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false})}catch(e){return iso}
+}
+function escHtml(x){return String(x==null?"":x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+async function loadAuditLog(){
+  var box=document.getElementById("auditList");if(!box)return;
+  try{
+    var headers=await sbHeaders();
+    var res=await fetch(SB_AUDIT+"?select=*&order=created_at.desc&limit=50",{headers:headers});
+    if(!res.ok)throw new Error("HTTP "+res.status);
+    var rows=await res.json();
+    document.getElementById("auditCount").textContent=rows.length;
+    if(!rows.length){box.innerHTML='<p style="color:#B9BFD6;font-size:13px;margin:0">No admin activity recorded yet.</p>';return}
+    box.innerHTML=rows.map(function(r){
+      return '<div style="display:flex;gap:10px;align-items:baseline;padding:9px 0;border-top:1px solid #232842;flex-wrap:wrap;font-size:13px">'
+      +'<span style="color:#B9BFD6;min-width:180px">'+fmtPKT(r.created_at)+'</span>'
+      +'<b style="min-width:130px">'+escHtml(r.action)+'</b>'
+      +'<span style="flex:1;min-width:140px">'+(r.record_name?escHtml(r.record_name):"—")+'</span>'
+      +'<span style="color:#B9BFD6">'+escHtml(r.actor_email)+'</span>'
+      +'<span style="color:#8A90A8;font-size:12px">'+escHtml(r.ip_address||"unknown")+'</span>'
+      +'</div>';
+    }).join("");
+  }catch(err){box.innerHTML='<p style="color:#FF8A8A;font-size:13px;margin:0">Could not load history — '+escHtml(err.message||"try again")+'</p>';}
+}
 function showAdmin(email){
   ADMIN_UNLOCKED=true;
   document.getElementById("adminGate").style.display="none";
   document.getElementById("adminBody").style.display="block";
   document.getElementById("adminWho").textContent=email||"";
   renderAdminList();
+  getAdminIP();
+  loadAuditLog();
 }
 async function signOutAdmin(){
+  try{var em=await currentActorEmail();if(em)await logAudit("logout","admin",null,em,{});}catch(e){}
   try{if(sb)await sb.auth.signOut()}catch(e){}
   ADMIN_UNLOCKED=false;
   document.getElementById("adminBody").style.display="none";
@@ -873,8 +936,11 @@ document.getElementById("adminUnlock").addEventListener("click",async function()
   try{
     if(!sb)throw new Error("Login is unavailable right now — reload the page and try again.");
     var r=await sb.auth.signInWithPassword({email:email,password:pass});
-    if(r.error)throw new Error("Wrong email or password — try again.");
-    showAdmin(r.data&&r.data.user?r.data.user.email:email);
+    if(r.error){await logFailedLogin(email);throw new Error("Wrong email or password — try again.");}
+    var who=r.data&&r.data.user?r.data.user.email:email;
+    showAdmin(who);
+    await logAudit("login_success","admin",null,who,{});
+    loadAuditLog();
     msg.textContent="";
     showToast("Signed in ✓");
   }catch(err){msg.textContent="✖ "+err.message;}
@@ -898,6 +964,8 @@ document.getElementById("npAdd").addEventListener("click",async function(){
   msg.textContent="Adding…";
   try{
     var added=await sbWrite("POST","",{name:name,slug:slug,category:cat,brand:brand,price:price,was_price:isNaN(was)?price:was,stock:stock,is_hot:document.getElementById("npHot").checked,is_new:document.getElementById("npNew").checked,image_urls:urls});if(!added||!added.length)throw new Error("Add failed — nothing was saved. Check that you are signed in and try again.");
+    await logAudit("product_added","product",added[0].id,name,{price:price,was_price:isNaN(was)?price:was,stock:stock,category:cat});
+    loadAuditLog();
     nextNumId++;
     msg.textContent="✓ Added — live on the shop now.";
     ["npName","npBrand","npPrice","npWas","npStock","npImgs"].forEach(function(id){document.getElementById(id).value=""});
@@ -915,13 +983,13 @@ document.getElementById("adminList").addEventListener("click",async function(e){
     var stock=parseInt(row.querySelector(".astock").value,10);
     if(!(price>0)||isNaN(stock)){showToast("✖ Price must be above 0 and stock a number");return}
     var btn=e.target.closest(".asave");btn.textContent="Saving…";
-    try{var upd=await sbWrite("PATCH","?id=eq."+uuid,{price:price,was_price:isNaN(was)?price:was,stock:stock});if(!upd||!upd.length)throw new Error("Save failed — nothing was updated. Are you still signed in?");showToast("Saved ✓ — live on the shop now");loadProducts();}
+    try{var upd=await sbWrite("PATCH","?id=eq."+uuid,{price:price,was_price:isNaN(was)?price:was,stock:stock});if(!upd||!upd.length)throw new Error("Save failed — nothing was updated. Are you still signed in?");await logAudit("product_edited","product",uuid,p?p.name:null,{old_price:p?p.price:null,new_price:price,old_was_price:p?p.old:null,new_was_price:isNaN(was)?price:was,old_stock:p?p.stock:null,new_stock:stock});loadAuditLog();showToast("Saved ✓ — live on the shop now");loadProducts();}
     catch(err){showToast("✖ "+err.message);btn.textContent="Save";}
   }
   if(e.target.closest(".adel")){
     if(!p)return;
     if(!confirm('Delete "'+p.name+'" from the shop? This cannot be undone.'))return;
-    try{var del=await sbWrite("DELETE","?id=eq."+uuid);if(!del||!del.length)throw new Error("Delete failed — nothing was deleted. Are you still signed in?");showToast("Deleted ✓");loadProducts();}
+    try{var del=await sbWrite("DELETE","?id=eq."+uuid);if(!del||!del.length)throw new Error("Delete failed — nothing was deleted. Are you still signed in?");await logAudit("product_deleted","product",uuid,p?p.name:null,{price:p?p.price:null,stock:p?p.stock:null});loadAuditLog();showToast("Deleted ✓");loadProducts();}
     catch(err){showToast("✖ "+err.message);}
   }
 });

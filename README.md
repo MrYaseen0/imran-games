@@ -21,6 +21,7 @@ Dark gaming e-commerce store for PS4 / PS5 games, consoles, controllers, headset
 The store is Supabase-driven: `index.html` loads all products live from the `imran-games` Supabase project (`public.products`, 40 products, 3 Storage photos each in the `product-images` bucket) with a Realtime subscription — no hardcoded product list, no embedded photos (page is ~1.6 MB, was 6.6 MB). The anon key is embedded in the page (public-safe); writes require a signed-in admin session (RLS policies on INSERT/UPDATE/DELETE allow only the `authenticated` role).
 
 - **Admin panel** (footer link "Admin — Add / Edit Products"): add a product, edit price / old price / stock inline, delete with confirm. Sign in with the admin email + password (the shop owner has them — the account lives in Supabase Auth; never commit credentials here). Writes go straight to Supabase PostgREST and appear on the site instantly via Realtime.
+- **Audit log** (`public.audit_log`, authenticated-only): every sign-in, failed sign-in, sign-out, product add/edit/delete is recorded with PKT time, admin email and IP address, and shown in the admin panel under "History — Audit Log" (latest 50, newest first).
 - **Checkout:** WhatsApp COD to +92-332-2202220 (delivery Rs 350, free above Rs 10,000). Orders are NOT saved to Supabase from this static page — anon order INSERT is blocked by RLS (42501) — so checkout stays WhatsApp-only.
 - **Old WordPress site** (imrangames.pk) is untouched; audit PDFs live in `~/workspace/your_files/imran-games-audit/`.
 
