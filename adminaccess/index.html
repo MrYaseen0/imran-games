@@ -592,7 +592,7 @@ document.getElementById("fpSend").addEventListener("click",async function(){
   msg.textContent="Sending…";
   try{
     if(!sb)throw new Error("unavailable");
-    var r=await sb.auth.resetPasswordForEmail(email,{redirectTo:"https://imrangames.vercel.app/adminaccess/"});
+    var r=await sb.auth.resetPasswordForEmail(email,{redirectTo:"https://imrangamesofficials.vercel.app/adminaccess/"});
     if(r.error)throw r.error;
     msg.textContent="✓ If that email is the admin email, a reset link was sent — check the inbox (and spam).";
   }catch(err){
