@@ -28,3 +28,5 @@ The store is Supabase-driven: `index.html` loads all products live from the `imr
 ## Status
 
 UI-first v2 delivered 2026-11-18. Backend (React / Next.js + Supabase) is the next step.
+
+- **Analytics** (admin panel, after login): live summary cards (total products, stock units, inventory value, sold-out, admin actions) plus Chart.js charts — products by category, stock overview, admin activity last 7 days (from `audit_log`), price-range bands — and a live activity flow timeline. All numbers computed live from Supabase; nothing is hardcoded.

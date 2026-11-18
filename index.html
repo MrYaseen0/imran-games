@@ -290,6 +290,7 @@ footer{margin-top:44px;background:#070912;border-top:1px solid var(--line)}
 </style>
 <script>document.documentElement.classList.add("anim")</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
 <div class="topbar"><span>🎮 Imran Games — Best Game Shop in Peshawar</span><span class="tb-sep" aria-hidden="true">•</span><span>All over Pakistan COD Available</span><span class="tb-sep" aria-hidden="true">•</span><a href="tel:+923322202220">Call +92-332-2202220</a></div>
@@ -546,6 +547,26 @@ footer{margin-top:44px;background:#070912;border-top:1px solid var(--line)}
    <div id="adminList"></div>
   </div>
   <div style="background:#12152A;border:1px solid #2A2F45;border-radius:16px;padding:20px;margin-top:24px">
+   <h3 style="margin:0 0 6px;font-size:18px">📊 Analytics — Live Shop Numbers</h3>
+   <p style="color:#B9BFD6;font-size:13px;margin:0 0 16px">Computed live from Supabase every time this panel opens — no demo numbers.</p>
+   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px">
+    <div style="background:#0B0D17;border:1px solid #2A2F45;border-radius:12px;padding:14px"><div style="color:#B9BFD6;font-size:12px">Total products</div><b id="anTotal" style="font-size:22px">—</b></div>
+    <div style="background:#0B0D17;border:1px solid #2A2F45;border-radius:12px;padding:14px"><div style="color:#B9BFD6;font-size:12px">Stock units</div><b id="anStock" style="font-size:22px">—</b></div>
+    <div style="background:#0B0D17;border:1px solid #2A2F45;border-radius:12px;padding:14px"><div style="color:#B9BFD6;font-size:12px">Inventory value</div><b id="anValue" style="font-size:22px">—</b></div>
+    <div style="background:#0B0D17;border:1px solid #2A2F45;border-radius:12px;padding:14px"><div style="color:#B9BFD6;font-size:12px">Sold out</div><b id="anSoldOut" style="font-size:22px">—</b></div>
+    <div style="background:#0B0D17;border:1px solid #2A2F45;border-radius:12px;padding:14px"><div style="color:#B9BFD6;font-size:12px">Admin actions logged</div><b id="anActions" style="font-size:22px">—</b></div>
+   </div>
+   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+    <div style="background:#0B0D17;border:1px solid #2A2F45;border-radius:12px;padding:14px"><h4 style="margin:0 0 8px;font-size:15px">Products by category</h4><div style="height:250px"><canvas id="chCat"></canvas></div></div>
+    <div style="background:#0B0D17;border:1px solid #2A2F45;border-radius:12px;padding:14px"><h4 style="margin:0 0 8px;font-size:15px">Stock overview</h4><div style="height:250px"><canvas id="chStock"></canvas></div></div>
+    <div style="background:#0B0D17;border:1px solid #2A2F45;border-radius:12px;padding:14px"><h4 style="margin:0 0 8px;font-size:15px">Admin activity — last 7 days</h4><div style="height:250px"><canvas id="chActivity"></canvas></div></div>
+    <div style="background:#0B0D17;border:1px solid #2A2F45;border-radius:12px;padding:14px"><h4 style="margin:0 0 8px;font-size:15px">Price range</h4><div style="height:250px"><canvas id="chPrice"></canvas></div></div>
+   </div>
+   <p id="anMsg" style="color:#B9BFD6;font-size:13px;margin:12px 0 0"></p>
+   <h4 style="margin:20px 0 8px;font-size:15px">🔄 Live Flow — latest activity</h4>
+   <div id="flowList"><p style="color:#B9BFD6;font-size:13px;margin:0">Loading flow…</p></div>
+  </div>
+  <div style="background:#12152A;border:1px solid #2A2F45;border-radius:16px;padding:20px;margin-top:24px">
    <h3 style="margin:0 0 6px;font-size:18px">History — Audit Log (<span id="auditCount">0</span>)</h3>
    <p style="color:#B9BFD6;font-size:13px;margin:0 0 8px">Every sign-in, sign-out, add, edit and delete — newest first, times in Pakistan time (PKT).</p>
    <div id="auditList"><p style="color:#B9BFD6;font-size:13px;margin:0">Loading history…</p></div>
@@ -644,6 +665,7 @@ async function loadProducts(){
     nextNumId=Math.max(1000,maxId+1);
     productsLoaded=true;
     renderAll();
+    if(typeof ADMIN_UNLOCKED!=="undefined"&&ADMIN_UNLOCKED&&typeof renderAnalytics==="function")renderAnalytics();
     handleDeepLink();
   }catch(err){
     if(tg&&!PRODUCTS.length)tg.innerHTML='<p style="color:#fff;padding:30px;text-align:center">⚠ Products could not load — check your connection and refresh. ('+String(err.message||err).slice(0,90)+')</p>';
@@ -880,6 +902,8 @@ async function loadAuditLog(){
     var res=await fetch(SB_AUDIT+"?select=*&order=created_at.desc&limit=50",{headers:headers});
     if(!res.ok)throw new Error("HTTP "+res.status);
     var rows=await res.json();
+    AUDIT_ROWS=rows||[];
+    renderFlow(AUDIT_ROWS);
     document.getElementById("auditCount").textContent=rows.length;
     if(!rows.length){box.innerHTML='<p style="color:#B9BFD6;font-size:13px;margin:0">No admin activity recorded yet.</p>';return}
     box.innerHTML=rows.map(function(r){
@@ -901,6 +925,7 @@ function showAdmin(email){
   renderAdminList();
   getAdminIP();
   loadAuditLog();
+  renderAnalytics();
 }
 async function signOutAdmin(){
   try{var em=await currentActorEmail();if(em)await logAudit("logout","admin",null,em,{});}catch(e){}
@@ -910,6 +935,73 @@ async function signOutAdmin(){
   document.getElementById("adminGate").style.display="block";
   document.getElementById("adminPass").value="";
   document.getElementById("adminMsg").textContent="Signed out.";
+}
+/* ===== ANALYTICS — live numbers + charts, computed from Supabase ===== */
+var AN_CHARTS={};
+var AUDIT_ROWS=[];
+function fmtNum(n){try{return Number(n).toLocaleString("en-PK")}catch(e){return String(n)}}
+function renderFlow(rows){
+  var box=document.getElementById("flowList");if(!box)return;
+  if(!rows||!rows.length){box.innerHTML='<p style="color:#B9BFD6;font-size:13px;margin:0">No admin activity recorded yet.</p>';return}
+  box.innerHTML=rows.slice(0,20).map(function(r,i){
+    return '<div style="display:flex;gap:10px;padding:8px 0;border-top:1px solid #232842;font-size:13px;align-items:baseline;flex-wrap:wrap">'
+    +'<span style="color:var(--pink);font-weight:700;min-width:22px">'+(i+1)+'.</span>'
+    +'<span style="color:#B9BFD6;min-width:170px">'+fmtPKT(r.created_at)+'</span>'
+    +'<span style="color:#fff">'+escHtml(r.actor_email||"")+'</span>'
+    +'<b>'+escHtml(r.action||"")+'</b>'
+    +'<span style="flex:1;min-width:120px">'+(r.record_name?escHtml(r.record_name):"—")+'</span>'
+    +'<span style="color:#8A90A8;font-size:12px">'+escHtml(r.ip_address||"unknown")+'</span>'
+    +'</div>';
+  }).join("");
+}
+function drawChart(key,elId,cfg){
+  var el=document.getElementById(elId);if(!el||!window.Chart)return;
+  if(AN_CHARTS[key]){try{AN_CHARTS[key].destroy()}catch(e){}}
+  if(window.Chart.defaults)window.Chart.defaults.color="#B9BFD6";
+  AN_CHARTS[key]=new window.Chart(el.getContext("2d"),cfg);
+}
+async function renderAnalytics(){
+  if(!document.getElementById("adminBody")||document.getElementById("adminBody").style.display==="none")return;
+  var total=PRODUCTS.length,units=0,value=0,soldOut=0;
+  var byCat={},bands=[0,0,0,0];
+  PRODUCTS.forEach(function(p){
+    units+=p.stock||0;value+=(p.price||0)*(p.stock||0);
+    if(p.soldOut||p.stock===0)soldOut++;
+    byCat[p.catLabel||"Other"]=(byCat[p.catLabel||"Other"]||0)+1;
+    if(p.price<10000)bands[0]++;else if(p.price<50000)bands[1]++;else if(p.price<150000)bands[2]++;else bands[3]++;
+  });
+  var set=function(id,v){var el=document.getElementById(id);if(el)el.textContent=v};
+  set("anTotal",fmtNum(total));set("anStock",fmtNum(units));
+  set("anValue","Rs. "+fmtNum(value));set("anSoldOut",fmtNum(soldOut));
+  var msg=document.getElementById("anMsg");
+  if(!window.Chart){if(msg)msg.textContent="Charts could not load (chart library unreachable) — numbers above are still live.";renderFlow(AUDIT_ROWS);return}
+  if(msg)msg.textContent="";
+  var palette=["#EC008C","#00AEEF","#7C5CFF","#22C55E","#F59E0B","#EF4444","#14B8A6","#F97316","#A855F7","#84CC16","#06B6D4"];
+  var catLabels=Object.keys(byCat),catData=catLabels.map(function(k){return byCat[k]});
+  drawChart("cat","chCat",{type:"doughnut",data:{labels:catLabels,datasets:[{data:catData,backgroundColor:palette}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{boxWidth:12,font:{size:11}}}}}});
+  drawChart("stock","chStock",{type:"doughnut",data:{labels:["In stock","Sold out"],datasets:[{data:[total-soldOut,soldOut],backgroundColor:["#22C55E","#EF4444"]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom"}}}});
+  drawChart("price","chPrice",{type:"bar",data:{labels:["Under Rs 10,000","Rs 10k – 50k","Rs 50k – 150k","Above Rs 150k"],datasets:[{data:bands,backgroundColor:["#00AEEF","#7C5CFF","#EC008C","#F59E0B"]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{stepSize:1},grid:{color:"#232842"}},x:{grid:{display:false}}}}});
+  try{
+    var headers=await sbHeaders();
+    var rc=await fetch(SB_AUDIT+"?select=id&limit=1",{headers:Object.assign({},headers,{Prefer:"count=exact"})});
+    var cr=rc.headers.get("content-range")||"";var tot=parseInt((cr.split("/")[1]||"0"),10);
+    set("anActions",isNaN(tot)?"—":fmtNum(tot));
+    var ra=await fetch(SB_AUDIT+"?select=action,created_at&order=created_at.desc&limit=500",{headers:headers});
+    var rows=await ra.json();
+    var days=[],keys=[];
+    for(var d=6;d>=0;d--){var dt=new Date(Date.now()-d*86400000);var key=dt.toLocaleDateString("en-GB",{timeZone:"Asia/Karachi",day:"2-digit",month:"short"});days.push(key);keys.push(key)}
+    var types=["login_success","login_failed","product_added","product_edited","product_deleted","logout"];
+    var tcol={login_success:"#22C55E",login_failed:"#EF4444",product_added:"#00AEEF",product_edited:"#F59E0B",product_deleted:"#EC008C",logout:"#8A90A8"};
+    var counts={};types.forEach(function(t){counts[t]=[0,0,0,0,0,0,0]});
+    (rows||[]).forEach(function(r){
+      var k=new Date(r.created_at).toLocaleDateString("en-GB",{timeZone:"Asia/Karachi",day:"2-digit",month:"short"});
+      var i=keys.indexOf(k);if(i<0||!counts[r.action])return;counts[r.action][i]++;
+    });
+    var ds=types.filter(function(t){return counts[t].some(function(v){return v>0})}).map(function(t){return {label:t,data:counts[t],backgroundColor:tcol[t]}});
+    if(!ds.length)ds=[{label:"admin actions",data:[0,0,0,0,0,0,0],backgroundColor:"#00AEEF"}];
+    drawChart("act","chActivity",{type:"bar",data:{labels:days,datasets:ds},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{boxWidth:12,font:{size:11}}}},scales:{y:{ticks:{stepSize:1},stacked:true,grid:{color:"#232842"}},x:{stacked:true,grid:{display:false}}}}});
+  }catch(e){set("anActions","—")}
+  renderFlow(AUDIT_ROWS);
 }
 function renderAdminList(){
   var box=document.getElementById("adminList");if(!box)return;
@@ -965,7 +1057,7 @@ document.getElementById("npAdd").addEventListener("click",async function(){
   try{
     var added=await sbWrite("POST","",{name:name,slug:slug,category:cat,brand:brand,price:price,was_price:isNaN(was)?price:was,stock:stock,is_hot:document.getElementById("npHot").checked,is_new:document.getElementById("npNew").checked,image_urls:urls});if(!added||!added.length)throw new Error("Add failed — nothing was saved. Check that you are signed in and try again.");
     await logAudit("product_added","product",added[0].id,name,{price:price,was_price:isNaN(was)?price:was,stock:stock,category:cat});
-    loadAuditLog();
+    loadAuditLog();renderAnalytics();
     nextNumId++;
     msg.textContent="✓ Added — live on the shop now.";
     ["npName","npBrand","npPrice","npWas","npStock","npImgs"].forEach(function(id){document.getElementById(id).value=""});
@@ -983,13 +1075,13 @@ document.getElementById("adminList").addEventListener("click",async function(e){
     var stock=parseInt(row.querySelector(".astock").value,10);
     if(!(price>0)||isNaN(stock)){showToast("✖ Price must be above 0 and stock a number");return}
     var btn=e.target.closest(".asave");btn.textContent="Saving…";
-    try{var upd=await sbWrite("PATCH","?id=eq."+uuid,{price:price,was_price:isNaN(was)?price:was,stock:stock});if(!upd||!upd.length)throw new Error("Save failed — nothing was updated. Are you still signed in?");await logAudit("product_edited","product",uuid,p?p.name:null,{old_price:p?p.price:null,new_price:price,old_was_price:p?p.old:null,new_was_price:isNaN(was)?price:was,old_stock:p?p.stock:null,new_stock:stock});loadAuditLog();showToast("Saved ✓ — live on the shop now");loadProducts();}
+    try{var upd=await sbWrite("PATCH","?id=eq."+uuid,{price:price,was_price:isNaN(was)?price:was,stock:stock});if(!upd||!upd.length)throw new Error("Save failed — nothing was updated. Are you still signed in?");await logAudit("product_edited","product",uuid,p?p.name:null,{old_price:p?p.price:null,new_price:price,old_was_price:p?p.old:null,new_was_price:isNaN(was)?price:was,old_stock:p?p.stock:null,new_stock:stock});loadAuditLog();renderAnalytics();showToast("Saved ✓ — live on the shop now");loadProducts();}
     catch(err){showToast("✖ "+err.message);btn.textContent="Save";}
   }
   if(e.target.closest(".adel")){
     if(!p)return;
     if(!confirm('Delete "'+p.name+'" from the shop? This cannot be undone.'))return;
-    try{var del=await sbWrite("DELETE","?id=eq."+uuid);if(!del||!del.length)throw new Error("Delete failed — nothing was deleted. Are you still signed in?");await logAudit("product_deleted","product",uuid,p?p.name:null,{price:p?p.price:null,stock:p?p.stock:null});loadAuditLog();showToast("Deleted ✓");loadProducts();}
+    try{var del=await sbWrite("DELETE","?id=eq."+uuid);if(!del||!del.length)throw new Error("Delete failed — nothing was deleted. Are you still signed in?");await logAudit("product_deleted","product",uuid,p?p.name:null,{price:p?p.price:null,stock:p?p.stock:null});loadAuditLog();renderAnalytics();showToast("Deleted ✓");loadProducts();}
     catch(err){showToast("✖ "+err.message);}
   }
 });
