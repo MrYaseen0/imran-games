@@ -1,0 +1,799 @@
+[
+ {
+  "id": "cbe75941-2594-43d2-bbf5-1f80e817a152",
+  "name": "PlayStation 5 Standard Edition \u2014 1TB SSD (Used)",
+  "slug": "6-playstation-5-standard-edition-1tb-used",
+  "category": "Consoles",
+  "brand": "Sony PlayStation",
+  "price": 150000,
+  "was_price": 175000,
+  "stock": 0,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/6-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/6-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/6-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "8ecbaee4-ec09-40a1-a17d-8abeb60a66e0",
+  "name": "Xbox Series X 1TB SSD Console \u2014 4K, 120 FPS, Black",
+  "slug": "7-xbox-series-x-1tb",
+  "category": "Consoles",
+  "brand": "Microsoft Xbox",
+  "price": 220000,
+  "was_price": 285000,
+  "stock": 4,
+  "is_hot": true,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/7-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/7-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/7-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "a4d1b4e1-d7c8-4677-bd24-7b11eeabec92",
+  "name": "Xbox Series S 512GB SSD \u2014 All-Digital, White",
+  "slug": "8-xbox-series-s-512gb",
+  "category": "Consoles",
+  "brand": "Microsoft Xbox",
+  "price": 148500,
+  "was_price": 165000,
+  "stock": 5,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/8-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/8-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/8-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "bcde62a1-92df-4598-a947-c8115729dced",
+  "name": "Xbox One S 1TB \u2014 All-Digital Console, 4K HDR",
+  "slug": "9-xbox-one-s-1tb-all-digital",
+  "category": "Consoles",
+  "brand": "Microsoft Xbox",
+  "price": 55499,
+  "was_price": 68500,
+  "stock": 7,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/9-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/9-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/9-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "16770409-c87e-4541-85a0-3b1c3e78b577",
+  "name": "Xbox One 500GB Console \u2014 Black, Complete Accessories",
+  "slug": "10-xbox-one-500gb",
+  "category": "Consoles",
+  "brand": "Microsoft Xbox",
+  "price": 37999,
+  "was_price": 48500,
+  "stock": 8,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/10-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/10-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/10-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "a7b86f3d-ae02-417d-b38e-98ab851840c2",
+  "name": "Xbox 360 320GB \u2014 80+ Games Installed, Complete Box",
+  "slug": "11-xbox-360-320gb-80-games",
+  "category": "Consoles",
+  "brand": "Microsoft Xbox",
+  "price": 28500,
+  "was_price": 38500,
+  "stock": 6,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/11-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/11-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/11-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "dd06b9b0-63ba-45e9-9909-935b901b1a48",
+  "name": "Meta Quest 2 128GB \u2014 All-in-One VR Headset",
+  "slug": "12-meta-quest-2-128gb-vr-headset",
+  "category": "Consoles",
+  "brand": "Meta",
+  "price": 95000,
+  "was_price": 120000,
+  "stock": 5,
+  "is_hot": true,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/12-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/12-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/12-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "0dd4f58b-0b08-422f-99c5-492481ffca6d",
+  "name": "PlayStation 5 1TB SSD \u2014 1200 Series (Used)",
+  "slug": "5-playstation-5-1tb-1200-series-used",
+  "category": "Consoles",
+  "brand": "Sony PlayStation",
+  "price": 145000,
+  "was_price": 175000,
+  "stock": 0,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/5-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/5-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/5-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "72b0a1d5-9085-4b8d-9af2-6ed023705064",
+  "name": "Sony PS4 500GB Fat \u2014 Matte Black, Complete Box",
+  "slug": "2-sony-ps4-500gb-fat-matte-black",
+  "category": "Consoles",
+  "brand": "Sony PlayStation",
+  "price": 46500,
+  "was_price": 55000,
+  "stock": 9,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/2-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/2-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/2-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "8943cd97-5bbc-4611-a39b-0fe7a7c70663",
+  "name": "PlayStation 5 Slim 1TB SSD Disc Edition \u2014 UK Region (Model 2116)",
+  "slug": "3-playstation-5-slim-1tb-disc-uk-2116",
+  "category": "Consoles",
+  "brand": "Sony PlayStation",
+  "price": 245000,
+  "was_price": 260000,
+  "stock": 0,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/3-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/3-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/3-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "69d9619e-05cf-4dd1-8a2a-6bdba9c411ba",
+  "name": "PlayStation 5 Slim Disc Console \u2014 UK Edition, 1TB SSD",
+  "slug": "4-playstation-5-slim-disc-uk-1tb",
+  "category": "Consoles",
+  "brand": "Sony PlayStation",
+  "price": 165000,
+  "was_price": 179999,
+  "stock": 0,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/4-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/4-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/4-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "f91dc00b-d7ce-4788-9936-11c07e8ade41",
+  "name": "PlayStation 4 Pro 1TB \u2014 Used, Best Condition, Complete Box",
+  "slug": "1-playstation-4-pro-1tb-used",
+  "category": "Consoles",
+  "brand": "Sony PlayStation",
+  "price": 90000,
+  "was_price": 85000,
+  "stock": 0,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/1-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/1-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/1-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 2
+ },
+ {
+  "id": "5fe01e7a-5f74-4bb1-a678-4dd809a9e1ca",
+  "name": "Apple Vision Pro \u2014 Spatial Computer",
+  "slug": "13-apple-vision-pro",
+  "category": "Premium Tech",
+  "brand": "Apple",
+  "price": 1150000,
+  "was_price": 1350000,
+  "stock": 2,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/13-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/13-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/13-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "2b9a5d75-4c1e-4ac1-b1b4-f0ba8cbd45f4",
+  "name": "M15 Retro Game Console \u2014 4K, 20,000 Games, Wireless",
+  "slug": "14-m15-retro-game-console-20000-games",
+  "category": "Consoles",
+  "brand": "Retro Gaming",
+  "price": 6500,
+  "was_price": 7800,
+  "stock": 31,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/14-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/14-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/14-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "635ed57f-d6f0-430a-9e64-229685050399",
+  "name": "SUP Game Box 400-in-1 \u2014 Handheld Retro Console",
+  "slug": "15-sup-game-box-400-in-1",
+  "category": "Consoles",
+  "brand": "SUP",
+  "price": 2999,
+  "was_price": 4200,
+  "stock": 42,
+  "is_hot": true,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/15-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/15-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/15-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "03c6ff74-aaf3-4a52-9c9c-b840123520f2",
+  "name": "PS4 DualShock 4 Wireless Controller \u2014 Black",
+  "slug": "16-ps4-dualshock-4-controller-black",
+  "category": "Controllers",
+  "brand": "Sony PlayStation",
+  "price": 3999,
+  "was_price": 5500,
+  "stock": 48,
+  "is_hot": true,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/16-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/16-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/16-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "7cb5b1d9-7ef0-44e6-8b01-44f233ff8543",
+  "name": "Saitake PS4 Wireless Gamepad \u2014 STK-4003L",
+  "slug": "17-saitake-ps4-wireless-gamepad-stk-4003l",
+  "category": "Controllers",
+  "brand": "Saitake",
+  "price": 4499,
+  "was_price": 5500,
+  "stock": 23,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/17-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/17-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/17-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "690c2d85-387b-4786-b7e3-e21af224dd36",
+  "name": "PS5 DualSense Wireless Controller \u2014 Cosmic Red",
+  "slug": "18-ps5-dualsense-controller-cosmic-red",
+  "category": "Controllers",
+  "brand": "Sony PlayStation",
+  "price": 20999,
+  "was_price": 24500,
+  "stock": 14,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/18-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/18-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/18-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "09d6ba6d-4e64-4591-964f-60b258db69c3",
+  "name": "PS5 DualSense Wireless Controller \u2014 Used",
+  "slug": "19-ps5-dualsense-controller-used",
+  "category": "Controllers",
+  "brand": "Sony PlayStation",
+  "price": 14499,
+  "was_price": 18500,
+  "stock": 19,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/19-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/19-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/19-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "905f52cd-e7d2-4eda-bcb9-aca5a42ab7f7",
+  "name": "Xbox Series X/S Controller \u2014 Forza Horizon 5 Limited Edition",
+  "slug": "21-xbox-controller-forza-horizon-5-limited-edition",
+  "category": "Controllers",
+  "brand": "Microsoft Xbox",
+  "price": 12500,
+  "was_price": 16500,
+  "stock": 16,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/21-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/21-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/21-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "ca01a968-531a-4d86-b8bc-21ab7798e237",
+  "name": "Grand Theft Auto V \u2014 Premium Edition (PS4 Disc)",
+  "slug": "22-gta-v-premium-edition-ps4",
+  "category": "PS4 Games",
+  "brand": "Rockstar Games",
+  "price": 5250,
+  "was_price": 7500,
+  "stock": 60,
+  "is_hot": true,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/22-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/22-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/22-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "86475113-04c9-4ab8-8ca5-95269f107c9b",
+  "name": "Red Dead Redemption II \u2014 (PS4 Disc)",
+  "slug": "23-red-dead-redemption-2-ps4",
+  "category": "PS4 Games",
+  "brand": "Rockstar Games",
+  "price": 5699,
+  "was_price": 7500,
+  "stock": 38,
+  "is_hot": true,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/23-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/23-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/23-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "0c037a0b-1fa8-484d-8cd3-668f3ae089e2",
+  "name": "Call of Duty: Modern Warfare II \u2014 Cross-Gen (PS4 Disc)",
+  "slug": "24-call-of-duty-modern-warfare-2-ps4",
+  "category": "PS4 Games",
+  "brand": "Activision",
+  "price": 12499,
+  "was_price": 15500,
+  "stock": 29,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/24-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/24-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/24-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "b64e0f44-62c0-438e-9d33-e94d76b13c3b",
+  "name": "Ghost of Tsushima \u2014 (PS4 Disc)",
+  "slug": "25-ghost-of-tsushima-ps4",
+  "category": "PS4 Games",
+  "brand": "Sucker Punch",
+  "price": 7449,
+  "was_price": 12000,
+  "stock": 31,
+  "is_hot": true,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/25-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/25-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/25-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "efda0d8d-ee28-43c0-9fdb-583355c02385",
+  "name": "Far Cry 6 \u2014 (PS4 Disc, Free PS5 Upgrade)",
+  "slug": "26-far-cry-6-ps4",
+  "category": "PS4 Games",
+  "brand": "Ubisoft",
+  "price": 6499,
+  "was_price": 7500,
+  "stock": 26,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/26-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/26-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/26-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "bf0d79a8-2e40-41dd-8467-6f2b38154e62",
+  "name": "A Plague Tale: Innocence \u2014 (PS4 Disc)",
+  "slug": "27-a-plague-tale-innocence-ps4",
+  "category": "PS4 Games",
+  "brand": "Asobo Studio",
+  "price": 6499,
+  "was_price": 8500,
+  "stock": 22,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/27-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/27-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/27-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "597807c6-d105-4564-82fa-aad79ba8e3fa",
+  "name": "Grand Theft Auto V \u2014 (PS5 Disc)",
+  "slug": "28-gta-v-ps5",
+  "category": "PS5 Games",
+  "brand": "Rockstar Games",
+  "price": 6499,
+  "was_price": 8500,
+  "stock": 35,
+  "is_hot": false,
+  "is_new": true,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/28-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/28-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/28-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "c1bc3475-3a09-4def-9c2a-0817cfe08ef8",
+  "name": "Assassin's Creed Valhalla \u2014 (PS5 Disc)",
+  "slug": "29-assassins-creed-valhalla-ps5",
+  "category": "PS5 Games",
+  "brand": "Ubisoft",
+  "price": 7499,
+  "was_price": 9500,
+  "stock": 28,
+  "is_hot": false,
+  "is_new": true,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/29-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/29-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/29-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "da8e4e93-7947-4682-9c3f-c42e50fd1fa2",
+  "name": "Cricket 24 \u2014 International Edition (PS5 Disc)",
+  "slug": "30-cricket-24-ps5",
+  "category": "PS5 Games",
+  "brand": "EA Sports",
+  "price": 11899,
+  "was_price": 13500,
+  "stock": 24,
+  "is_hot": false,
+  "is_new": true,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/30-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/30-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/30-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "3168ec1c-d392-49b6-a1a7-c6f1a3da55c4",
+  "name": "G6000 Multi-Platform Gaming Headset \u2014 PC, PS5, Xbox, Mobile",
+  "slug": "31-g6000-gaming-headset",
+  "category": "Headsets",
+  "brand": "G6000",
+  "price": 6499,
+  "was_price": 12500,
+  "stock": 36,
+  "is_hot": true,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/31-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/31-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/31-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "ceb1a5e9-ecd9-4188-abb9-29175766b694",
+  "name": "Turtle Beach Recon 70 \u2014 Wired Gaming Headset",
+  "slug": "32-turtle-beach-recon-70-headset",
+  "category": "Headsets",
+  "brand": "Turtle Beach",
+  "price": 8500,
+  "was_price": 10500,
+  "stock": 17,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/32-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/32-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/32-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "3287fb5c-e04e-4d70-85b8-5be8a6305ee5",
+  "name": "Onikuma K2 Pro Gaming Headset \u2014 Surround Sound, RGB",
+  "slug": "33-onikuma-k2-pro-gaming-headset",
+  "category": "Headsets",
+  "brand": "Onikuma",
+  "price": 4599,
+  "was_price": 7500,
+  "stock": 29,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/33-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/33-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/33-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "7580e1ed-7c25-432c-a8c7-e11f8c7720b3",
+  "name": "Logitech G29 Driving Force Racing Wheel \u2014 PS4, PS5, PC",
+  "slug": "34-logitech-g29-racing-wheel",
+  "category": "Racing Wheels",
+  "brand": "Logitech",
+  "price": 78500,
+  "was_price": 85000,
+  "stock": 6,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/34-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/34-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/34-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "a13d5478-b8e2-4c37-ae38-87ccd913df06",
+  "name": "PXN V9 Gen 2 Racing Wheel \u2014 Precision Steering",
+  "slug": "35-pxn-v9-gen-2-racing-wheel",
+  "category": "Racing Wheels",
+  "brand": "PXN",
+  "price": 35000,
+  "was_price": 45000,
+  "stock": 8,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/35-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/35-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/35-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "f3cd2968-c7ce-4588-86a2-e9136084d9ee",
+  "name": "$10 PlayStation Store Gift Card \u2014 Digital Code via Email",
+  "slug": "36-10-dollar-playstation-store-gift-card",
+  "category": "Gift Cards",
+  "brand": "PlayStation",
+  "price": 2850,
+  "was_price": 3500,
+  "stock": 99,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/36-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/36-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/36-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "a342ae5f-86d6-4f8b-a55d-acd3abe0ae81",
+  "name": "\u00a310 PlayStation Store Gift Card \u2014 UK Account, Digital Code",
+  "slug": "37-10-pound-playstation-store-gift-card-uk",
+  "category": "Gift Cards",
+  "brand": "PlayStation",
+  "price": 3850,
+  "was_price": 4350,
+  "stock": 99,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/37-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/37-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/37-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "2e70dc05-165d-4485-a4e0-76bd55c938d3",
+  "name": "Pro Gaming Chair \u2014 Ergonomic, Recline + Lumbar Support (Starting Price)",
+  "slug": "38-pro-gaming-chair",
+  "category": "Gaming Chairs",
+  "brand": "Imran Games Gear",
+  "price": 34999,
+  "was_price": null,
+  "stock": 13,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/38-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/38-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/38-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "048a8052-902a-4424-8dde-604eeb594b9a",
+  "name": "Complete Gaming Setup \u2014 Console, Chair, Desk & Lighting (Starting Price)",
+  "slug": "39-complete-gaming-setup",
+  "category": "Gaming Setups",
+  "brand": "Imran Games Custom",
+  "price": 149999,
+  "was_price": null,
+  "stock": 5,
+  "is_hot": true,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/39-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/39-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/39-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "9fd7fe7a-0b84-4aef-9063-eeefe5b18d70",
+  "name": "RGB Room Lighting Kit \u2014 Gaming Room Lights (Starting Price)",
+  "slug": "40-rgb-room-lighting-kit",
+  "category": "Room Lighting",
+  "brand": "Imran Games Gear",
+  "price": 8999,
+  "was_price": null,
+  "stock": 40,
+  "is_hot": false,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/40-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/40-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/40-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "2000d2b0-ce07-48a2-a337-192f8d2d9eeb",
+  "name": "PS5 DualSense Controller \u2014 Astro Bot Limited Edition",
+  "slug": "20-ps5-dualsense-astro-bot-limited-edition",
+  "category": "Controllers",
+  "brand": "Sony PlayStation",
+  "price": 23499,
+  "was_price": 42500,
+  "stock": 8,
+  "is_hot": true,
+  "is_new": false,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/20-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/20-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/20-3.webp"
+  ],
+  "created_at": "2026-11-18T11:55:25.31628+00:00",
+  "version": 1
+ },
+ {
+  "id": "03407fb7-5d42-4f00-9d52-0443d87f3707",
+  "name": "Apple MacBook Pro M1 Pro \u2014 Used, Best Condition",
+  "slug": "1000-apple-macbook-pro-m1-pro-used-best-condition",
+  "category": "Premium Tech",
+  "brand": "Apple",
+  "price": 120000,
+  "was_price": 120000,
+  "stock": 10,
+  "is_hot": false,
+  "is_new": true,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/41-1-enhanced.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/41-2-enhanced.webp"
+  ],
+  "created_at": "2026-11-18T14:47:27.76235+00:00",
+  "version": 1
+ },
+ {
+  "id": "8eb05042-f944-46d0-8ef3-c7ffeb7b311a",
+  "name": "Grand Theft Auto VI \u2014 Standard Edition (PS5 Disc) \u2014 Pre-Order",
+  "slug": "1001-grand-theft-auto-vi-standard-edition-ps5-disc-pre-order",
+  "category": "PS5 Games",
+  "brand": "Rockstar Games",
+  "price": 27999,
+  "was_price": 34999,
+  "stock": 10,
+  "is_hot": true,
+  "is_new": true,
+  "image_urls": [
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/42-1.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/42-2.webp",
+   "https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/42-3.webp"
+  ],
+  "created_at": "2026-11-18T15:52:07.747491+00:00",
+  "version": 1
+ }
+]
