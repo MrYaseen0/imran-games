@@ -577,6 +577,7 @@ async function loadProducts(){
   var tg=document.getElementById("topGrid");
   if(!productsLoaded&&tg&&!PRODUCTS.length)tg.innerHTML='<p style="color:#fff;padding:30px;text-align:center">Loading products… 🎮</p>';
   try{
+    igRpc("release_expired_reservations",{}).catch(function(){}); /* v13: lazy cleanup of expired holds on every load */
     var res=await fetch(SB_URL+"/rest/v1/products?select=*&order=created_at",{headers:{"apikey":SB_ANON,"Authorization":"Bearer "+SB_ANON}});
     if(!res.ok)throw new Error("Supabase answered HTTP "+res.status);
     var rows=await res.json();
@@ -723,7 +724,44 @@ document.getElementById("cartBtn").addEventListener("click",openCart);
 document.getElementById("closeDrawer").addEventListener("click",closeCart);
 overlay.addEventListener("click",closeCart);
 document.getElementById("wishBtn").addEventListener("click",function(){showToast(Object.keys(wish).length?("♥ Wishlist: "+Object.keys(wish).length+" item(s)"):"♥ Your wishlist is empty — tap ♥ on any product")});
-document.getElementById("checkoutBtn").addEventListener("click",function(){if(!cartQty()){showToast("Cart is empty — add something first 🎮");return}var lines=["New COD Order — Imran Games",""];var sub=0;Object.keys(cart).forEach(function(id){var p=PRODUCTS.find(function(x){return x.id==id});if(!p)return;var lt=p.price*cart[id];sub+=lt;lines.push("- "+p.name+" x "+cart[id]+" = "+fmt(lt))});var del=sub>=10000?0:350;lines.push("","Subtotal: "+fmt(sub),"Delivery: "+(del?fmt(del):"FREE"),"Total (Cash on Delivery): "+fmt(sub+del),"","My name: ","Delivery address: ");window.open("https://wa.me/923322202220?text="+encodeURIComponent(lines.join("\n")),"_blank");showToast("Opening WhatsApp — confirm your COD order there 📲")});
+/* ===== v13: atomic stock reservation for WhatsApp COD checkout ===== */
+function igSession(){try{var s=sessionStorage.getItem("ig_session");if(!s){s="s"+Date.now().toString(36)+Math.random().toString(36).slice(2,10);sessionStorage.setItem("ig_session",s)}return s}catch(e){return "s"+Date.now().toString(36)}}
+async function igRpc(fn,body){var res=await fetch(SB_URL+"/rest/v1/rpc/"+fn,{method:"POST",headers:{"apikey":SB_ANON,"Authorization":"Bearer "+SB_ANON,"Content-Type":"application/json"},body:JSON.stringify(body||{})});if(!res.ok)throw new Error("HTTP "+res.status);return res.json();}
+function igHoldSig(items){return items.map(function(it){return it.p.uuid+":"+it.qty}).sort().join("|")}
+var igCheckoutBusy=false;
+document.getElementById("checkoutBtn").addEventListener("click",async function(){
+  if(igCheckoutBusy)return;
+  if(!cartQty()){showToast("Cart is empty — add something first 🎮");return}
+  var items=Object.keys(cart).map(function(id){var p=PRODUCTS.find(function(x){return x.id==id});return p?{p:p,qty:cart[id]}:null}).filter(Boolean);
+  if(!items.length){showToast("Cart is empty — add something first 🎮");return}
+  igCheckoutBusy=true;
+  try{
+    var lines=["New COD Order — Imran Games",""];var sub=0;Object.keys(cart).forEach(function(id){var p=PRODUCTS.find(function(x){return x.id==id});if(!p)return;var lt=p.price*cart[id];sub+=lt;lines.push("- "+p.name+" x "+cart[id]+" = "+fmt(lt))});var del=sub>=10000?0:350;lines.push("","Subtotal: "+fmt(sub),"Delivery: "+(del?fmt(del):"FREE"),"Total (Cash on Delivery): "+fmt(sub+del),"","My name: ","Delivery address: ");
+    var waWin=null;try{waWin=window.open("https://wa.me/923322202220?text="+encodeURIComponent(lines.join("\n")),"_blank")}catch(e){}
+    var sig=igHoldSig(items),held=null;
+    try{held=JSON.parse(sessionStorage.getItem("ig_hold")||"null")}catch(e){held=null}
+    if(!held||held.sig!==sig||!held.exp||held.exp<Date.now()){
+      if(held&&held.items){for(var h=0;h<held.items.length;h++){try{await igRpc("release_stock",{p_product_id:held.items[h].uuid,p_qty:held.items[h].qty,p_session:igSession()})}catch(e){}}}
+      igRpc("release_expired_reservations",{}).catch(function(){});
+      var session=igSession(),reserved=[];
+      for(var i=0;i<items.length;i++){
+        var ok=false;
+        try{ok=await igRpc("reserve_stock",{p_product_id:items[i].p.uuid,p_qty:items[i].qty,p_session:session})}catch(e){ok=false}
+        if(!ok){
+          for(var j=0;j<reserved.length;j++){try{await igRpc("release_stock",{p_product_id:reserved[j].p.uuid,p_qty:reserved[j].qty,p_session:session})}catch(e){}}
+          try{if(waWin)waWin.close()}catch(e){}
+          var ip=items[i].p;
+          showToast(ip.stock<=0?("Sorry — "+ip.name+" just sold out"):("Sorry — only "+ip.stock+" left of "+ip.name));
+          return;
+        }
+        reserved.push(items[i]);
+      }
+      try{sessionStorage.setItem("ig_hold",JSON.stringify({sig:sig,exp:Date.now()+15*60*1000,items:items.map(function(it){return{uuid:it.p.uuid,qty:it.qty}})}))}catch(e){}
+    }
+    if(!waWin||waWin.closed){showToast("Stock reserved for 15 minutes — WhatsApp did not open, tap Checkout again to open it.");return}
+    showToast("Stock reserved for 15 minutes — send the WhatsApp message to confirm your order.");
+  }finally{igCheckoutBusy=false;}
+});
 /* modal */
 var modal=document.getElementById("modal");
 var galIdx=0;
