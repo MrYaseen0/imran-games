@@ -138,7 +138,7 @@ a{color:#6A1B9A}
   </div>
   <div style="background:#12152A;border:1px solid #2A2F45;border-radius:16px;padding:20px">
    <h3 style="margin:0 0 6px;font-size:18px">All products (<span id="adminCount">0</span>)</h3>
-   <p style="color:#B9BFD6;font-size:13px;margin:0 0 8px">Edit the price, old price or stock, then press Save. Delete asks first. Every change goes live on the shop right away.</p>
+   <p style="color:#B9BFD6;font-size:13px;margin:0 0 8px">Edit the price, old price, stock or photo URLs, then press Save. Delete asks first — tap twice to confirm. Every change goes live on the shop right away.</p>
    <div id="adminList"></div>
   </div>
   <div style="background:#12152A;border:1px solid #2A2F45;border-radius:16px;padding:20px;margin-top:24px">
@@ -305,10 +305,11 @@ function toAdminProduct(r,fallbackId){
   var id=m?+m[1]:fallbackId;
   var slug=m?m[2]:(r.slug||"item");
   var cm=CATMAP[r.category]||["accessories",r.category||"Accessories"];
-  var imgs=(r.image_urls||[]).filter(function(u){return !!u});
+  var rawImgs=(r.image_urls||[]).filter(function(u){return !!u});
+  var imgs=rawImgs.slice();
   if(!imgs.length)imgs=["../logo.png"];
   while(imgs.length<3)imgs.push(imgs[0]);
-  return {id:id,uuid:r.id,slug:slug,name:r.name,brand:r.brand||"",cat:cm[0],catLabel:cm[1],price:r.price,old:(r.was_price||r.price),stock:r.stock,soldOut:r.stock===0,hot:!!r.is_hot,imgs:imgs,img:imgs[0],version:(r.version||1)};
+  return {id:id,uuid:r.id,slug:slug,name:r.name,brand:r.brand||"",cat:cm[0],catLabel:cm[1],price:r.price,old:(r.was_price||r.price),stock:r.stock,soldOut:r.stock===0,hot:!!r.is_hot,imgs:imgs,img:imgs[0],rawImgs:rawImgs,version:(r.version||1)};
 }
 async function loadProducts(){
   try{
@@ -506,6 +507,7 @@ function renderAdminList(){
     +'<label style="font-size:12px;color:#B9BFD6">Price<br/><input class="aprice" type="number" value="'+p.price+'" style="width:100px;background:#0B0D17;border:1px solid #2A2F45;color:#fff;border-radius:10px;padding:8px;outline:none"/></label>'
     +'<label style="font-size:12px;color:#B9BFD6">Old price<br/><input class="awas" type="number" value="'+p.old+'" style="width:100px;background:#0B0D17;border:1px solid #2A2F45;color:#fff;border-radius:10px;padding:8px;outline:none"/></label>'
     +'<label style="font-size:12px;color:#B9BFD6">Stock<br/><input class="astock" type="number" value="'+p.stock+'" style="width:80px;background:#0B0D17;border:1px solid #2A2F45;color:#fff;border-radius:10px;padding:8px;outline:none"/></label>'
+    +'<label style="font-size:12px;color:#B9BFD6;flex:1 1 100%">Photos — one URL per line (first is the card photo)<br/><textarea class="aphotos" rows="2" style="width:100%;background:#0B0D17;border:1px solid #2A2F45;color:#fff;border-radius:10px;padding:8px;outline:none;font-size:12px;resize:vertical">'+escHtml((p.rawImgs||[]).join("\n"))+'</textarea></label>'
     +'<button class="btn btn-pink asave" type="button" style="min-height:40px;padding:0 16px">Save</button>'
     +'<button class="btn btn-ghost adel" type="button" style="min-height:40px;padding:0 16px">Delete</button>'
     +'</div>';
@@ -548,13 +550,22 @@ document.getElementById("adminList").addEventListener("click",async function(e){
     var was=parseInt(row.querySelector(".awas").value,10);
     var stock=parseInt(row.querySelector(".astock").value,10);
     if(!(price>0)||isNaN(stock)){showToast("✖ Price must be above 0 and stock a number");return}
+    var photoEl=row.querySelector(".aphotos");
+    var photoUrls=photoEl?photoEl.value.split("\n").map(function(s){return s.trim()}).filter(Boolean).slice(0,3):[];
     var btn=e.target.closest(".asave");btn.textContent="Saving…";
-    try{var loadedVer=parseInt(row.getAttribute("data-version")||"1",10);if(!(loadedVer>0))loadedVer=(p&&p.version)||1;var upd=await sbWrite("PATCH","?id=eq."+uuid+"&version=eq."+loadedVer,{price:price,was_price:isNaN(was)?price:was,stock:stock,version:loadedVer+1});if(!upd||!upd.length){showToast("Someone changed this product — refresh and try again");btn.textContent="Save";loadProducts();return}await logAudit("product_edited","product",uuid,p?p.name:null,{old_price:p?p.price:null,new_price:price,old_was_price:p?p.old:null,new_was_price:isNaN(was)?price:was,old_stock:p?p.stock:null,new_stock:stock});loadAuditLog();renderAnalytics();showToast("Saved ✓ — live on the shop now");loadProducts();}
+    try{var loadedVer=parseInt(row.getAttribute("data-version")||"1",10);if(!(loadedVer>0))loadedVer=(p&&p.version)||1;var patchBody={price:price,was_price:isNaN(was)?price:was,stock:stock,version:loadedVer+1};if(photoUrls.length)patchBody.image_urls=photoUrls;var upd=await sbWrite("PATCH","?id=eq."+uuid+"&version=eq."+loadedVer,patchBody);if(!upd||!upd.length){showToast("Someone changed this product — refresh and try again");btn.textContent="Save";loadProducts();return}var auditDetails={old_price:p?p.price:null,new_price:price,old_was_price:p?p.old:null,new_was_price:isNaN(was)?price:was,old_stock:p?p.stock:null,new_stock:stock};if(photoUrls.length)auditDetails.new_image_urls=photoUrls;await logAudit("product_edited","product",uuid,p?p.name:null,auditDetails);loadAuditLog();renderAnalytics();showToast("Saved ✓ — live on the shop now");loadProducts();}
     catch(err){showToast("✖ "+err.message);btn.textContent="Save";}
   }
   if(e.target.closest(".adel")){
     if(!p)return;
-    if(!confirm('Delete "'+p.name+'" from the shop? This cannot be undone.'))return;
+    var delBtn=e.target.closest(".adel");
+    if(delBtn.getAttribute("data-arm")!=="1"){
+      delBtn.setAttribute("data-arm","1");
+      delBtn.textContent="Sure? Tap again to delete";
+      delBtn.style.background="#7F1D1D";delBtn.style.borderColor="#EF4444";
+      setTimeout(function(){try{delBtn.removeAttribute("data-arm");delBtn.textContent="Delete";delBtn.style.background="";delBtn.style.borderColor="";}catch(e){}},5000);
+      return;
+    }
     try{var del=await sbWrite("DELETE","?id=eq."+uuid);if(!del||!del.length)throw new Error("Delete failed — nothing was deleted. Are you still signed in?");await logAudit("product_deleted","product",uuid,p?p.name:null,{price:p?p.price:null,stock:p?p.stock:null});loadAuditLog();renderAnalytics();showToast("Deleted ✓");loadProducts();}
     catch(err){showToast("✖ "+err.message);}
   }
