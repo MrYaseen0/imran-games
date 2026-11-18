@@ -506,16 +506,21 @@ footer{margin-top:44px;background:#070912;border-top:1px solid var(--line)}
 <!-- ADMIN -->
 <section id="admin" style="padding:56px 0;border-top:1px solid #232842"><div class="wrap">
  <h2 style="font-family:Orbitron,Inter,sans-serif;font-size:26px;margin:0 0 8px">Admin — Manage Products</h2>
- <p style="color:#B9BFD6;margin:0 0 20px">Add, edit or delete products. Changes save straight to Supabase and appear on the shop instantly — no redeploy needed. Only the passcode unlocks editing.</p>
+ <p style="color:#B9BFD6;margin:0 0 20px">Add, edit or delete products. Changes save straight to Supabase and appear on the shop instantly — no redeploy needed. Sign in below with your admin email and password.</p>
  <div id="adminGate" style="background:#12152A;border:1px solid #2A2F45;border-radius:16px;padding:20px;max-width:520px">
-  <label style="display:block;font-weight:700;margin-bottom:8px">Admin passcode</label>
+  <label style="display:block;font-weight:700;margin-bottom:8px">Admin email</label>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+   <input id="adminEmail" type="email" placeholder="admin@solon.com" autocomplete="username" style="flex:1;min-width:200px;background:#0B0D17;border:1px solid #2A2F45;color:#fff;border-radius:999px;padding:12px 16px;font-size:14px;outline:none"/>
+  </div>
+  <label style="display:block;font-weight:700;margin-bottom:8px">Password</label>
   <div style="display:flex;gap:10px;flex-wrap:wrap">
-   <input id="adminPass" type="password" placeholder="Enter admin passcode" autocomplete="off" style="flex:1;min-width:200px;background:#0B0D17;border:1px solid #2A2F45;color:#fff;border-radius:999px;padding:12px 16px;font-size:14px;outline:none"/>
-   <button class="btn btn-pink" id="adminUnlock" type="button">Unlock Admin</button>
+   <input id="adminPass" type="password" placeholder="Enter your admin password" autocomplete="current-password" style="flex:1;min-width:200px;background:#0B0D17;border:1px solid #2A2F45;color:#fff;border-radius:999px;padding:12px 16px;font-size:14px;outline:none"/>
+   <button class="btn btn-pink" id="adminUnlock" type="button">Log In</button>
   </div>
   <p id="adminMsg" style="margin:10px 0 0;color:#B9BFD6;font-size:13px"></p>
  </div>
  <div id="adminBody" style="display:none;margin-top:24px">
+  <p style="color:#B9BFD6;font-size:14px;margin:0 0 16px">Signed in as <b id="adminWho" style="color:#fff"></b> <button class="btn btn-ghost" id="adminLockTop" type="button" style="min-height:36px;padding:0 14px;margin-left:8px">Log Out</button></p>
   <div style="background:#12152A;border:1px solid #2A2F45;border-radius:16px;padding:20px;margin-bottom:24px">
    <h3 style="margin:0 0 14px;font-size:18px">＋ Add a new product</h3>
    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
@@ -540,7 +545,7 @@ footer{margin-top:44px;background:#070912;border-top:1px solid var(--line)}
    <p style="color:#B9BFD6;font-size:13px;margin:0 0 8px">Edit the price, old price or stock, then press Save. Delete asks first. Every change goes live on the shop right away.</p>
    <div id="adminList"></div>
   </div>
-  <div style="margin-top:16px"><button class="btn btn-ghost" id="adminLock" type="button">Lock Admin</button></div>
+  <div style="margin-top:16px"><button class="btn btn-ghost" id="adminLock" type="button">Log Out</button></div>
  </div>
 </div></section>
 
@@ -813,22 +818,35 @@ renderCart();
 function handleDeepLink(){var hp=productFromHash();if(hp)setTimeout(function(){openModal(hp.id)},400)}
 window.addEventListener("hashchange",function(){var p2=productFromHash();if(p2&&currentId!==p2.id)openModal(p2.id);else if(!p2&&modal.classList.contains("open"))modal.classList.remove("open")});
 
-/* ===== ADMIN — product editing on the live site (Supabase, passcode-gated) ===== */
-var ADMIN_PASS=null,ADMIN_UNLOCKED=false;
+/* ===== ADMIN — product editing on the live site (Supabase, email + password login) ===== */
+var ADMIN_UNLOCKED=false;
 var SB_REST=SB_URL+"/rest/v1/products";
-function sbHeaders(){return {"apikey":SB_ANON,"Authorization":"Bearer "+SB_ANON,"Content-Type":"application/json","Prefer":"return=representation","x-admin-passcode":ADMIN_PASS||""}}
+async function sbHeaders(){
+  var token=SB_ANON;
+  if(sb){try{var sess=await sb.auth.getSession();if(sess&&sess.data&&sess.data.session)token=sess.data.session.access_token}catch(e){}}
+  return {"apikey":SB_ANON,"Authorization":"Bearer "+token,"Content-Type":"application/json","Prefer":"return=representation"};
+}
 async function sbWrite(method,path,body){
-  var res=await fetch(SB_REST+path,{method:method,headers:sbHeaders(),body:body?JSON.stringify(body):undefined});
+  var res=await fetch(SB_REST+path,{method:method,headers:await sbHeaders(),body:body?JSON.stringify(body):undefined});
   var txt=await res.text(),data=null;try{data=JSON.parse(txt)}catch(e){}
-  if(!res.ok){var msg=(data&&data.message)||("HTTP "+res.status);if(res.status===401||res.status===403)msg="Wrong passcode — check the admin passcode and try again.";throw new Error(msg)}
+  if(!res.ok){var msg=(data&&data.message)||("HTTP "+res.status);if(res.status===401||res.status===403)msg="Not signed in — log in again with your admin email and password.";throw new Error(msg)}
   return data;
 }
 function slugify(s){return String(s||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,60)||"item"}
-async function verifyPasscode(){
-  if(PRODUCTS.length){var p0=PRODUCTS[0];var chk=await sbWrite("PATCH","?id=eq."+p0.uuid,{price:p0.price});if(!chk||!chk.length)throw new Error("Wrong passcode — check the admin passcode and try again.");return}
-  var slug="__probe-"+Date.now()+"__";
-  var created=await sbWrite("POST","",{name:"__admin probe__",slug:slug,category:"Consoles",brand:"Imran Games",price:1,was_price:1,stock:0,image_urls:[]});
-  if(created&&created[0]&&created[0].id){try{await sbWrite("DELETE","?id=eq."+created[0].id)}catch(e){}}
+function showAdmin(email){
+  ADMIN_UNLOCKED=true;
+  document.getElementById("adminGate").style.display="none";
+  document.getElementById("adminBody").style.display="block";
+  document.getElementById("adminWho").textContent=email||"";
+  renderAdminList();
+}
+async function signOutAdmin(){
+  try{if(sb)await sb.auth.signOut()}catch(e){}
+  ADMIN_UNLOCKED=false;
+  document.getElementById("adminBody").style.display="none";
+  document.getElementById("adminGate").style.display="block";
+  document.getElementById("adminPass").value="";
+  document.getElementById("adminMsg").textContent="Signed out.";
 }
 function renderAdminList(){
   var box=document.getElementById("adminList");if(!box)return;
@@ -847,27 +865,23 @@ function renderAdminList(){
   }).join("");
 }
 document.getElementById("adminUnlock").addEventListener("click",async function(){
-  var pass=document.getElementById("adminPass").value.trim();
+  var email=document.getElementById("adminEmail").value.trim();
+  var pass=document.getElementById("adminPass").value;
   var msg=document.getElementById("adminMsg");
-  if(!pass){msg.textContent="Enter the admin passcode first.";return}
-  ADMIN_PASS=pass;msg.textContent="Checking passcode…";
+  if(!email||!pass){msg.textContent="Enter your admin email and password.";return}
+  msg.textContent="Signing in…";
   try{
-    await verifyPasscode();
-    ADMIN_UNLOCKED=true;
-    document.getElementById("adminGate").style.display="none";
-    document.getElementById("adminBody").style.display="block";
-    renderAdminList();
+    if(!sb)throw new Error("Login is unavailable right now — reload the page and try again.");
+    var r=await sb.auth.signInWithPassword({email:email,password:pass});
+    if(r.error)throw new Error("Wrong email or password — try again.");
+    showAdmin(r.data&&r.data.user?r.data.user.email:email);
     msg.textContent="";
-    showToast("Admin unlocked ✓");
-  }catch(err){ADMIN_PASS=null;msg.textContent="✖ "+err.message;}
+    showToast("Signed in ✓");
+  }catch(err){msg.textContent="✖ "+err.message;}
 });
-document.getElementById("adminLock").addEventListener("click",function(){
-  ADMIN_PASS=null;ADMIN_UNLOCKED=false;
-  document.getElementById("adminBody").style.display="none";
-  document.getElementById("adminGate").style.display="block";
-  document.getElementById("adminPass").value="";
-  document.getElementById("adminMsg").textContent="Locked.";
-});
+document.getElementById("adminPass").addEventListener("keydown",function(e){if(e.key==="Enter")document.getElementById("adminUnlock").click();});
+document.getElementById("adminLock").addEventListener("click",signOutAdmin);
+document.getElementById("adminLockTop").addEventListener("click",signOutAdmin);
 document.getElementById("npAdd").addEventListener("click",async function(){
   var name=document.getElementById("npName").value.trim();
   var brand=document.getElementById("npBrand").value.trim()||"Imran Games";
@@ -883,7 +897,7 @@ document.getElementById("npAdd").addEventListener("click",async function(){
   var slug=nextNumId+"-"+slugify(name);
   msg.textContent="Adding…";
   try{
-    var added=await sbWrite("POST","",{name:name,slug:slug,category:cat,brand:brand,price:price,was_price:isNaN(was)?price:was,stock:stock,is_hot:document.getElementById("npHot").checked,is_new:document.getElementById("npNew").checked,image_urls:urls});if(!added||!added.length)throw new Error("Add failed — nothing was saved. Check the passcode and try again.");
+    var added=await sbWrite("POST","",{name:name,slug:slug,category:cat,brand:brand,price:price,was_price:isNaN(was)?price:was,stock:stock,is_hot:document.getElementById("npHot").checked,is_new:document.getElementById("npNew").checked,image_urls:urls});if(!added||!added.length)throw new Error("Add failed — nothing was saved. Check that you are signed in and try again.");
     nextNumId++;
     msg.textContent="✓ Added — live on the shop now.";
     ["npName","npBrand","npPrice","npWas","npStock","npImgs"].forEach(function(id){document.getElementById(id).value=""});
@@ -901,19 +915,21 @@ document.getElementById("adminList").addEventListener("click",async function(e){
     var stock=parseInt(row.querySelector(".astock").value,10);
     if(!(price>0)||isNaN(stock)){showToast("✖ Price must be above 0 and stock a number");return}
     var btn=e.target.closest(".asave");btn.textContent="Saving…";
-    try{var upd=await sbWrite("PATCH","?id=eq."+uuid,{price:price,was_price:isNaN(was)?price:was,stock:stock});if(!upd||!upd.length)throw new Error("Save failed — nothing was updated. Wrong passcode?");showToast("Saved ✓ — live on the shop now");loadProducts();}
+    try{var upd=await sbWrite("PATCH","?id=eq."+uuid,{price:price,was_price:isNaN(was)?price:was,stock:stock});if(!upd||!upd.length)throw new Error("Save failed — nothing was updated. Are you still signed in?");showToast("Saved ✓ — live on the shop now");loadProducts();}
     catch(err){showToast("✖ "+err.message);btn.textContent="Save";}
   }
   if(e.target.closest(".adel")){
     if(!p)return;
     if(!confirm('Delete "'+p.name+'" from the shop? This cannot be undone.'))return;
-    try{var del=await sbWrite("DELETE","?id=eq."+uuid);if(!del||!del.length)throw new Error("Delete failed — nothing was deleted. Wrong passcode?");showToast("Deleted ✓");loadProducts();}
+    try{var del=await sbWrite("DELETE","?id=eq."+uuid);if(!del||!del.length)throw new Error("Delete failed — nothing was deleted. Are you still signed in?");showToast("Deleted ✓");loadProducts();}
     catch(err){showToast("✖ "+err.message);}
   }
 });
 /* ===== boot: load live products, then subscribe to realtime updates ===== */
 loadProducts();
 subscribeRealtime();
+/* stay signed in across reloads until Log Out */
+if(sb){sb.auth.getSession().then(function(r){if(r&&r.data&&r.data.session)showAdmin(r.data.session.user?r.data.session.user.email:"")});}
 
 </script>
 </body>
