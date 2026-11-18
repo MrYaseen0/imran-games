@@ -181,7 +181,120 @@ var igStorage={
   setItem:function(k,v){try{(localStorage.getItem("ig_remember")==="0"?sessionStorage:localStorage).setItem(k,v)}catch(e){}},
   removeItem:function(k){try{localStorage.removeItem(k)}catch(e){}try{sessionStorage.removeItem(k)}catch(e){}}
 };
-var sb=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SB_URL,SB_ANON,{auth:{storage:igStorage,autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}}):null;
+var sb=null; /* created lazily by ensureSb() — a client-init failure must never kill the Login button */
+try{if(window.supabase&&window.supabase.createClient){sb=window.supabase.createClient(SB_URL,SB_ANON,{auth:{storage:igStorage,autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}});}}catch(e){sb=null;}
+
+/* ===== LOGIN — handler registered FIRST, before any other init, so the button can never sit dead ===== */
+function igSetMsg(t){try{var m=document.getElementById("adminMsg");if(m)m.textContent=t;}catch(e){}}
+function igLoadSupabaseLib(){
+  if(window.supabase&&window.supabase.createClient)return Promise.resolve(true);
+  return new Promise(function(resolve){
+    var done=false;
+    var finish=function(ok){if(!done){done=true;resolve(ok);}};
+    try{
+      var s=document.createElement("script");
+      s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js";
+      s.onload=function(){finish(!!(window.supabase&&window.supabase.createClient));};
+      s.onerror=function(){finish(false);};
+      document.head.appendChild(s);
+      setTimeout(function(){finish(!!(window.supabase&&window.supabase.createClient));},10000);
+    }catch(e){finish(false);}
+  });
+}
+async function ensureSb(){
+  if(sb)return sb;
+  try{
+    if(window.supabase&&window.supabase.createClient){
+      sb=window.supabase.createClient(SB_URL,SB_ANON,{auth:{storage:igStorage,autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}});
+      if(sb)return sb;
+    }
+  }catch(e){sb=null;}
+  var ok=await igLoadSupabaseLib();
+  if(!ok)return null;
+  try{
+    sb=window.supabase.createClient(SB_URL,SB_ANON,{auth:{storage:igStorage,autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}});
+  }catch(e){sb=null;}
+  return sb;
+}
+async function igDirectLogin(email,pass){
+  /* Fallback: raw Auth call when the supabase-js client is broken or timed out. */
+  var ctl=new AbortController();var to=setTimeout(function(){ctl.abort()},15000);
+  try{
+    var res=await fetch(SB_URL+"/auth/v1/token?grant_type=password",{method:"POST",signal:ctl.signal,headers:{"apikey":SB_ANON,"Content-Type":"application/json"},body:JSON.stringify({email:email,password:pass})});
+    clearTimeout(to);
+    if(!res.ok)return null;
+    var data=await res.json();
+    if(!data||!data.access_token)return null;
+    return data;
+  }catch(e){clearTimeout(to);return null;}
+}
+async function igDoLogin(){
+  var emailEl=document.getElementById("adminEmail"),passEl=document.getElementById("adminPass"),btn=document.getElementById("adminUnlock");
+  var email=emailEl?emailEl.value.trim():"";
+  var pass=passEl?passEl.value:"";
+  if(!email||!pass){igSetMsg("Enter your admin email and password.");return;}
+  if(btn)btn.disabled=true;
+  igSetMsg("Signing in…");
+  try{
+    try{localStorage.setItem("ig_remember",document.getElementById("rememberMe").checked?"1":"0");}catch(e){}
+    var client=await ensureSb();
+    if(!client){
+      igSetMsg("Sign-in library did not load — check your connection and reload.");
+      if(btn)btn.disabled=false;
+      return;
+    }
+    var result=null;
+    try{
+      result=await Promise.race([
+        client.auth.signInWithPassword({email:email,password:pass}),
+        new Promise(function(res){setTimeout(function(){res({__igTimeout:true});},15000);})
+      ]);
+    }catch(e){result={error:e};}
+    if(result&&result.__igTimeout){
+      igSetMsg("Sign-in is slow — trying another way…");
+      var direct=await igDirectLogin(email,pass);
+      if(direct){
+        try{await client.auth.setSession({access_token:direct.access_token,refresh_token:direct.refresh_token});}catch(e){}
+        var who0=direct.user&&direct.user.email?direct.user.email:email;
+        showAdmin(who0);
+        try{await logAudit("login_success","admin",null,who0,{});}catch(e){}
+        try{loadAuditLog();}catch(e){}
+        igSetMsg("");
+        try{showToast("Signed in ✓");}catch(e){}
+        if(btn)btn.disabled=false;
+        return;
+      }
+      igSetMsg("Sign-in timed out — check your connection and try again.");
+      if(btn)btn.disabled=false;
+      return;
+    }
+    if(result&&result.error){
+      var emsg=(result.error&&result.error.message)||"";
+      if(/invalid login credentials/i.test(emsg)){
+        try{await logFailedLogin(email);}catch(e){}
+        igSetMsg("✖ Wrong email or password — try again.");
+      }else{
+        igSetMsg("✖ "+(emsg||"Sign-in failed — try again."));
+      }
+      if(btn)btn.disabled=false;
+      return;
+    }
+    var who=(result&&result.data&&result.data.user&&result.data.user.email)||email;
+    showAdmin(who);
+    try{await logAudit("login_success","admin",null,who,{});}catch(e){}
+    try{loadAuditLog();}catch(e){}
+    igSetMsg("");
+    try{showToast("Signed in ✓");}catch(e){}
+  }catch(err){
+    igSetMsg("✖ "+(err&&err.message?err.message:"Sign-in failed — try again."));
+  }
+  if(btn)btn.disabled=false;
+}
+try{
+  document.getElementById("adminUnlock").addEventListener("click",igDoLogin);
+  document.getElementById("adminPass").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();igDoLogin();}});
+  document.getElementById("adminEmail").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();igDoLogin();}});
+}catch(e){/* login form elements missing — page cannot show the form at all */}
 
 /* ===== DATA — products for the admin panel only ===== */
 var PRODUCTS=[];
@@ -296,6 +409,7 @@ function showAdmin(email){
   ADMIN_UNLOCKED=true;
   document.getElementById("loginView").style.display="none";
   document.getElementById("dashView").style.display="block";
+  document.getElementById("adminBody").style.display="block";
   document.getElementById("adminWho").textContent=email||"";
   renderAdminList();
   getAdminIP();
@@ -307,6 +421,7 @@ async function signOutAdmin(){
   try{if(sb)await sb.auth.signOut()}catch(e){}
   ADMIN_UNLOCKED=false;
   try{localStorage.removeItem("ig_remember")}catch(e){}
+  document.getElementById("adminBody").style.display="none";
   document.getElementById("dashView").style.display="none";
   document.getElementById("loginView").style.display="block";
   document.getElementById("adminPass").value="";
@@ -397,26 +512,6 @@ function renderAdminList(){
   }).join("");
 }
 
-document.getElementById("adminUnlock").addEventListener("click",async function(){
-  var email=document.getElementById("adminEmail").value.trim();
-  var pass=document.getElementById("adminPass").value;
-  var msg=document.getElementById("adminMsg");
-  if(!email||!pass){msg.textContent="Enter your admin email and password.";return}
-  msg.textContent="Signing in…";
-  try{
-    if(!sb)throw new Error("Login is unavailable right now — reload the page and try again.");
-    try{localStorage.setItem("ig_remember",document.getElementById("rememberMe").checked?"1":"0")}catch(e){}
-    var r=await sb.auth.signInWithPassword({email:email,password:pass});
-    if(r.error){await logFailedLogin(email);throw new Error("Wrong email or password — try again.");}
-    var who=r.data&&r.data.user?r.data.user.email:email;
-    showAdmin(who);
-    await logAudit("login_success","admin",null,who,{});
-    loadAuditLog();
-    msg.textContent="";
-    showToast("Signed in ✓");
-  }catch(err){msg.textContent="✖ "+err.message;}
-});
-document.getElementById("adminPass").addEventListener("keydown",function(e){if(e.key==="Enter")document.getElementById("adminUnlock").click();});
 document.getElementById("adminLock").addEventListener("click",signOutAdmin);
 document.getElementById("adminLockTop").addEventListener("click",signOutAdmin);
 document.getElementById("npAdd").addEventListener("click",async function(){
@@ -473,7 +568,6 @@ document.getElementById("togglePass").addEventListener("click",function(){
   var show=inp.type==="password";inp.type=show?"text":"password";
   this.textContent=show?"🙈":"👁";this.setAttribute("aria-label",show?"Hide password":"Show password");
 });
-document.getElementById("adminEmail").addEventListener("keydown",function(e){if(e.key==="Enter")document.getElementById("adminUnlock").click();});
 function showCard(which){
   ["loginCard","forgotCard","resetCard"].forEach(function(id){document.getElementById(id).style.display=(id===which)?"block":"none";});
 }
@@ -516,11 +610,13 @@ function checkRecovery(){
   }
   return false;
 }
-/* ===== boot ===== */
-loadProducts();
-subscribeRealtime();
-var _isRecovery=checkRecovery();
-if(sb&&!_isRecovery){sb.auth.getSession().then(function(r){if(r&&r.data&&r.data.session)showAdmin(r.data.session.user?r.data.session.user.email:"")});}
+/* ===== boot (guarded — a boot failure must never break the already-registered Login button) ===== */
+try{loadProducts();}catch(e){}
+try{subscribeRealtime();}catch(e){}
+try{
+  var _isRecovery=checkRecovery();
+  if(sb&&!_isRecovery){sb.auth.getSession().then(function(r){if(r&&r.data&&r.data.session)showAdmin(r.data.session.user?r.data.session.user.email:"");}).catch(function(){});}
+}catch(e){}
 
 </script>
 </body>
