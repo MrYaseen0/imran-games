@@ -1,0 +1,880 @@
+/* ==========================================================================
+   Imran Games — Admin Design System (admin.css)
+   Wave 2, Agent 2 — Design System. Vanilla CSS only, no build step.
+   Tokens are taken from docs/admin/CONTRACTS.md and verified against the
+   five reference screenshots (01-overview … 05-dark-mode). Values marked
+   (≈) in the prompt are estimates read from the screenshots.
+   This file styles ONLY the admin area. It never touches the public shop
+   (styles.css) or the shop theme (docs/design.md).
+   Usage (Wave 3): <link rel="stylesheet" href="admin.css"> in the
+   dashboard page, AFTER the no-flash theme snippet in <head> (see
+   docs/admin/DESIGN_SYSTEM.md). Login page keeps its own minimal styles
+   until Wave 10 restyles it with the .ig-login classes below.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Tokens
+   -------------------------------------------------------------------------- */
+:root,
+:root[data-theme="light"] {
+  --sidebar-bg: #0a00ff;
+  --sidebar-text: #ffffff;
+  --sidebar-active-bg: #ffffff;
+  --sidebar-active-text: #0a00ff;
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.12);
+  --sidebar-muted: rgba(255, 255, 255, 0.75);
+  --page-bg: #f0f1fa;
+  --card-bg: #ffffff;
+  --card-shadow: 0 2px 8px rgba(20, 20, 60, 0.18);
+  --topbar-bg: #ffffff;
+  --topbar-border: #e3e3e3;
+  --search-bg: #e4e4e4;
+  --search-text: #0d0d0d;
+  --table-head-bg: #e3dede;
+  --table-line: #bdbdbd;
+  --text: #0d0d0d;
+  --text-muted: #7a7a85;
+  --primary: #0a00ff;
+  --primary-hover: #0800cc;
+  --primary-soft: rgba(10, 0, 255, 0.08);
+  --success: #22c55e;
+  --danger: #e11d1d;
+  --warning: #f59e0b;
+  --info: #00aeef;
+  --chart-blue: #0a00ff;
+  --chart-green: #a8d98a;
+  --chart-orange: #e8650a;
+  --chart-yellow: #ffeb00;
+  --chart-grey: #c4c4c4;
+  --tile-bg: #f8e4e4;
+  --discount-bg: #8fe04a;
+  --discount-text: #14532d;
+  --input-bg: #ffffff;
+  --input-border: #c9c9d4;
+  --input-focus: #0a00ff;
+  --overlay-bg: rgba(13, 13, 30, 0.5);
+  --focus-ring: 0 0 0 3px rgba(10, 0, 255, 0.25);
+  --radius-card: 8px;
+  --radius-input: 6px;
+  --radius-pill: 999px;
+  --sidebar-width: 240px;
+  --sidebar-rail-width: 72px;
+  --topbar-height: 64px;
+  --content-padding: 32px;
+  --grid-gap: 24px;
+  --font-body: "Roboto", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Roboto", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+:root[data-theme="dark"] {
+  --sidebar-bg: #101a55;
+  --sidebar-text: #ffffff;
+  --sidebar-active-bg: #ffffff;
+  --sidebar-active-text: #101a55;
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.12);
+  --sidebar-muted: #a9b2e0;
+  --page-bg: #141e5c;
+  --card-bg: #1b2a6e;
+  --card-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  --topbar-bg: #14215f;
+  --topbar-border: rgba(255, 255, 255, 0.1);
+  --search-bg: #22337e;
+  --search-text: #ffffff;
+  --table-head-bg: #1a2a70;
+  --table-line: rgba(255, 255, 255, 0.14);
+  --text: #ffffff;
+  --text-muted: #a9b2e0;
+  --primary: #3b3bff;
+  --primary-hover: #5a5aff;
+  --primary-soft: rgba(59, 59, 255, 0.2);
+  --success: #22c55e;
+  --danger: #ff5c5c;
+  --warning: #f59e0b;
+  --info: #38c6ff;
+  --chart-blue: #3b3bff;
+  --chart-green: #a8d98a;
+  --chart-orange: #e8650a;
+  --chart-yellow: #ffeb00;
+  --chart-grey: #5a6a9e;
+  --tile-bg: #27388a;
+  --discount-bg: #8fe04a;
+  --discount-text: #14532d;
+  --input-bg: #22337e;
+  --input-border: rgba(255, 255, 255, 0.22);
+  --input-focus: #3b3bff;
+  --overlay-bg: rgba(0, 0, 0, 0.6);
+  --focus-ring: 0 0 0 3px rgba(59, 59, 255, 0.45);
+}
+
+/* --------------------------------------------------------------------------
+   2. Base + typography
+   -------------------------------------------------------------------------- */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body.ig-admin {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  background: var(--page-bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+.ig-admin a { color: var(--primary); }
+.ig-admin img { max-width: 100%; }
+.ig-admin button { font-family: inherit; }
+
+/* Page titles: Roboto/Inter 900/700, UPPERCASE, 28–32px (screenshot). */
+.ig-page-title {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 1.15;
+}
+/* Card titles: 12–14px, 700, UPPERCASE. */
+.ig-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0;
+}
+.ig-muted { color: var(--text-muted); }
+.ig-small { font-size: 12px; }
+.ig-mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+
+/* Visible focus rings everywhere (a11y). */
+.ig-admin :focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: 4px;
+}
+
+/* --------------------------------------------------------------------------
+   3. App shell — sidebar + topbar + content
+   -------------------------------------------------------------------------- */
+.ig-shell { display: flex; min-height: 100vh; }
+
+/* Sidebar: electric blue, full height, ~240px. */
+.ig-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--sidebar-width);
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  display: flex;
+  flex-direction: column;
+  z-index: 60;
+  transition: width 0.2s ease, transform 0.25s ease;
+}
+.ig-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 20px 16px;
+  color: var(--sidebar-text);
+  text-decoration: none;
+  font-weight: 900;
+  font-size: 17px;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+.ig-sidebar-brand img { height: 34px; width: auto; object-fit: contain; }
+.ig-sidebar-brand .ig-brand-word { overflow: hidden; text-overflow: ellipsis; }
+
+.ig-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 0 12px 16px; /* no right padding: the active pill bleeds to the edge */
+  flex: 1;
+  overflow-y: auto;
+}
+.ig-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 18px 11px 14px;
+  color: var(--sidebar-text);
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border-radius: var(--radius-pill) 0 0 var(--radius-pill); /* rounded left, flat right */
+  white-space: nowrap;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  text-align: left;
+  width: 100%;
+}
+.ig-nav-item:hover { background: var(--sidebar-hover-bg); color: var(--sidebar-text); }
+.ig-nav-item.active {
+  background: var(--sidebar-active-bg);
+  color: var(--sidebar-active-text);
+}
+.ig-nav-item .ig-nav-icon { font-size: 16px; line-height: 1; flex: 0 0 auto; width: 20px; text-align: center; }
+.ig-nav-item .ig-nav-label { overflow: hidden; text-overflow: ellipsis; }
+
+/* Sidebar footer: social icons + Back to shop. Social block is HIDDEN by
+   default — no social links were provided (see DESIGN_SYSTEM.md). Wave 3
+   shows it only when real links exist, by adding .ig-sidebar-social--visible. */
+.ig-sidebar-foot { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 12px; }
+.ig-sidebar-social { display: none; gap: 10px; align-items: center; }
+.ig-sidebar-social--visible { display: flex; }
+.ig-sidebar-social a {
+  display: grid;
+  place-items: center;
+  width: 32px; height: 32px;
+  border-radius: 6px;
+  color: var(--sidebar-text);
+  text-decoration: none;
+  font-size: 15px;
+}
+.ig-sidebar-social a:hover { background: var(--sidebar-hover-bg); }
+.ig-back-shop {
+  color: var(--sidebar-text);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.9;
+}
+.ig-back-shop:hover { opacity: 1; text-decoration: underline; }
+
+/* Collapsed rail (1024–1279px, or toggled): 72px icon rail. */
+body.ig-rail .ig-sidebar { width: var(--sidebar-rail-width); }
+body.ig-rail .ig-sidebar-brand { padding: 20px 0 16px; justify-content: center; }
+body.ig-rail .ig-sidebar-brand .ig-brand-word,
+body.ig-rail .ig-nav-item .ig-nav-label,
+body.ig-rail .ig-sidebar-foot { display: none; }
+body.ig-rail .ig-nav { padding-left: 0; align-items: center; }
+body.ig-rail .ig-nav-item { justify-content: center; padding: 11px 0; border-radius: var(--radius-pill); width: 48px; }
+body.ig-rail .ig-main { margin-left: var(--sidebar-rail-width); }
+
+/* Main column. */
+.ig-main {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  transition: margin-left 0.2s ease;
+}
+
+/* Topbar: white (light) / navy (dark), 2px bottom border/shadow. */
+.ig-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: var(--topbar-height);
+  background: var(--topbar-bg);
+  border-bottom: 2px solid var(--topbar-border);
+  box-shadow: 0 2px 8px rgba(20, 20, 60, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+}
+.ig-topbar .ig-menu-btn { display: none; }
+.ig-topbar-spacer { flex: 1; }
+
+/* Global search pill. */
+.ig-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--search-bg);
+  color: var(--search-text);
+  border-radius: var(--radius-pill);
+  padding: 8px 14px;
+  min-width: 200px;
+  max-width: 320px;
+  flex: 0 1 320px;
+}
+.ig-search input {
+  border: 0; outline: 0; background: transparent;
+  color: inherit; font: inherit; width: 100%; min-width: 0;
+}
+.ig-search input::placeholder { color: var(--text-muted); opacity: 1; }
+.ig-search kbd {
+  font: 11px var(--font-body);
+  border: 1px solid var(--table-line);
+  border-radius: 4px;
+  padding: 1px 5px;
+  color: var(--text-muted);
+}
+
+/* Topbar icon buttons: sun toggle, mail, bell. */
+.ig-icon-btn {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 40px; height: 40px;
+  border: 0; border-radius: 50%;
+  background: transparent;
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+}
+.ig-icon-btn:hover { background: var(--primary-soft); }
+.ig-bell-badge {
+  position: absolute;
+  top: 2px; right: 0;
+  min-width: 17px; height: 17px;
+  padding: 0 4px;
+  border-radius: var(--radius-pill);
+  background: var(--danger);
+  color: #fff;
+  font-size: 10px; font-weight: 800;
+  display: grid; place-items: center;
+  line-height: 1;
+}
+.ig-bell-badge[hidden] { display: none; }
+
+/* Avatar + name + role, with dropdown menu. */
+.ig-avatar-menu { position: relative; display: flex; align-items: center; }
+.ig-avatar-btn {
+  display: flex; align-items: center; gap: 10px;
+  background: transparent; border: 0; cursor: pointer;
+  color: var(--text); font: inherit; text-align: left;
+  padding: 4px; border-radius: var(--radius-pill);
+}
+.ig-avatar-btn:hover { background: var(--primary-soft); }
+.ig-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--primary); color: #fff;
+  display: grid; place-items: center;
+  font-weight: 800; font-size: 14px; flex: 0 0 auto;
+  border: 2px solid var(--primary);
+  object-fit: cover;
+}
+.ig-avatar-who { line-height: 1.2; min-width: 0; }
+.ig-avatar-who b { display: block; font-size: 13px; white-space: nowrap; }
+.ig-avatar-who span { display: block; font-size: 11px; color: var(--text-muted); }
+.ig-avatar-drop {
+  position: absolute; right: 0; top: calc(100% + 8px);
+  background: var(--card-bg); color: var(--text);
+  border: 1px solid var(--table-line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--card-shadow);
+  min-width: 180px; padding: 6px;
+  display: none; z-index: 70;
+}
+.ig-avatar-drop.open { display: block; }
+.ig-avatar-drop a, .ig-avatar-drop button {
+  display: block; width: 100%;
+  padding: 9px 12px; border: 0; background: transparent;
+  color: inherit; font: inherit; text-align: left;
+  border-radius: 6px; cursor: pointer; text-decoration: none;
+}
+.ig-avatar-drop a:hover, .ig-avatar-drop button:hover { background: var(--primary-soft); }
+
+/* Content area: 32px padding, 24px grid gap. */
+.ig-content { padding: var(--content-padding); display: flex; flex-direction: column; gap: var(--grid-gap); }
+.ig-grid { display: grid; gap: var(--grid-gap); }
+.ig-grid-2 { grid-template-columns: 2fr 1fr; }
+.ig-grid-4 { grid-template-columns: repeat(4, 1fr); }
+.ig-grid-products { grid-template-columns: repeat(4, 1fr); }
+
+/* Page header row: big UPPERCASE title left, date-range pill right. */
+.ig-page-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+}
+
+/* --------------------------------------------------------------------------
+   4. Cards, KPI cards, chart cards
+   -------------------------------------------------------------------------- */
+.ig-card {
+  background: var(--card-bg);
+  border-radius: var(--radius-card);
+  box-shadow: var(--card-shadow);
+  padding: 20px;
+  min-width: 0;
+}
+.ig-card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-bottom: 14px;
+}
+.ig-card-menu { position: relative; }
+.ig-card-menu-btn {
+  border: 0; background: transparent; color: var(--text);
+  font-size: 18px; cursor: pointer; padding: 4px 8px; border-radius: 6px;
+}
+.ig-card-menu-btn:hover { background: var(--primary-soft); }
+
+/* KPI card: muted label top-left, % change top-right, big value,
+   sparkline bottom-right (screenshot 02). */
+.ig-kpi { position: relative; overflow: hidden; }
+.ig-kpi-top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.ig-kpi-label { font-size: 12px; color: var(--text-muted); font-weight: 600; }
+.ig-kpi-delta { font-size: 12px; font-weight: 800; }
+.ig-kpi-delta.pos { color: var(--success); }
+.ig-kpi-delta.neg { color: var(--danger); }
+.ig-kpi-delta.flat { color: var(--text-muted); }
+.ig-kpi-value { font-size: 26px; font-weight: 800; line-height: 1.2; margin: 6px 0 2px; }
+.ig-kpi-sub { font-size: 12px; color: var(--text-muted); }
+.ig-kpi-spark { position: absolute; right: 12px; bottom: 10px; width: 72px; height: 34px; pointer-events: none; }
+.ig-kpi-spark svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+/* Chart card: title + segmented control + canvas area + legend. */
+.ig-chart-wrap { position: relative; height: 260px; }
+.ig-chart-wrap.tall { height: 300px; }
+.ig-chart-legend { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 12px; font-size: 12px; color: var(--text-muted); }
+.ig-chart-legend .ig-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+
+/* Segmented control: WEEKLY | MONTHLY | YEARLY, active = filled blue. */
+.ig-segmented {
+  display: inline-flex;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-input);
+  overflow: hidden;
+}
+.ig-segmented button {
+  border: 0; background: transparent; color: var(--primary);
+  font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+  padding: 6px 12px; cursor: pointer; text-transform: uppercase;
+}
+.ig-segmented button + button { border-left: 1px solid var(--primary); }
+.ig-segmented button.active { background: var(--primary); color: #fff; }
+
+/* --------------------------------------------------------------------------
+   5. Buttons, inputs, selects, toggles
+   -------------------------------------------------------------------------- */
+.ig-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: 0; border-radius: var(--radius-input);
+  font-size: 13px; font-weight: 700;
+  padding: 10px 16px; cursor: pointer; text-decoration: none;
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+.ig-btn:hover { filter: brightness(1.08); }
+.ig-btn:active { transform: translateY(1px); }
+.ig-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+.ig-btn-primary { background: var(--primary); color: #fff; }
+.ig-btn-ghost {
+  background: transparent; color: var(--text);
+  border: 1px solid var(--table-line);
+}
+.ig-btn-danger { background: var(--danger); color: #fff; }
+.ig-btn-success { background: var(--success); color: #fff; }
+.ig-btn-sm { padding: 6px 12px; font-size: 12px; }
+.ig-btn-block { width: 100%; }
+
+.ig-input, .ig-select, .ig-textarea {
+  width: 100%;
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--input-border);
+  border-radius: var(--radius-input);
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+}
+.ig-input:focus, .ig-select:focus, .ig-textarea:focus {
+  border-color: var(--input-focus);
+  box-shadow: var(--focus-ring);
+}
+.ig-input::placeholder, .ig-textarea::placeholder { color: var(--text-muted); }
+.ig-textarea { resize: vertical; min-height: 80px; }
+.ig-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.ig-field > label { font-size: 13px; font-weight: 600; }
+.ig-field .ig-hint { font-size: 12px; color: var(--text-muted); }
+.ig-field .ig-error { font-size: 12px; color: var(--danger); font-weight: 600; }
+.ig-input[aria-invalid="true"], .ig-select[aria-invalid="true"] { border-color: var(--danger); }
+
+/* Toggle switch. */
+.ig-toggle {
+  position: relative; display: inline-flex; align-items: center; gap: 10px;
+  cursor: pointer; font-size: 13px; font-weight: 600;
+}
+.ig-toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+.ig-toggle .ig-track {
+  width: 42px; height: 24px; border-radius: var(--radius-pill);
+  background: var(--table-line); flex: 0 0 auto;
+  transition: background 0.15s ease; position: relative;
+}
+.ig-toggle .ig-track::after {
+  content: ""; position: absolute; top: 3px; left: 3px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease;
+}
+.ig-toggle input:checked + .ig-track { background: var(--primary); }
+.ig-toggle input:checked + .ig-track::after { transform: translateX(18px); }
+.ig-toggle input:focus-visible + .ig-track { box-shadow: var(--focus-ring); }
+
+/* --------------------------------------------------------------------------
+   6. Status pills, badges
+   -------------------------------------------------------------------------- */
+.ig-pill {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.02em;
+  padding: 4px 10px; border-radius: var(--radius-pill);
+  white-space: nowrap; text-transform: capitalize;
+}
+.ig-pill-pending { background: rgba(245, 158, 11, 0.16); color: #b45309; }
+.ig-pill-paid { background: rgba(10, 0, 255, 0.12); color: var(--primary); }
+.ig-pill-processing { background: rgba(99, 102, 241, 0.16); color: #4f46e5; }
+.ig-pill-shipped { background: rgba(20, 184, 166, 0.16); color: #0f766e; }
+.ig-pill-delivered { background: rgba(34, 197, 94, 0.16); color: #15803d; }
+.ig-pill-canceled { background: rgba(225, 29, 29, 0.14); color: var(--danger); }
+.ig-pill-refunded { background: rgba(122, 122, 133, 0.18); color: var(--text-muted); }
+:root[data-theme="dark"] .ig-pill-pending { color: #fbbf24; }
+:root[data-theme="dark"] .ig-pill-paid { color: #a5a5ff; }
+:root[data-theme="dark"] .ig-pill-processing { color: #a5b4fc; }
+:root[data-theme="dark"] .ig-pill-shipped { color: #5eead4; }
+:root[data-theme="dark"] .ig-pill-delivered { color: #86efac; }
+:root[data-theme="dark"] .ig-pill-canceled { color: #ff8a8a; }
+:root[data-theme="dark"] .ig-pill-refunded { color: #c6cbe8; }
+
+.ig-badge {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 800;
+  padding: 3px 8px; border-radius: var(--radius-pill);
+  background: var(--danger); color: #fff; white-space: nowrap;
+}
+.ig-badge-hot { background: linear-gradient(90deg, var(--primary), #ff5c00); }
+.ig-badge-new { background: var(--info); color: #04121c; }
+.ig-badge-soldout { background: #111; color: #fff; }
+.ig-badge-discount { background: var(--discount-bg); color: var(--discount-text); }
+
+/* --------------------------------------------------------------------------
+   7. Data tables
+   -------------------------------------------------------------------------- */
+.ig-table-wrap { overflow-x: auto; border-radius: var(--radius-card); }
+.ig-table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 640px; }
+.ig-table thead th {
+  background: var(--table-head-bg);
+  color: var(--text);
+  text-align: left;
+  font-size: 12px; font-weight: 700;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--table-line);
+  white-space: nowrap;
+  position: sticky; top: 0; z-index: 2;
+}
+.ig-table thead th.ig-sortable { cursor: pointer; user-select: none; }
+.ig-table thead th.ig-sortable:hover { filter: brightness(0.96); }
+.ig-table thead th .ig-sort-arrow { font-size: 10px; margin-left: 4px; }
+.ig-table tbody td {
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--table-line);
+  vertical-align: middle;
+}
+.ig-table tbody tr:hover { background: var(--primary-soft); }
+.ig-table tbody tr:last-child td { border-bottom: 0; }
+.ig-table .ig-row-check { width: 36px; }
+.ig-table .ig-actions { white-space: nowrap; text-align: right; }
+.ig-table .ig-num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Table toolbar: search + filters + export, above the table. */
+.ig-table-toolbar {
+  display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+  margin-bottom: 14px;
+}
+.ig-table-toolbar .ig-search { flex: 1 1 220px; }
+
+/* Pagination: ‹ 1 2 3 … 163 › + page-size select. */
+.ig-pagination {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  margin-top: 14px; font-size: 13px;
+}
+.ig-pagination button {
+  min-width: 32px; height: 32px; padding: 0 8px;
+  border: 1px solid var(--table-line); border-radius: 6px;
+  background: var(--card-bg); color: var(--text);
+  font: inherit; font-weight: 700; cursor: pointer;
+}
+.ig-pagination button:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+.ig-pagination button.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+.ig-pagination button:disabled { opacity: 0.45; cursor: not-allowed; }
+.ig-pagination .ig-page-info { color: var(--text-muted); margin-left: auto; }
+
+/* Table states: empty / loading / error (rendered inside the card). */
+.ig-state { padding: 36px 20px; text-align: center; color: var(--text-muted); }
+.ig-state b { display: block; color: var(--text); font-size: 15px; margin-bottom: 6px; }
+.ig-state p { margin: 0 0 14px; font-size: 13px; }
+
+/* Skeleton loaders (shimmer). */
+.ig-skeleton {
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--search-bg) 25%, var(--card-bg) 50%, var(--search-bg) 75%);
+  background-size: 200% 100%;
+  animation: ig-shimmer 1.4s infinite linear;
+  color: transparent !important;
+}
+.ig-skeleton-text { height: 14px; margin: 6px 0; }
+.ig-skeleton-block { height: 120px; }
+@keyframes ig-shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+/* --------------------------------------------------------------------------
+   8. Product tiles (screenshot 04)
+   -------------------------------------------------------------------------- */
+.ig-tile-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.ig-tile {
+  background: var(--tile-bg);
+  border-radius: var(--radius-card);
+  padding: 14px;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.ig-tile:hover { transform: translateY(-3px); box-shadow: var(--card-shadow); }
+.ig-tile .ig-tile-img {
+  width: 100%; aspect-ratio: 4 / 3; object-fit: contain;
+  border-radius: 6px; background: rgba(255, 255, 255, 0.5);
+  display: block; margin-bottom: 10px;
+}
+:root[data-theme="dark"] .ig-tile .ig-tile-img { background: rgba(255, 255, 255, 0.08); }
+.ig-tile .ig-badge-discount { position: absolute; top: 10px; right: 10px; }
+.ig-tile .ig-tile-cat {
+  font-size: 10px; font-weight: 800; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text-muted);
+}
+.ig-tile .ig-tile-name { font-size: 13px; font-weight: 700; margin: 2px 0 4px; }
+.ig-tile .ig-tile-price { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.ig-tile .ig-tile-price b { font-size: 14px; }
+.ig-tile .ig-tile-price s { font-size: 12px; color: var(--text-muted); }
+.ig-tile .ig-tile-rating { font-size: 12px; color: var(--warning); margin-top: 4px; }
+.ig-tile .ig-tile-rating .ig-no-rating { color: var(--text-muted); font-style: italic; }
+.ig-tile .ig-tile-actions {
+  display: none; gap: 6px; margin-top: 10px;
+}
+.ig-tile:hover .ig-tile-actions, .ig-tile:focus-within .ig-tile-actions { display: flex; }
+
+/* --------------------------------------------------------------------------
+   9. Modal, drawer, toast, tabs, date-range picker
+   -------------------------------------------------------------------------- */
+.ig-overlay {
+  position: fixed; inset: 0; z-index: 90;
+  background: var(--overlay-bg);
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.ig-overlay.open { display: flex; }
+.ig-modal {
+  background: var(--card-bg); color: var(--text);
+  border-radius: var(--radius-card);
+  box-shadow: var(--card-shadow);
+  width: 100%; max-width: 560px; max-height: 92vh;
+  overflow: auto; padding: 24px;
+}
+.ig-modal-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 16px; }
+.ig-modal-foot { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+/* Drawer: slides in from the right (order details, add/edit product). */
+.ig-drawer {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 95;
+  width: min(480px, 94vw);
+  background: var(--card-bg); color: var(--text);
+  box-shadow: -8px 0 30px rgba(0, 0, 0, 0.25);
+  transform: translateX(105%);
+  transition: transform 0.25s ease;
+  display: flex; flex-direction: column;
+}
+.ig-drawer.open { transform: translateX(0); }
+.ig-drawer-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 18px 20px; border-bottom: 1px solid var(--table-line); }
+.ig-drawer-body { padding: 20px; overflow-y: auto; flex: 1; }
+.ig-drawer-foot { padding: 16px 20px; border-top: 1px solid var(--table-line); display: flex; justify-content: flex-end; gap: 10px; }
+.ig-drawer-scrim {
+  position: fixed; inset: 0; z-index: 94;
+  background: var(--overlay-bg); display: none;
+}
+.ig-drawer-scrim.open { display: block; }
+
+/* Toast (bottom-centre pill, like the existing admin toast). */
+.ig-toast {
+  position: fixed; left: 50%; bottom: 24px; z-index: 99;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--card-bg); color: var(--text);
+  border: 1px solid var(--table-line);
+  box-shadow: var(--card-shadow);
+  padding: 12px 20px; border-radius: var(--radius-pill);
+  font-size: 14px; opacity: 0; pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  max-width: 90vw; text-align: center;
+}
+.ig-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.ig-toast-success { border-color: var(--success); }
+.ig-toast-error { border-color: var(--danger); }
+
+/* Tabs. */
+.ig-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--table-line); margin-bottom: 16px; flex-wrap: wrap; }
+.ig-tabs button {
+  border: 0; background: transparent; color: var(--text-muted);
+  font: inherit; font-weight: 700; font-size: 13px;
+  padding: 10px 14px; cursor: pointer;
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.ig-tabs button.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+/* Date-range picker pill (page header, right side). */
+.ig-daterange {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--card-bg);
+  border: 1px solid var(--table-line);
+  border-radius: var(--radius-input);
+  padding: 8px 12px; font-size: 13px; font-weight: 600;
+  cursor: pointer; color: var(--text);
+}
+.ig-daterange select {
+  border: 0; background: transparent; color: inherit;
+  font: inherit; cursor: pointer; outline: none;
+}
+.ig-daterange input[type="date"] {
+  border: 0; background: transparent; color: inherit;
+  font: inherit; outline: none;
+}
+
+/* Image uploader (Wave 4, Products): drag-and-drop zone + thumbs. */
+.ig-uploader {
+  border: 2px dashed var(--table-line);
+  border-radius: var(--radius-card);
+  padding: 20px; text-align: center; color: var(--text-muted);
+  font-size: 13px; cursor: pointer;
+}
+.ig-uploader.dragging { border-color: var(--primary); background: var(--primary-soft); }
+.ig-uploader-thumbs { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.ig-uploader-thumbs img {
+  width: 72px; height: 72px; object-fit: cover;
+  border-radius: 6px; border: 2px solid transparent;
+}
+.ig-uploader-thumbs img.first { border-color: var(--primary); }
+
+/* --------------------------------------------------------------------------
+   10. Login (Wave 10 restyle target — classes only, not wired up yet)
+   The current login keeps its purple gradient until Wave 10. These classes
+   give Wave 10 the new look: white card, primary-blue button, same fields.
+   -------------------------------------------------------------------------- */
+.ig-login-wrap { max-width: 460px; margin: 0 auto; padding: 48px 16px 60px; }
+.ig-login-card {
+  background: var(--card-bg); color: var(--text);
+  border-radius: 16px; box-shadow: var(--card-shadow);
+  padding: 34px 30px 28px;
+}
+.ig-login-card h1 { margin: 0 0 4px; font-size: 28px; text-align: center; }
+.ig-login-card .ig-sub { margin: 0 0 24px; text-align: center; color: var(--text-muted); font-size: 13px; }
+
+/* --------------------------------------------------------------------------
+   11. Motion + responsive
+   -------------------------------------------------------------------------- */
+.ig-fade-in { animation: ig-fade 0.25s ease both; }
+@keyframes ig-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* 1024–1279px: sidebar collapses to the 72px icon rail. */
+@media (max-width: 1279px) and (min-width: 768px) {
+  .ig-sidebar { width: var(--sidebar-rail-width); }
+  .ig-sidebar-brand { padding: 20px 0 16px; justify-content: center; }
+  .ig-sidebar-brand .ig-brand-word,
+  .ig-nav-item .ig-nav-label,
+  .ig-sidebar-foot { display: none; }
+  .ig-nav { padding-left: 0; align-items: center; }
+  .ig-nav-item { justify-content: center; padding: 11px 0; border-radius: var(--radius-pill); width: 48px; }
+  .ig-main { margin-left: var(--sidebar-rail-width); }
+  .ig-grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .ig-grid-products { grid-template-columns: repeat(3, 1fr); }
+  .ig-grid-2 { grid-template-columns: 1fr; }
+}
+
+/* <768px: sidebar becomes a slide-in drawer; KPIs 2×2; tiles 2-up. */
+@media (max-width: 767px) {
+  .ig-sidebar { transform: translateX(-105%); width: var(--sidebar-width); }
+  body.ig-sidebar-open .ig-sidebar { transform: translateX(0); }
+  .ig-sidebar-scrim {
+    position: fixed; inset: 0; z-index: 55;
+    background: var(--overlay-bg); display: none;
+  }
+  body.ig-sidebar-open .ig-sidebar-scrim { display: block; }
+  .ig-main { margin-left: 0; }
+  .ig-topbar .ig-menu-btn { display: inline-grid; }
+  .ig-topbar .ig-search { display: none; }
+  .ig-avatar-who { display: none; }
+  .ig-content { padding: 20px 16px; }
+  .ig-page-title { font-size: 24px; }
+  .ig-grid-4 { grid-template-columns: repeat(2, 1fr); }
+  .ig-grid-products { grid-template-columns: repeat(2, 1fr); }
+  .ig-grid-2 { grid-template-columns: 1fr; }
+  .ig-kpi-value { font-size: 22px; }
+}
+@media (max-width: 419px) {
+  .ig-grid-products { grid-template-columns: 1fr; }
+  .ig-grid-4 { grid-template-columns: 1fr; }
+}
+
+/* --------------------------------------------------------------------------
+   12. Login (Wave 3 restyle — additive only, appended 2026-11-19)
+   The login logic is unchanged; only the look moved from the old purple
+   gradient to this design system (tokens above). Only login.html uses
+   these classes. The .ig-login-wrap / .ig-login-card rules in §10 are
+   untouched — the rules below fill in the form elements §10 did not cover.
+   -------------------------------------------------------------------------- */
+.ig-login-page { min-height: 100vh; }
+.ig-login-head { text-align: center; padding: 44px 16px 8px; }
+.ig-login-head img { height: 74px; max-width: 82vw; object-fit: contain; }
+.ig-login-hello {
+  display: inline-block; margin-top: 22px;
+  background: var(--primary-soft);
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  font-size: 22px; font-weight: 700;
+  padding: 8px 22px; border-radius: 999px;
+}
+.ig-login-card label {
+  display: block; font-size: 13px; font-weight: 600;
+  color: var(--text); margin: 14px 0 6px;
+}
+.ig-login-pass { position: relative; }
+.ig-login-pass input { padding-right: 44px; }
+.ig-login-pass button {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  border: 0; background: none; font-size: 17px; cursor: pointer; padding: 6px;
+  color: var(--text);
+}
+.ig-login-row {
+  display: flex; justify-content: space-between; align-items: center;
+  margin: 14px 0 18px; font-size: 13px;
+}
+.ig-login-remember {
+  display: flex !important; align-items: center; gap: 6px;
+  margin: 0 !important; font-weight: 400 !important; color: var(--text-muted);
+}
+.ig-login-remember input { accent-color: var(--primary); }
+.ig-login-msg {
+  margin: 12px 0 0; font-size: 13px; color: var(--text-muted);
+  min-height: 18px; text-align: center;
+}
+.ig-login-back { text-align: center; font-size: 13px; margin: 14px 0 0; }
+.ig-login-tiny { text-align: center; color: var(--text-muted); font-size: 12px; margin: 18px 0 0; }
+@media (max-width: 560px) {
+  .ig-login-hello { font-size: 18px; }
+  .ig-login-head img { height: 56px; }
+  .ig-login-card { padding: 28px 20px 22px; }
+}
+/* Rail toggle lives in the dashboard topbar; the mobile drawer replaces it. */
+@media (max-width: 767px) { #railToggle { display: none; } }
+
+/* --------------------------------------------------------------------------
+   13. Wave 4 additions — order form grid, inventory stat tiles, 5-up grid
+   (additive only, appended 2026-11-19)
+   -------------------------------------------------------------------------- */
+.ig-form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 14px; }
+@media (max-width: 767px) { .ig-form-grid { grid-template-columns: 1fr; } }
+.ig-grid-5 { grid-template-columns: repeat(5, 1fr); }
+@media (max-width: 1279px) { .ig-grid-5 { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 767px) { .ig-grid-5 { grid-template-columns: repeat(2, 1fr); } }
+.ig-stat-mini {
+  background: var(--input-bg);
+  border: 1px solid var(--table-line);
+  border-radius: 8px;
+  padding: 14px;
+}
+.ig-stat-mini b { font-size: 22px; display: block; margin-top: 2px; }
+.ig-tile-actions .ig-btn { flex: 1; }
+#adminList .ig-input { padding: 8px 10px; }

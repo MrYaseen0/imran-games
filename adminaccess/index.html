@@ -4,631 +4,302 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
 <meta name="robots" content="noindex, nofollow"/>
-<meta name="color-scheme" content="dark"/>
+<meta name="color-scheme" content="light dark"/>
 <title>Imran Games — Admin</title>
 <meta name="description" content="Private admin area for Imran Games, Peshawar. Not indexed."/>
-<link rel="icon" href="../logo.png"/>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<style>
-*{box-sizing:border-box}
-html,body{margin:0;padding:0}
-body{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#fff;color:#111}
-a{color:#6A1B9A}
-/* ---- purple login header (reference design) ---- */
-.purple-head{position:relative;background:linear-gradient(135deg,#5B21B6 0%,#7C3AED 45%,#9333EA 75%,#6D28D9 100%);overflow:hidden;text-align:center;padding:44px 16px 110px}
-.purple-head::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 15% 20%,rgba(255,255,255,.22) 0 90px,transparent 91px),radial-gradient(circle at 85% 30%,rgba(255,255,255,.16) 0 130px,transparent 131px),radial-gradient(circle at 70% 85%,rgba(255,255,255,.12) 0 110px,transparent 111px),radial-gradient(circle at 25% 80%,rgba(0,0,0,.18) 0 100px,transparent 101px)}
-.ph-logo{position:relative;height:74px;max-width:82vw;object-fit:contain;filter:drop-shadow(0 4px 14px rgba(0,0,0,.45))}
-.hello-pill{position:relative;display:inline-block;margin-top:22px;background:rgba(255,255,255,.22);border:1px solid rgba(255,255,255,.35);color:#fff;font-size:22px;font-weight:700;padding:8px 22px;border-radius:999px;backdrop-filter:blur(2px)}
-.curve{position:absolute;left:0;right:0;bottom:-1px;width:100%;height:90px;display:block}
-.login-wrap{position:relative;max-width:460px;margin:-58px auto 0;padding:0 16px 60px;z-index:2}
-.login-card{background:#fff;border-radius:16px;box-shadow:0 18px 50px rgba(60,10,110,.28);padding:34px 30px 28px;text-align:left}
-.login-card h1{margin:0 0 4px;font-size:28px;text-align:center;color:#111}
-.login-card .sub{margin:0 0 24px;text-align:center;color:#777;font-size:13px}
-.login-card label{display:block;font-size:13px;font-weight:600;color:#333;margin:14px 0 6px}
-.login-card input[type=email],.login-card input[type=password],.login-card input[type=text]{width:100%;border:1px solid #ddd;border-radius:8px;padding:12px 14px;font-size:14px;outline:none;background:#fff;color:#111}
-.login-card input:focus{border-color:#7C3AED;box-shadow:0 0 0 3px rgba(124,58,237,.15)}
-.pass-wrap{position:relative}
-.pass-wrap input{padding-right:44px}
-.pass-wrap button{position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:none;font-size:17px;cursor:pointer;padding:6px}
-.row-between{display:flex;justify-content:space-between;align-items:center;margin:14px 0 18px;font-size:13px}
-.remember{display:flex!important;align-items:center;gap:6px;margin:0!important;font-weight:400!important;color:#444}
-.remember input{accent-color:#6A1B9A}
-.btn-purple{width:100%;border:0;border-radius:8px;background:linear-gradient(135deg,#5B21B6,#7C3AED);color:#fff;font-size:15px;font-weight:700;padding:13px;cursor:pointer}
-.btn-purple:hover{filter:brightness(1.08)}
-.msg{margin:12px 0 0;font-size:13px;color:#666;min-height:18px;text-align:center}
-.back{text-align:center;font-size:13px;margin:14px 0 0}
-.tiny{text-align:center;color:#999;font-size:12px;margin:18px 0 0}
-/* ---- dashboard (dark, same as store) ---- */
-#dashView{background:#0B0D17;min-height:100vh;color:#fff}
-.dash-top{background:linear-gradient(135deg,#5B21B6,#7C3AED);padding:14px 0}
-.dash-top .wrap{max-width:1200px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.dash-top img{height:42px}
-.dash-top b{font-size:18px}
-.dash-top a{color:#fff;font-size:13px;margin-left:auto}
-.btn{display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:999px;font-weight:700;cursor:pointer;text-decoration:none}
-.btn-pink{background:linear-gradient(135deg,#EC008C,#FF4DA6);color:#fff}
-.btn-ghost{background:#1A1E33;color:#fff;border:1px solid #2A2F45}
-.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#12152A;color:#fff;border:1px solid #2A2F45;padding:12px 20px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:99;max-width:90vw;text-align:center}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media(max-width:560px){.hello-pill{font-size:18px}.login-card{padding:28px 20px 22px}.ph-logo{height:56px}}
-</style>
-</head>
-<body>
-<div id="loginView">
-  <div class="purple-head">
-    <img class="ph-logo" src="../logo.png" alt="Imran Games logo"/>
-    <div><span class="hello-pill">Hello 👋 Welcome!</span></div>
-    <svg class="curve" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true"><path d="M0,55 C240,95 480,15 720,45 C960,75 1200,20 1440,55 L1440,90 L0,90 Z" fill="#ffffff"/></svg>
-  </div>
-  <div class="login-wrap">
-    <div class="login-card" id="loginCard">
-      <h1>Login</h1>
-      <p class="sub">Please login to admin dashboard</p>
-      <label for="adminEmail">Email/Username*</label>
-      <input id="adminEmail" type="email" placeholder="admin@solon.com" autocomplete="username"/>
-      <label for="adminPass">Password*</label>
-      <div class="pass-wrap">
-        <input id="adminPass" type="password" placeholder="••••••••" autocomplete="current-password"/>
-        <button type="button" id="togglePass" aria-label="Show password">👁</button>
-      </div>
-      <div class="row-between">
-        <label class="remember"><input type="checkbox" id="rememberMe" checked/> Remember me</label>
-        <a href="#" id="forgotLink">Forgot password?</a>
-      </div>
-      <button class="btn-purple" id="adminUnlock" type="button">Login</button>
-      <p id="adminMsg" class="msg"></p>
-      <p class="back"><a href="../">← Back to shop</a></p>
-    </div>
-    <div class="login-card" id="forgotCard" style="display:none">
-      <h1>Reset password</h1>
-      <p class="sub">We will email you a reset link for your admin account.</p>
-      <label for="fpEmail">Admin email*</label>
-      <input id="fpEmail" type="email" placeholder="admin@solon.com" autocomplete="username"/>
-      <div style="height:16px"></div>
-      <button class="btn-purple" id="fpSend" type="button">Send reset link</button>
-      <p id="fpMsg" class="msg"></p>
-      <p class="back"><a href="#" id="backToLogin">← Back to login</a></p>
-    </div>
-    <div class="login-card" id="resetCard" style="display:none">
-      <h1>Set new password</h1>
-      <p class="sub">Choose a new password for your admin account.</p>
-      <label for="newPass">New password*</label>
-      <input id="newPass" type="password" placeholder="At least 6 characters" autocomplete="new-password"/>
-      <label for="newPass2">Confirm new password*</label>
-      <input id="newPass2" type="password" placeholder="Repeat new password" autocomplete="new-password"/>
-      <div style="height:16px"></div>
-      <button class="btn-purple" id="resetBtn" type="button">Update password</button>
-      <p id="resetMsg" class="msg"></p>
-      <p class="back"><a href="#" id="backToLogin2">← Back to login</a></p>
-    </div>
-    <p class="tiny">Private admin area — Imran Games. This page is not linked from the shop.</p>
-  </div>
-</div>
-
-<div id="dashView" style="display:none">
-  <div class="dash-top"><div class="wrap">
-    <img src="../logo.png" alt="Imran Games"/>
-    <b>Admin Dashboard</b>
-    <a href="../">← Back to shop</a>
-  </div></div>
-  <div style="max-width:1200px;margin:0 auto;padding:28px 16px 60px">
-    <h2 style="font-size:26px;margin:0 0 8px">Admin — Manage Products</h2>
-    <p style="color:#B9BFD6;margin:0 0 20px">Add, edit or delete products. Changes save straight to Supabase and appear on the shop instantly — no redeploy needed.</p>
-<div id="adminBody" style="display:none;margin-top:24px">
-  <p style="color:#B9BFD6;font-size:14px;margin:0 0 16px">Signed in as <b id="adminWho" style="color:#fff"></b> <button class="btn btn-ghost" id="adminLockTop" type="button" style="min-height:36px;padding:0 14px;margin-left:8px">Log Out</button></p>
-  <div style="background:#12152A;border:1px solid #2A2F45;border-radius:16px;padding:20px;margin-bottom:24px">
-   <h3 style="margin:0 0 14px;font-size:18px">＋ Add a new product</h3>
-   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
-    <input id="npName" placeholder="Product name *" style="background:#0B0D17;border:1px solid #2A2F45;color:#fff;border-radius:12px;padding:12px;font-size:14px;outline:none"/>
-    <input id="npBrand" placeholder="Brand (e.g. Sony PlayStation)" style="background:#0B0D17;border:1px solid #2A2F45;color:#fff;border-radius:12px;padding:12px;font-size:14px;outline:none"/>
-    <select id="npCat" style="background:#0B0D17;border:1px solid #2A2F45;color:#fff;border-radius:12px;padding:12px;font-size:14px;outline:none"><option>Consoles</option><option>Premium Tech</option><option>Controllers</option><option>Headsets</option><option>Racing Wheels</option><option>PS4 Games</option><option>PS5 Games</option><option>Gift Cards</option><option>Gaming Chairs</option><option>Gaming Setups</option><option>Room Lighting</option></select>
-    <input id="npPrice" type="number" min="1" placeholder="Price (PKR) *" style="background:#0B0D17;border:1px solid #2A2F45;color:#fff;border-radius:12px;padding:12px;font-size:14px;outline:none"/>
-    <input id="npWas" type="number" min="0" placeholder="Old price (PKR, optional)" style="background:#0B0D17;border:1px solid #2A2F45;color:#fff;border-radius:12px;padding:12px;font-size:14px;outline:none"/>
-    <input id="npStock" type="number" min="0" placeholder="Stock quantity *" style="background:#0B0D17;border:1px solid #2A2F45;color:#fff;border-radius:12px;padding:12px;font-size:14px;outline:none"/>
-   </div>
-   <textarea id="npImgs" rows="3" placeholder="Photo URLs — one per line, up to 3 (paste Supabase Storage links from the product-images bucket)" style="width:100%;box-sizing:border-box;margin-top:12px;background:#0B0D17;border:1px solid #2A2F45;color:#fff;border-radius:12px;padding:12px;font-size:14px;outline:none"></textarea>
-   <div style="display:flex;gap:18px;flex-wrap:wrap;margin:12px 0;align-items:center">
-    <label style="font-size:14px"><input type="checkbox" id="npHot"/> 🔥 Hot deal</label>
-    <label style="font-size:14px"><input type="checkbox" id="npNew"/> 🆕 New</label>
-    <button class="btn btn-pink" id="npAdd" type="button">Add Product</button>
-    <span id="npMsg" style="color:#B9BFD6;font-size:13px"></span>
-   </div>
-   <p style="color:#B9BFD6;font-size:12px;margin:0">Tip: upload photos first in Supabase → Storage → product-images, then paste the public URLs here (one per line). The first photo is the card photo.</p>
-  </div>
-  <div style="background:#12152A;border:1px solid #2A2F45;border-radius:16px;padding:20px">
-   <h3 style="margin:0 0 6px;font-size:18px">All products (<span id="adminCount">0</span>)</h3>
-   <p style="color:#B9BFD6;font-size:13px;margin:0 0 8px">Edit the price, old price, stock or photo URLs, then press Save. Delete asks first — tap twice to confirm. Every change goes live on the shop right away.</p>
-   <div id="adminList"></div>
-  </div>
-  <div style="background:#12152A;border:1px solid #2A2F45;border-radius:16px;padding:20px;margin-top:24px">
-   <h3 style="margin:0 0 6px;font-size:18px">📊 Analytics — Live Shop Numbers</h3>
-   <p style="color:#B9BFD6;font-size:13px;margin:0 0 16px">Computed live from Supabase every time this panel opens — no demo numbers.</p>
-   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px">
-    <div style="background:#0B0D17;border:1px solid #2A2F45;border-radius:12px;padding:14px"><div style="color:#B9BFD6;font-size:12px">Total products</div><b id="anTotal" style="font-size:22px">—</b></div>
-    <div style="background:#0B0D17;border:1px solid #2A2F45;border-radius:12px;padding:14px"><div style="color:#B9BFD6;font-size:12px">Stock units</div><b id="anStock" style="font-size:22px">—</b></div>
-    <div style="background:#0B0D17;border:1px solid #2A2F45;border-radius:12px;padding:14px"><div style="color:#B9BFD6;font-size:12px">Inventory value</div><b id="anValue" style="font-size:22px">—</b></div>
-    <div style="background:#0B0D17;border:1px solid #2A2F45;border-radius:12px;padding:14px"><div style="color:#B9BFD6;font-size:12px">Sold out</div><b id="anSoldOut" style="font-size:22px">—</b></div>
-    <div style="background:#0B0D17;border:1px solid #2A2F45;border-radius:12px;padding:14px"><div style="color:#B9BFD6;font-size:12px">Admin actions logged</div><b id="anActions" style="font-size:22px">—</b></div>
-   </div>
-   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
-    <div style="background:#0B0D17;border:1px solid #2A2F45;border-radius:12px;padding:14px"><h4 style="margin:0 0 8px;font-size:15px">Products by category</h4><div style="height:250px"><canvas id="chCat"></canvas></div></div>
-    <div style="background:#0B0D17;border:1px solid #2A2F45;border-radius:12px;padding:14px"><h4 style="margin:0 0 8px;font-size:15px">Stock overview</h4><div style="height:250px"><canvas id="chStock"></canvas></div></div>
-    <div style="background:#0B0D17;border:1px solid #2A2F45;border-radius:12px;padding:14px"><h4 style="margin:0 0 8px;font-size:15px">Admin activity — last 7 days</h4><div style="height:250px"><canvas id="chActivity"></canvas></div></div>
-    <div style="background:#0B0D17;border:1px solid #2A2F45;border-radius:12px;padding:14px"><h4 style="margin:0 0 8px;font-size:15px">Price range</h4><div style="height:250px"><canvas id="chPrice"></canvas></div></div>
-   </div>
-   <p id="anMsg" style="color:#B9BFD6;font-size:13px;margin:12px 0 0"></p>
-   <h4 style="margin:20px 0 8px;font-size:15px">🔄 Live Flow — latest activity</h4>
-   <div id="flowList"><p style="color:#B9BFD6;font-size:13px;margin:0">Loading flow…</p></div>
-  </div>
-  <div style="background:#12152A;border:1px solid #2A2F45;border-radius:16px;padding:20px;margin-top:24px">
-   <h3 style="margin:0 0 6px;font-size:18px">History — Audit Log (<span id="auditCount">0</span>)</h3>
-   <p style="color:#B9BFD6;font-size:13px;margin:0 0 8px">Every sign-in, sign-out, add, edit and delete — newest first, times in Pakistan time (PKT).</p>
-   <div id="auditList"><p style="color:#B9BFD6;font-size:13px;margin:0">Loading history…</p></div>
-  </div>
-  <div style="margin-top:16px"><button class="btn btn-ghost" id="adminLock" type="button">Log Out</button></div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
+<link rel="icon" href="/logo.png"/>
 <script>
-var SB_URL="https://vnbaizpqucimomrfvfpd.supabase.co";
-var SB_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZuYmFpenBxdWNpbW9tcmZ2ZnBkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ5ODA4NDMsImV4cCI6MjExMDU1Njg0M30.9-Zsqx811GKk0QP7ASoxQATbATzwmBtNy521jYeE1mg";
-/* Remember me: checked = session survives browser restarts (localStorage);
-   unchecked = session ends when the browser/tab closes (sessionStorage). */
-var igStorage={
-  getItem:function(k){try{return (localStorage.getItem("ig_remember")==="0"?sessionStorage:localStorage).getItem(k)}catch(e){return null}},
-  setItem:function(k,v){try{(localStorage.getItem("ig_remember")==="0"?sessionStorage:localStorage).setItem(k,v)}catch(e){}},
-  removeItem:function(k){try{localStorage.removeItem(k)}catch(e){}try{sessionStorage.removeItem(k)}catch(e){}}
-};
-var sb=null; /* created lazily by ensureSb() — a client-init failure must never kill the Login button */
-try{if(window.supabase&&window.supabase.createClient){sb=window.supabase.createClient(SB_URL,SB_ANON,{auth:{storage:igStorage,autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}});}}catch(e){sb=null;}
-
-/* ===== LOGIN — handler registered FIRST, before any other init, so the button can never sit dead ===== */
-function igSetMsg(t){try{var m=document.getElementById("adminMsg");if(m)m.textContent=t;}catch(e){}}
-function igLoadSupabaseLib(){
-  if(window.supabase&&window.supabase.createClient)return Promise.resolve(true);
-  return new Promise(function(resolve){
-    var done=false;
-    var finish=function(ok){if(!done){done=true;resolve(ok);}};
-    try{
-      var s=document.createElement("script");
-      s.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js";
-      s.onload=function(){finish(!!(window.supabase&&window.supabase.createClient));};
-      s.onerror=function(){finish(false);};
-      document.head.appendChild(s);
-      setTimeout(function(){finish(!!(window.supabase&&window.supabase.createClient));},10000);
-    }catch(e){finish(false);}
-  });
-}
-async function ensureSb(){
-  if(sb)return sb;
-  try{
-    if(window.supabase&&window.supabase.createClient){
-      sb=window.supabase.createClient(SB_URL,SB_ANON,{auth:{storage:igStorage,autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}});
-      if(sb)return sb;
-    }
-  }catch(e){sb=null;}
-  var ok=await igLoadSupabaseLib();
-  if(!ok)return null;
-  try{
-    sb=window.supabase.createClient(SB_URL,SB_ANON,{auth:{storage:igStorage,autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}});
-  }catch(e){sb=null;}
-  return sb;
-}
-async function igDirectLogin(email,pass){
-  /* Fallback: raw Auth call when the supabase-js client is broken or timed out. */
-  var ctl=new AbortController();var to=setTimeout(function(){ctl.abort()},15000);
-  try{
-    var res=await fetch(SB_URL+"/auth/v1/token?grant_type=password",{method:"POST",signal:ctl.signal,headers:{"apikey":SB_ANON,"Content-Type":"application/json"},body:JSON.stringify({email:email,password:pass})});
-    clearTimeout(to);
-    if(!res.ok)return null;
-    var data=await res.json();
-    if(!data||!data.access_token)return null;
-    return data;
-  }catch(e){clearTimeout(to);return null;}
-}
-async function igDoLogin(){
-  var emailEl=document.getElementById("adminEmail"),passEl=document.getElementById("adminPass"),btn=document.getElementById("adminUnlock");
-  var email=emailEl?emailEl.value.trim():"";
-  var pass=passEl?passEl.value:"";
-  if(!email||!pass){igSetMsg("Enter your admin email and password.");return;}
-  if(btn)btn.disabled=true;
-  igSetMsg("Signing in…");
-  try{
-    try{localStorage.setItem("ig_remember",document.getElementById("rememberMe").checked?"1":"0");}catch(e){}
-    var client=await ensureSb();
-    if(!client){
-      igSetMsg("Sign-in library did not load — check your connection and reload.");
-      if(btn)btn.disabled=false;
-      return;
-    }
-    var result=null;
-    try{
-      result=await Promise.race([
-        client.auth.signInWithPassword({email:email,password:pass}),
-        new Promise(function(res){setTimeout(function(){res({__igTimeout:true});},15000);})
-      ]);
-    }catch(e){result={error:e};}
-    if(result&&result.__igTimeout){
-      igSetMsg("Sign-in is slow — trying another way…");
-      var direct=await igDirectLogin(email,pass);
-      if(direct){
-        try{await client.auth.setSession({access_token:direct.access_token,refresh_token:direct.refresh_token});}catch(e){}
-        var who0=direct.user&&direct.user.email?direct.user.email:email;
-        showAdmin(who0);
-        try{await logAudit("login_success","admin",null,who0,{});}catch(e){}
-        try{loadAuditLog();}catch(e){}
-        igSetMsg("");
-        try{showToast("Signed in ✓");}catch(e){}
-        if(btn)btn.disabled=false;
-        return;
-      }
-      igSetMsg("Sign-in timed out — check your connection and try again.");
-      if(btn)btn.disabled=false;
-      return;
-    }
-    if(result&&result.error){
-      var emsg=(result.error&&result.error.message)||"";
-      if(/invalid login credentials/i.test(emsg)){
-        try{await logFailedLogin(email);}catch(e){}
-        igSetMsg("✖ Wrong email or password — try again.");
-      }else{
-        igSetMsg("✖ "+(emsg||"Sign-in failed — try again."));
-      }
-      if(btn)btn.disabled=false;
-      return;
-    }
-    var who=(result&&result.data&&result.data.user&&result.data.user.email)||email;
-    showAdmin(who);
-    try{await logAudit("login_success","admin",null,who,{});}catch(e){}
-    try{loadAuditLog();}catch(e){}
-    igSetMsg("");
-    try{showToast("Signed in ✓");}catch(e){}
-  }catch(err){
-    igSetMsg("✖ "+(err&&err.message?err.message:"Sign-in failed — try again."));
-  }
-  if(btn)btn.disabled=false;
-}
-try{
-  document.getElementById("adminUnlock").addEventListener("click",igDoLogin);
-  document.getElementById("adminPass").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();igDoLogin();}});
-  document.getElementById("adminEmail").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();igDoLogin();}});
-}catch(e){/* login form elements missing — page cannot show the form at all */}
-
-/* ===== DATA — products for the admin panel only ===== */
-var PRODUCTS=[];
-var nextNumId=1000;
-var CATMAP={"Consoles":["hardware","Consoles"],"Premium Tech":["hardware","Premium Tech"],"Controllers":["controls","Controllers"],"Headsets":["controls","Headsets"],"Racing Wheels":["controls","Racing Wheels"],"PS4 Games":["games","PS4 Games"],"PS5 Games":["games","PS5 Games"],"Gift Cards":["accessories","Gift Cards"],"Gaming Chairs":["accessories","Gaming Chairs"],"Gaming Setups":["accessories","Gaming Setups"],"Room Lighting":["accessories","Room Lighting"]};
-function toAdminProduct(r,fallbackId){
-  var m=String(r.slug||"").match(/^(\d+)-(.+)$/);
-  var id=m?+m[1]:fallbackId;
-  var slug=m?m[2]:(r.slug||"item");
-  var cm=CATMAP[r.category]||["accessories",r.category||"Accessories"];
-  var rawImgs=(r.image_urls||[]).filter(function(u){return !!u});
-  var imgs=rawImgs.slice();
-  if(!imgs.length)imgs=["../logo.png"];
-  while(imgs.length<3)imgs.push(imgs[0]);
-  return {id:id,uuid:r.id,slug:slug,name:r.name,brand:r.brand||"",cat:cm[0],catLabel:cm[1],price:r.price,old:(r.was_price||r.price),stock:r.stock,soldOut:r.stock===0,hot:!!r.is_hot,imgs:imgs,img:imgs[0],rawImgs:rawImgs,version:(r.version||1)};
-}
-async function loadProducts(){
-  try{
-    var res=await fetch(SB_URL+"/rest/v1/products?select=*&order=created_at",{headers:{"apikey":SB_ANON,"Authorization":"Bearer "+SB_ANON}});
-    if(!res.ok)throw new Error("HTTP "+res.status);
-    var rows=await res.json();
-    var maxId=0;
-    PRODUCTS=rows.map(function(r){var m=String(r.slug||"").match(/^(\d+)-/);if(m)maxId=Math.max(maxId,+m[1]);return toAdminProduct(r,0);});
-    var nid=Math.max(1000,maxId+1);
-    PRODUCTS.forEach(function(p){if(!p.id){p.id=nid++;}});
-    nextNumId=Math.max(1000,maxId+1);
-    if(ADMIN_UNLOCKED){renderAdminList();renderAnalytics();}
-  }catch(err){
-    var b=document.getElementById("adminList");
-    if(b&&ADMIN_UNLOCKED)b.innerHTML='<p style="color:#FF8A8A">Could not load products — '+escHtml(err.message||"")+'</p>';
-  }
-}
-function subscribeRealtime(){
-  if(!sb){setInterval(function(){loadProducts()},30000);return}
-  sb.channel("ig-admin-products").on("postgres_changes",{event:"*",schema:"public",table:"products"},function(){loadProducts();}).subscribe();
-}
-
-var ADMIN_UNLOCKED=false;
-var SB_REST=SB_URL+"/rest/v1/products";
-async function sbHeaders(){
-  var token=SB_ANON;
-  if(sb){try{var sess=await sb.auth.getSession();if(sess&&sess.data&&sess.data.session)token=sess.data.session.access_token}catch(e){}}
-  return {"apikey":SB_ANON,"Authorization":"Bearer "+token,"Content-Type":"application/json","Prefer":"return=representation"};
-}
-async function sbWrite(method,path,body){
-  var res=await fetch(SB_REST+path,{method:method,headers:await sbHeaders(),body:body?JSON.stringify(body):undefined});
-  var txt=await res.text(),data=null;try{data=JSON.parse(txt)}catch(e){}
-  if(!res.ok){var msg=(data&&data.message)||("HTTP "+res.status);if(res.status===401||res.status===403)msg="Not signed in — log in again with your admin email and password.";throw new Error(msg)}
-  return data;
-}
-function slugify(s){return String(s||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,60)||"item"}
-
-/* ===== AUDIT LOG — every admin event is recorded in Supabase audit_log ===== */
-var SB_AUDIT=SB_URL+"/rest/v1/audit_log";
-var ADMIN_IP=null;
-async function getAdminIP(){
-  if(ADMIN_IP)return ADMIN_IP;
-  try{
-    var ctl=new AbortController();var to=setTimeout(function(){ctl.abort()},3000);
-    var r=await fetch("https://api.ipify.org?format=json",{signal:ctl.signal});
-    clearTimeout(to);
-    var j=await r.json();ADMIN_IP=(j&&j.ip)||"unknown";
-  }catch(e){ADMIN_IP="unknown";}
-  return ADMIN_IP;
-}
-async function currentActorEmail(){
-  try{if(sb){var s=await sb.auth.getSession();if(s&&s.data&&s.data.session&&s.data.session.user)return s.data.session.user.email}}catch(e){}
-  return null;
-}
-async function logAudit(action,entity,recordId,recordName,details){
-  try{
-    var email=await currentActorEmail();if(!email)return;
-    var ip=await getAdminIP();
-    var headers=await sbHeaders();
-    await fetch(SB_AUDIT,{method:"POST",headers:headers,body:JSON.stringify({actor_email:email,action:action,entity:entity||"product",record_id:recordId||null,record_name:recordName||null,details:details||{},ip_address:ip,user_agent:navigator.userAgent||null})});
-  }catch(e){/* audit must never block an admin action */}
-}
-async function logFailedLogin(email){
-  try{
-    var ip=await getAdminIP();
-    await fetch(SB_URL+"/rest/v1/rpc/log_failed_login",{method:"POST",headers:{"apikey":SB_ANON,"Authorization":"Bearer "+SB_ANON,"Content-Type":"application/json"},body:JSON.stringify({p_email:email,p_ip:ip,p_ua:navigator.userAgent||null})});
-  }catch(e){}
-}
-function fmtPKT(iso){
-  try{return new Date(iso).toLocaleString("en-GB",{timeZone:"Asia/Karachi",day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false})}catch(e){return iso}
-}
-function escHtml(x){return String(x==null?"":x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
-async function loadAuditLog(){
-  var box=document.getElementById("auditList");if(!box)return;
-  try{
-    var headers=await sbHeaders();
-    var res=await fetch(SB_AUDIT+"?select=*&order=created_at.desc&limit=50",{headers:headers});
-    if(!res.ok)throw new Error("HTTP "+res.status);
-    var rows=await res.json();
-    AUDIT_ROWS=rows||[];
-    renderFlow(AUDIT_ROWS);
-    document.getElementById("auditCount").textContent=rows.length;
-    if(!rows.length){box.innerHTML='<p style="color:#B9BFD6;font-size:13px;margin:0">No admin activity recorded yet.</p>';return}
-    box.innerHTML=rows.map(function(r){
-      return '<div style="display:flex;gap:10px;align-items:baseline;padding:9px 0;border-top:1px solid #232842;flex-wrap:wrap;font-size:13px">'
-      +'<span style="color:#B9BFD6;min-width:180px">'+fmtPKT(r.created_at)+'</span>'
-      +'<b style="min-width:130px">'+escHtml(r.action)+'</b>'
-      +'<span style="flex:1;min-width:140px">'+(r.record_name?escHtml(r.record_name):"—")+'</span>'
-      +'<span style="color:#B9BFD6">'+escHtml(r.actor_email)+'</span>'
-      +'<span style="color:#8A90A8;font-size:12px">'+escHtml(r.ip_address||"unknown")+'</span>'
-      +'</div>';
-    }).join("");
-  }catch(err){box.innerHTML='<p style="color:#FF8A8A;font-size:13px;margin:0">Could not load history — '+escHtml(err.message||"try again")+'</p>';}
-}
-
-
-function showAdmin(email){
-  ADMIN_UNLOCKED=true;
-  document.getElementById("loginView").style.display="none";
-  document.getElementById("dashView").style.display="block";
-  document.getElementById("adminBody").style.display="block";
-  document.getElementById("adminWho").textContent=email||"";
-  renderAdminList();
-  getAdminIP();
-  loadAuditLog();
-  renderAnalytics();
-}
-async function signOutAdmin(){
-  try{var em=await currentActorEmail();if(em)await logAudit("logout","admin",null,em,{});}catch(e){}
-  try{if(sb)await sb.auth.signOut()}catch(e){}
-  ADMIN_UNLOCKED=false;
-  try{localStorage.removeItem("ig_remember")}catch(e){}
-  document.getElementById("adminBody").style.display="none";
-  document.getElementById("dashView").style.display="none";
-  document.getElementById("loginView").style.display="block";
-  document.getElementById("adminPass").value="";
-  document.getElementById("adminMsg").textContent="Signed out.";
-}
-
-/* ===== ANALYTICS — live numbers + charts, computed from Supabase ===== */
-var AN_CHARTS={};
-var AUDIT_ROWS=[];
-function fmtNum(n){try{return Number(n).toLocaleString("en-PK")}catch(e){return String(n)}}
-function renderFlow(rows){
-  var box=document.getElementById("flowList");if(!box)return;
-  if(!rows||!rows.length){box.innerHTML='<p style="color:#B9BFD6;font-size:13px;margin:0">No admin activity recorded yet.</p>';return}
-  box.innerHTML=rows.slice(0,20).map(function(r,i){
-    return '<div style="display:flex;gap:10px;padding:8px 0;border-top:1px solid #232842;font-size:13px;align-items:baseline;flex-wrap:wrap">'
-    +'<span style="color:var(--pink);font-weight:700;min-width:22px">'+(i+1)+'.</span>'
-    +'<span style="color:#B9BFD6;min-width:170px">'+fmtPKT(r.created_at)+'</span>'
-    +'<span style="color:#fff">'+escHtml(r.actor_email||"")+'</span>'
-    +'<b>'+escHtml(r.action||"")+'</b>'
-    +'<span style="flex:1;min-width:120px">'+(r.record_name?escHtml(r.record_name):"—")+'</span>'
-    +'<span style="color:#8A90A8;font-size:12px">'+escHtml(r.ip_address||"unknown")+'</span>'
-    +'</div>';
-  }).join("");
-}
-function drawChart(key,elId,cfg){
-  var el=document.getElementById(elId);if(!el||!window.Chart)return;
-  if(AN_CHARTS[key]){try{AN_CHARTS[key].destroy()}catch(e){}}
-  if(window.Chart.defaults)window.Chart.defaults.color="#B9BFD6";
-  AN_CHARTS[key]=new window.Chart(el.getContext("2d"),cfg);
-}
-async function renderAnalytics(){
-  if(!document.getElementById("adminBody")||document.getElementById("adminBody").style.display==="none")return;
-  var total=PRODUCTS.length,units=0,value=0,soldOut=0;
-  var byCat={},bands=[0,0,0,0];
-  PRODUCTS.forEach(function(p){
-    units+=p.stock||0;value+=(p.price||0)*(p.stock||0);
-    if(p.soldOut||p.stock===0)soldOut++;
-    byCat[p.catLabel||"Other"]=(byCat[p.catLabel||"Other"]||0)+1;
-    if(p.price<10000)bands[0]++;else if(p.price<50000)bands[1]++;else if(p.price<150000)bands[2]++;else bands[3]++;
-  });
-  var set=function(id,v){var el=document.getElementById(id);if(el)el.textContent=v};
-  set("anTotal",fmtNum(total));set("anStock",fmtNum(units));
-  set("anValue","Rs. "+fmtNum(value));set("anSoldOut",fmtNum(soldOut));
-  var msg=document.getElementById("anMsg");
-  if(!window.Chart){if(msg)msg.textContent="Charts could not load (chart library unreachable) — numbers above are still live.";renderFlow(AUDIT_ROWS);return}
-  if(msg)msg.textContent="";
-  var palette=["#EC008C","#00AEEF","#7C5CFF","#22C55E","#F59E0B","#EF4444","#14B8A6","#F97316","#A855F7","#84CC16","#06B6D4"];
-  var catLabels=Object.keys(byCat),catData=catLabels.map(function(k){return byCat[k]});
-  drawChart("cat","chCat",{type:"doughnut",data:{labels:catLabels,datasets:[{data:catData,backgroundColor:palette}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{boxWidth:12,font:{size:11}}}}}});
-  drawChart("stock","chStock",{type:"doughnut",data:{labels:["In stock","Sold out"],datasets:[{data:[total-soldOut,soldOut],backgroundColor:["#22C55E","#EF4444"]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom"}}}});
-  drawChart("price","chPrice",{type:"bar",data:{labels:["Under Rs 10,000","Rs 10k – 50k","Rs 50k – 150k","Above Rs 150k"],datasets:[{data:bands,backgroundColor:["#00AEEF","#7C5CFF","#EC008C","#F59E0B"]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{stepSize:1},grid:{color:"#232842"}},x:{grid:{display:false}}}}});
-  try{
-    var headers=await sbHeaders();
-    var rc=await fetch(SB_AUDIT+"?select=id&limit=1",{headers:Object.assign({},headers,{Prefer:"count=exact"})});
-    var cr=rc.headers.get("content-range")||"";var tot=parseInt((cr.split("/")[1]||"0"),10);
-    set("anActions",isNaN(tot)?"—":fmtNum(tot));
-    var ra=await fetch(SB_AUDIT+"?select=action,created_at&order=created_at.desc&limit=500",{headers:headers});
-    var rows=await ra.json();
-    var days=[],keys=[];
-    for(var d=6;d>=0;d--){var dt=new Date(Date.now()-d*86400000);var key=dt.toLocaleDateString("en-GB",{timeZone:"Asia/Karachi",day:"2-digit",month:"short"});days.push(key);keys.push(key)}
-    var types=["login_success","login_failed","product_added","product_edited","product_deleted","logout"];
-    var tcol={login_success:"#22C55E",login_failed:"#EF4444",product_added:"#00AEEF",product_edited:"#F59E0B",product_deleted:"#EC008C",logout:"#8A90A8"};
-    var counts={};types.forEach(function(t){counts[t]=[0,0,0,0,0,0,0]});
-    (rows||[]).forEach(function(r){
-      var k=new Date(r.created_at).toLocaleDateString("en-GB",{timeZone:"Asia/Karachi",day:"2-digit",month:"short"});
-      var i=keys.indexOf(k);if(i<0||!counts[r.action])return;counts[r.action][i]++;
-    });
-    var ds=types.filter(function(t){return counts[t].some(function(v){return v>0})}).map(function(t){return {label:t,data:counts[t],backgroundColor:tcol[t]}});
-    if(!ds.length)ds=[{label:"admin actions",data:[0,0,0,0,0,0,0],backgroundColor:"#00AEEF"}];
-    drawChart("act","chActivity",{type:"bar",data:{labels:days,datasets:ds},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom",labels:{boxWidth:12,font:{size:11}}}},scales:{y:{ticks:{stepSize:1},stacked:true,grid:{color:"#232842"}},x:{stacked:true,grid:{display:false}}}}});
-  }catch(e){set("anActions","—")}
-  renderFlow(AUDIT_ROWS);
-}
-function renderAdminList(){
-  var box=document.getElementById("adminList");if(!box)return;
-  document.getElementById("adminCount").textContent=PRODUCTS.length;
-  var rows=PRODUCTS.slice().sort(function(a,b){return a.id-b.id});
-  box.innerHTML=rows.map(function(p){
-    return '<div class="arow" data-uuid="'+p.uuid+'" data-version="'+p.version+'" style="display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid #232842;flex-wrap:wrap">'
-    +'<img src="'+p.img+'" alt="" style="width:52px;height:52px;object-fit:cover;border-radius:10px"/>'
-    +'<div style="flex:1;min-width:180px"><b style="font-size:13px">'+p.name.replace(/</g,"&lt;")+'</b><br/><span style="color:#B9BFD6;font-size:12px">'+p.catLabel+' • '+p.brand+(p.soldOut?' • <span style="color:#FF5C5C">SOLD OUT</span>':'')+'</span></div>'
-    +'<label style="font-size:12px;color:#B9BFD6">Price<br/><input class="aprice" type="number" value="'+p.price+'" style="width:100px;background:#0B0D17;border:1px solid #2A2F45;color:#fff;border-radius:10px;padding:8px;outline:none"/></label>'
-    +'<label style="font-size:12px;color:#B9BFD6">Old price<br/><input class="awas" type="number" value="'+p.old+'" style="width:100px;background:#0B0D17;border:1px solid #2A2F45;color:#fff;border-radius:10px;padding:8px;outline:none"/></label>'
-    +'<label style="font-size:12px;color:#B9BFD6">Stock<br/><input class="astock" type="number" value="'+p.stock+'" style="width:80px;background:#0B0D17;border:1px solid #2A2F45;color:#fff;border-radius:10px;padding:8px;outline:none"/></label>'
-    +'<label style="font-size:12px;color:#B9BFD6;flex:1 1 100%">Photos — one URL per line (first is the card photo)<br/><textarea class="aphotos" rows="2" style="width:100%;background:#0B0D17;border:1px solid #2A2F45;color:#fff;border-radius:10px;padding:8px;outline:none;font-size:12px;resize:vertical">'+escHtml((p.rawImgs||[]).join("\n"))+'</textarea></label>'
-    +'<button class="btn btn-pink asave" type="button" style="min-height:40px;padding:0 16px">Save</button>'
-    +'<button class="btn btn-ghost adel" type="button" style="min-height:40px;padding:0 16px">Delete</button>'
-    +'</div>';
-  }).join("");
-}
-
-document.getElementById("adminLock").addEventListener("click",signOutAdmin);
-document.getElementById("adminLockTop").addEventListener("click",signOutAdmin);
-document.getElementById("npAdd").addEventListener("click",async function(){
-  var name=document.getElementById("npName").value.trim();
-  var brand=document.getElementById("npBrand").value.trim()||"Imran Games";
-  var cat=document.getElementById("npCat").value;
-  var price=parseInt(document.getElementById("npPrice").value,10);
-  var was=parseInt(document.getElementById("npWas").value,10);
-  var stock=parseInt(document.getElementById("npStock").value,10);
-  var urls=document.getElementById("npImgs").value.split("\n").map(function(s){return s.trim()}).filter(Boolean).slice(0,3);
-  var msg=document.getElementById("npMsg");
-  if(!name||!(price>0)||isNaN(stock)){msg.textContent="✖ Fill in the name, a price above 0, and stock.";return}
-  if(!urls.length){msg.textContent="✖ Paste at least 1 photo URL (Supabase Storage link).";return}
-  while(urls.length<3)urls.push(urls[0]);
-  var slug=nextNumId+"-"+slugify(name);
-  msg.textContent="Adding…";
-  try{
-    var added=await sbWrite("POST","",{name:name,slug:slug,category:cat,brand:brand,price:price,was_price:isNaN(was)?price:was,stock:stock,is_hot:document.getElementById("npHot").checked,is_new:document.getElementById("npNew").checked,image_urls:urls});if(!added||!added.length)throw new Error("Add failed — nothing was saved. Check that you are signed in and try again.");
-    await logAudit("product_added","product",added[0].id,name,{price:price,was_price:isNaN(was)?price:was,stock:stock,category:cat});
-    loadAuditLog();renderAnalytics();
-    nextNumId++;
-    msg.textContent="✓ Added — live on the shop now.";
-    ["npName","npBrand","npPrice","npWas","npStock","npImgs"].forEach(function(id){document.getElementById(id).value=""});
-    document.getElementById("npHot").checked=false;document.getElementById("npNew").checked=false;
-    loadProducts();
-  }catch(err){msg.textContent="✖ "+err.message;}
-});
-document.getElementById("adminList").addEventListener("click",async function(e){
-  var row=e.target.closest(".arow");if(!row)return;
-  var uuid=row.getAttribute("data-uuid");
-  var p=PRODUCTS.find(function(x){return x.uuid===uuid});
-  if(e.target.closest(".asave")){
-    var price=parseInt(row.querySelector(".aprice").value,10);
-    var was=parseInt(row.querySelector(".awas").value,10);
-    var stock=parseInt(row.querySelector(".astock").value,10);
-    if(!(price>0)||isNaN(stock)){showToast("✖ Price must be above 0 and stock a number");return}
-    var photoEl=row.querySelector(".aphotos");
-    var photoUrls=photoEl?photoEl.value.split("\n").map(function(s){return s.trim()}).filter(Boolean).slice(0,3):[];
-    var btn=e.target.closest(".asave");btn.textContent="Saving…";
-    try{var loadedVer=parseInt(row.getAttribute("data-version")||"1",10);if(!(loadedVer>0))loadedVer=(p&&p.version)||1;var patchBody={price:price,was_price:isNaN(was)?price:was,stock:stock,version:loadedVer+1};if(photoUrls.length)patchBody.image_urls=photoUrls;var upd=await sbWrite("PATCH","?id=eq."+uuid+"&version=eq."+loadedVer,patchBody);if(!upd||!upd.length){showToast("Someone changed this product — refresh and try again");btn.textContent="Save";loadProducts();return}var auditDetails={old_price:p?p.price:null,new_price:price,old_was_price:p?p.old:null,new_was_price:isNaN(was)?price:was,old_stock:p?p.stock:null,new_stock:stock};if(photoUrls.length)auditDetails.new_image_urls=photoUrls;await logAudit("product_edited","product",uuid,p?p.name:null,auditDetails);loadAuditLog();renderAnalytics();showToast("Saved ✓ — live on the shop now");loadProducts();}
-    catch(err){showToast("✖ "+err.message);btn.textContent="Save";}
-  }
-  if(e.target.closest(".adel")){
-    if(!p)return;
-    var delBtn=e.target.closest(".adel");
-    if(delBtn.getAttribute("data-arm")!=="1"){
-      delBtn.setAttribute("data-arm","1");
-      delBtn.textContent="Sure? Tap again to delete";
-      delBtn.style.background="#7F1D1D";delBtn.style.borderColor="#EF4444";
-      setTimeout(function(){try{delBtn.removeAttribute("data-arm");delBtn.textContent="Delete";delBtn.style.background="";delBtn.style.borderColor="";}catch(e){}},5000);
-      return;
-    }
-    try{var del=await sbWrite("DELETE","?id=eq."+uuid);if(!del||!del.length)throw new Error("Delete failed — nothing was deleted. Are you still signed in?");await logAudit("product_deleted","product",uuid,p?p.name:null,{price:p?p.price:null,stock:p?p.stock:null});loadAuditLog();renderAnalytics();showToast("Deleted ✓");loadProducts();}
-    catch(err){showToast("✖ "+err.message);}
-  }
-});
-
-
-/* ===== LOGIN PAGE — eye toggle, forgot password, reset, boot ===== */
-function showToast(msg){var t=document.getElementById("toast");if(!t)return;t.textContent=msg;t.classList.add("show");clearTimeout(showToast._t);showToast._t=setTimeout(function(){t.classList.remove("show")},2600);}
-document.getElementById("togglePass").addEventListener("click",function(){
-  var inp=document.getElementById("adminPass");
-  var show=inp.type==="password";inp.type=show?"text":"password";
-  this.textContent=show?"🙈":"👁";this.setAttribute("aria-label",show?"Hide password":"Show password");
-});
-function showCard(which){
-  ["loginCard","forgotCard","resetCard"].forEach(function(id){document.getElementById(id).style.display=(id===which)?"block":"none";});
-}
-document.getElementById("forgotLink").addEventListener("click",function(e){e.preventDefault();showCard("forgotCard");});
-document.getElementById("backToLogin").addEventListener("click",function(e){e.preventDefault();showCard("loginCard");});
-document.getElementById("backToLogin2").addEventListener("click",function(e){e.preventDefault();showCard("loginCard");});
-document.getElementById("fpSend").addEventListener("click",async function(){
-  var email=document.getElementById("fpEmail").value.trim();
-  var msg=document.getElementById("fpMsg");
-  if(!email||email.indexOf("@")===-1){msg.textContent="✖ Enter your admin email address.";return}
-  msg.textContent="Sending…";
-  try{
-    if(!sb)throw new Error("unavailable");
-    var r=await sb.auth.resetPasswordForEmail(email,{redirectTo:"https://imrangamesofficials.vercel.app/adminaccess/"});
-    if(r.error)throw r.error;
-    msg.textContent="✓ If that email is the admin email, a reset link was sent — check the inbox (and spam).";
-  }catch(err){
-    msg.textContent="✖ Could not send a reset link — email sending is not set up for this project. Ask Yaseen to reset the password in Supabase.";
-  }
-});
-document.getElementById("resetBtn").addEventListener("click",async function(){
-  var p1=document.getElementById("newPass").value;
-  var p2=document.getElementById("newPass2").value;
-  var msg=document.getElementById("resetMsg");
-  if(!p1||p1.length<6){msg.textContent="✖ New password must be at least 6 characters.";return}
-  if(p1!==p2){msg.textContent="✖ The two passwords do not match.";return}
-  msg.textContent="Updating…";
-  try{
-    var r=await sb.auth.updateUser({password:p1});
-    if(r.error)throw r.error;
-    try{if(sb)await sb.auth.signOut()}catch(e){}
-    showCard("loginCard");
-    document.getElementById("adminMsg").textContent="✓ Password updated — log in with your new password.";
-  }catch(err){msg.textContent="✖ "+(err.message||"Reset link expired — request a new one.");}
-});
-function checkRecovery(){
-  if(((location.hash||"").indexOf("type=recovery")!==-1)){
-    showCard("resetCard");
-    return true;
-  }
-  return false;
-}
-/* ===== boot (guarded — a boot failure must never break the already-registered Login button) ===== */
-try{loadProducts();}catch(e){}
-try{subscribeRealtime();}catch(e){}
-try{
-  var _isRecovery=checkRecovery();
-  if(sb&&!_isRecovery){sb.auth.getSession().then(function(r){if(r&&r.data&&r.data.session)showAdmin(r.data.session.user?r.data.session.user.email:"");}).catch(function(){});}
-}catch(e){}
-
+/* No-flash theme: set data-theme before admin.css loads (see DESIGN_SYSTEM.md §3). */
+try{var t=localStorage.getItem("ig-admin-theme");
+  if(!t)t=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";
+  document.documentElement.setAttribute("data-theme",t);}catch(e){
+  document.documentElement.setAttribute("data-theme","light");}
 </script>
+<link rel="stylesheet" href="/adminaccess/admin.css"/>
+<script src="/vendor/supabase-js-2.119.1.min.js"></script>
+<script src="/vendor/chart-4.4.1.umd.min.js"></script>
+</head>
+<body class="ig-admin">
+<div class="ig-shell">
+  <aside class="ig-sidebar" aria-label="Admin navigation">
+    <a class="ig-sidebar-brand" href="#/dashboard"><img src="/logo.png" alt="Imran Games logo"/><span class="ig-brand-word">Imran Games</span></a>
+    <nav class="ig-nav">
+      <a class="ig-nav-item" href="#/dashboard" data-route="dashboard"><span class="ig-nav-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg></span><span class="ig-nav-label">Dashboard</span></a>
+      <a class="ig-nav-item" href="#/orders" data-route="orders"><span class="ig-nav-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span><span class="ig-nav-label">Orders</span></a>
+      <a class="ig-nav-item" href="#/products" data-route="products"><span class="ig-nav-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><span class="ig-nav-label">Products</span></a>
+      <a class="ig-nav-item" href="#/reports" data-route="reports"><span class="ig-nav-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><span class="ig-nav-label">Reports</span></a>
+      <a class="ig-nav-item" href="#/customers" data-route="customers"><span class="ig-nav-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span class="ig-nav-label">Customers</span></a>
+      <a class="ig-nav-item" href="#/settings" data-route="settings"><span class="ig-nav-icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><span class="ig-nav-label">Settings</span></a>
+    </nav>
+    <div class="ig-sidebar-foot">
+      <div class="ig-sidebar-social" aria-hidden="true"><!-- No social links provided — hidden by default (see DESIGN_SYSTEM.md §5). --></div>
+      <a class="ig-back-shop" href="/">← Back to shop</a>
+    </div>
+  </aside>
+  <div class="ig-sidebar-scrim" aria-hidden="true"></div>
+  <div class="ig-main">
+    <header class="ig-topbar">
+      <button class="ig-icon-btn ig-menu-btn" type="button" data-ig-menu-btn aria-label="Open menu">☰</button>
+      <button class="ig-icon-btn" type="button" id="railToggle" aria-label="Collapse sidebar" title="Collapse sidebar">«</button>
+      <div class="ig-search"><span aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input type="search" placeholder="Search" data-ig-global-search aria-label="Search products"/><kbd>/</kbd></div>
+      <div class="ig-topbar-spacer"></div>
+      <button class="ig-icon-btn" type="button" data-ig-theme-toggle aria-label="Switch to dark mode" aria-pressed="false">☀</button>
+      <button class="ig-icon-btn" type="button" data-ig-bell aria-label="Notifications"><span aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span><span class="ig-bell-badge" data-ig-bell-badge hidden>0</span></button>
+      <div class="ig-avatar-menu">
+        <button class="ig-avatar-btn" type="button" data-ig-avatar-btn aria-haspopup="true" aria-expanded="false">
+          <span class="ig-avatar" id="avatarInitials">A</span>
+          <span class="ig-avatar-who"><b id="avatarName">Admin</b><span id="avatarRole">Admin</span></span>
+        </button>
+        <div class="ig-avatar-drop" role="menu">
+          <a href="#/settings">Profile</a>
+          <a href="#/settings">Settings</a>
+          <button type="button" id="avatarLogout">Log Out</button>
+        </div>
+      </div>
+    </header>
+    <main class="ig-content">
+
+      <!-- ================= DASHBOARD ================= -->
+      <section id="route-dashboard" aria-label="Dashboard">
+        <div id="adminBody" style="display:none">
+          <p class="ig-muted ig-small" style="margin:0 0 16px">Signed in as <b id="adminWho" style="color:var(--text)"></b> <button class="ig-btn ig-btn-ghost ig-btn-sm" id="adminLockTop" type="button" style="margin-left:8px">Log Out</button></p>
+          <div class="ig-page-header">
+            <h1 class="ig-page-title">Dashboard</h1>
+            <div id="dashRange"></div>
+          </div>
+          <div class="ig-grid ig-grid-4" id="dashKpis"></div>
+          <div class="ig-grid ig-grid-2">
+            <div class="ig-card">
+              <div class="ig-card-head"><h2 class="ig-card-title">Market Overview</h2><div id="marketSeg"></div></div>
+              <div class="ig-chart-wrap"><canvas id="chMarket"></canvas></div>
+              <div class="ig-chart-legend"><span><span class="ig-dot" style="background:#0a00ff"></span>Total Revenue</span><span><span class="ig-dot" style="background:#a8d98a"></span>Total Sale</span></div>
+              <p class="ig-muted ig-small" id="marketMsg" style="margin:12px 0 0"></p>
+            </div>
+            <div class="ig-card">
+              <div class="ig-card-head"><h2 class="ig-card-title">Sales by Category</h2></div>
+              <div class="ig-chart-wrap"><canvas id="chDonut"></canvas></div>
+              <div class="ig-chart-legend" id="donutLegend"></div>
+              <div id="donutEmpty"></div>
+            </div>
+          </div>
+          <div class="ig-card">
+            <div class="ig-card-head"><h2 class="ig-card-title">Recent Orders</h2><button class="ig-btn ig-btn-primary ig-btn-sm" type="button" id="dashAddOrder">+ Add Order</button></div>
+            <div id="recentOrdersWrap"></div>
+          </div>
+          <div class="ig-card">
+            <div class="ig-card-head"><h2 class="ig-card-title">Inventory &amp; Activity — Live Shop Numbers</h2></div>
+            <p class="ig-muted ig-small" style="margin:0 0 16px">Computed live from Supabase every time this panel opens — no demo numbers.</p>
+            <div class="ig-grid ig-grid-5" style="margin-bottom:20px">
+              <div class="ig-stat-mini"><div class="ig-muted ig-small">Total products</div><b id="anTotal">—</b></div>
+              <div class="ig-stat-mini"><div class="ig-muted ig-small">Stock units</div><b id="anStock">—</b></div>
+              <div class="ig-stat-mini"><div class="ig-muted ig-small">Inventory value</div><b id="anValue">—</b></div>
+              <div class="ig-stat-mini"><div class="ig-muted ig-small">Sold out</div><b id="anSoldOut">—</b></div>
+              <div class="ig-stat-mini"><div class="ig-muted ig-small">Admin actions logged</div><b id="anActions">—</b></div>
+            </div>
+            <div class="ig-grid ig-grid-2">
+              <div><h3 class="ig-card-title" style="margin-bottom:8px">Products by category</h3><div class="ig-chart-wrap"><canvas id="chCat"></canvas></div></div>
+              <div><h3 class="ig-card-title" style="margin-bottom:8px">Stock overview</h3><div class="ig-chart-wrap"><canvas id="chStock"></canvas></div></div>
+              <div><h3 class="ig-card-title" style="margin-bottom:8px">Admin activity — last 7 days</h3><div class="ig-chart-wrap"><canvas id="chActivity"></canvas></div></div>
+              <div><h3 class="ig-card-title" style="margin-bottom:8px">Price range</h3><div class="ig-chart-wrap"><canvas id="chPrice"></canvas></div></div>
+            </div>
+            <p class="ig-muted ig-small" id="anMsg" style="margin:12px 0 0"></p>
+            <h3 class="ig-card-title" style="margin:20px 0 8px">Live Flow — latest activity</h3>
+            <div id="flowList"><p class="ig-muted ig-small" style="margin:0">Loading flow…</p></div>
+          </div>
+          <div class="ig-card">
+            <div class="ig-card-head"><h2 class="ig-card-title">History — Audit Log (<span id="auditCount">0</span>)</h2></div>
+            <p class="ig-muted ig-small" style="margin:0 0 8px">Every sign-in, sign-out, add, edit and delete — newest first, times in Pakistan time (PKT).</p>
+            <div id="auditList"><p class="ig-muted ig-small" style="margin:0">Loading history…</p></div>
+          </div>
+          <div style="margin-top:16px"><button class="ig-btn ig-btn-ghost" id="adminLock" type="button">Log Out</button></div>
+        </div>
+      </section>
+
+      <!-- ================= ORDERS ================= -->
+      <section id="route-orders" hidden>
+        <div class="ig-page-header">
+          <h1 class="ig-page-title">Orders</h1>
+          <div id="ordRange"></div>
+        </div>
+        <div class="ig-grid ig-grid-4" id="ordKpis"></div>
+        <div class="ig-card" id="orderFormCard" hidden>
+          <div class="ig-card-head"><h2 class="ig-card-title">Add Order</h2><button class="ig-icon-btn" type="button" id="orderFormClose" aria-label="Close form">✕</button></div>
+          <div class="ig-form-grid">
+            <div class="ig-field"><label for="ofName">Customer name *</label><input class="ig-input" id="ofName" placeholder="Customer name"/></div>
+            <div class="ig-field"><label for="ofPhone">Phone *</label><input class="ig-input" id="ofPhone" placeholder="03xx-xxxxxxx" inputmode="tel"/></div>
+            <div class="ig-field"><label for="ofCity">City</label><input class="ig-input" id="ofCity" value="Peshawar"/></div>
+            <div class="ig-field"><label for="ofAddress">Address *</label><input class="ig-input" id="ofAddress" placeholder="Street / area"/></div>
+            <div class="ig-field"><label for="ofPay">Payment method</label><select class="ig-select" id="ofPay"><option>COD</option><option>JazzCash</option><option>Easypaisa</option><option>Bank</option></select></div>
+            <div class="ig-field"><label for="ofStatus">Status</label><select class="ig-select" id="ofStatus"><option>Pending</option><option>Paid</option><option>Processing</option><option>Shipped</option><option>Delivered</option><option>Canceled</option><option>Refunded</option></select></div>
+            <div class="ig-field"><label for="ofDisc">Discount (Rs)</label><input class="ig-input" id="ofDisc" type="number" min="0" value="0"/></div>
+            <div class="ig-field"><label for="ofCode">Discount code (optional)</label><input class="ig-input" id="ofCode" placeholder="e.g. EID10"/></div>
+            <div class="ig-field"><label for="ofFee">Delivery fee (Rs)</label><input class="ig-input" id="ofFee" type="number" min="0" value="350"/></div>
+            <div class="ig-field"><label for="ofNotes">Notes</label><input class="ig-input" id="ofNotes" placeholder="Optional note"/></div>
+          </div>
+          <div class="ig-field"><label>Items *</label>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <select class="ig-select" id="ofProd" style="flex:1;min-width:220px"></select>
+              <input class="ig-input" id="ofQty" type="number" min="1" value="1" style="width:90px"/>
+              <button class="ig-btn ig-btn-ghost" type="button" id="ofAddItem">+ Add item</button>
+            </div>
+            <div id="ofItems" style="margin-top:10px"></div>
+          </div>
+          <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin:6px 0 14px">
+            <label class="ig-toggle"><input type="checkbox" id="ofDeduct"/><span class="ig-track"></span> Deduct stock</label>
+            <span class="ig-muted ig-small" id="ofTotals">Subtotal Rs. 0 — Total Rs. 0</span>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <button class="ig-btn ig-btn-primary" id="ofSubmit" type="button">Save Order</button>
+            <span class="ig-muted ig-small" id="ofMsg"></span>
+          </div>
+        </div>
+        <div class="ig-card">
+          <div class="ig-card-head"><h2 class="ig-card-title">Recent Orders</h2><button class="ig-btn ig-btn-primary ig-btn-sm" type="button" id="ordAddBtn">+ Add Order</button></div>
+          <div id="ordersTableWrap"></div>
+          <div id="ordersPager"></div>
+        </div>
+      </section>
+
+      <!-- ================= PRODUCTS ================= -->
+      <section id="route-products" hidden>
+        <div class="ig-page-header"><h1 class="ig-page-title">Products</h1></div>
+        <div class="ig-card">
+          <div class="ig-table-toolbar">
+            <select class="ig-select" id="prodCatFilter" style="width:200px"><option value="">All Categories</option></select>
+            <button class="ig-btn ig-btn-primary" type="button" id="prodAddBtn">+ Add New Item</button>
+            <span class="ig-muted ig-small" id="prodCount" style="margin-left:auto"></span>
+          </div>
+          <div class="ig-tile-grid" id="prodTiles"></div>
+          <div id="prodPager"></div>
+        </div>
+        <div class="ig-card">
+          <div class="ig-card-head"><h2 class="ig-card-title">Product Lists (<span id="adminCount">0</span>)</h2></div>
+          <p class="ig-muted ig-small" style="margin:0 0 8px">Edit the price, old price, stock or photo URLs, then press Save. Delete asks first — tap twice to confirm. Every change goes live on the shop right away.</p>
+          <div class="ig-table-wrap">
+            <table class="ig-table">
+              <thead><tr><th>Photo</th><th>Product</th><th>Price</th><th>Old price</th><th>Stock</th><th>Photos</th><th class="ig-actions">Actions</th></tr></thead>
+              <tbody id="adminList"></tbody>
+            </table>
+          </div>
+          <div id="prodListPager"></div>
+        </div>
+      </section>
+
+      <!-- ================= REPORTS ================= -->
+      <section id="route-reports" hidden>
+        <div class="ig-page-header">
+          <h1 class="ig-page-title">Reports</h1>
+          <div id="repRange"></div>
+        </div>
+        <div class="ig-card">
+          <div class="ig-card-head"><h2 class="ig-card-title">Revenue by Day</h2></div>
+          <div class="ig-chart-wrap tall"><canvas id="chRepRev"></canvas></div>
+          <p class="ig-muted ig-small" id="repMsg" style="margin:12px 0 0"></p>
+        </div>
+        <div class="ig-grid ig-grid-2">
+          <div class="ig-card">
+            <div class="ig-card-head"><h2 class="ig-card-title">Top Products</h2></div>
+            <div id="repTopWrap"></div>
+          </div>
+          <div class="ig-card">
+            <div class="ig-card-head"><h2 class="ig-card-title">Orders by Status</h2></div>
+            <div id="repStatusWrap"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= CUSTOMERS ================= -->
+      <section id="route-customers" hidden>
+        <div class="ig-page-header"><h1 class="ig-page-title">Customers</h1></div>
+        <div class="ig-card">
+          <div class="ig-card-head"><h2 class="ig-card-title">Customers</h2></div>
+          <p class="ig-muted ig-small" style="margin:0 0 8px">Customers are grouped by phone from real orders — newest name and city shown.</p>
+          <div id="custTableWrap"></div>
+        </div>
+      </section>
+
+      <!-- ================= SETTINGS ================= -->
+      <section id="route-settings" hidden>
+        <div class="ig-page-header"><h1 class="ig-page-title">Settings</h1></div>
+        <div class="ig-grid ig-grid-2">
+          <div class="ig-card">
+            <div class="ig-card-head"><h2 class="ig-card-title">Account</h2></div>
+            <p style="margin:0 0 6px">Signed in as <b id="setEmail">—</b></p>
+            <p style="margin:0 0 6px">Role: <b id="setRole">—</b></p>
+            <p class="ig-muted ig-small" style="margin:0">Role decides what this account can do: Owner can do everything, Manager can add/edit but not delete, Viewer is read-only. Roles are enforced by the database, not just this page.</p>
+          </div>
+          <div class="ig-card">
+            <div class="ig-card-head"><h2 class="ig-card-title">Appearance</h2></div>
+            <p class="ig-muted ig-small" style="margin:0 0 12px">Theme is saved on this device.</p>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="ig-btn ig-btn-ghost" type="button" id="setThemeLight">Light</button>
+              <button class="ig-btn ig-btn-ghost" type="button" id="setThemeDark">Dark</button>
+              <button class="ig-btn ig-btn-ghost" type="button" id="setThemeSystem">System</button>
+            </div>
+          </div>
+        </div>
+        <div class="ig-card">
+          <div class="ig-card-head"><h2 class="ig-card-title">Audit Log (<span id="setAuditCount">0</span>)</h2></div>
+          <div class="ig-table-toolbar">
+            <select class="ig-select" id="auditFilter" style="width:200px">
+              <option value="">All actions</option><option>login_success</option><option>login_failed</option><option>logout</option><option>product_added</option><option>product_edited</option><option>product_deleted</option><option>order_added</option><option>order_edited</option><option>order_deleted</option>
+            </select>
+            <input class="ig-input" id="auditSearch" placeholder="Search email or record…" style="flex:1;min-width:200px"/>
+          </div>
+          <div id="setAuditList"><p class="ig-muted ig-small" style="margin:0">Loading history…</p></div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- Add product modal (reuses the existing np* add handler in app.js) -->
+<div class="ig-overlay" id="prodModal" role="dialog" aria-modal="true" aria-label="Add a new product">
+  <div class="ig-modal">
+    <div class="ig-modal-head"><h2 class="ig-card-title" style="font-size:16px">＋ Add a new product</h2><button class="ig-icon-btn" type="button" data-ig-close-modal="prodModal" aria-label="Close">✕</button></div>
+    <div class="ig-form-grid">
+      <div class="ig-field"><label for="npName">Product name *</label><input class="ig-input" id="npName" placeholder="Product name *"/></div>
+      <div class="ig-field"><label for="npBrand">Brand</label><input class="ig-input" id="npBrand" placeholder="Brand (e.g. Sony PlayStation)"/></div>
+      <div class="ig-field"><label for="npCat">Category</label><select class="ig-select" id="npCat"><option>Consoles</option><option>Premium Tech</option><option>Controllers</option><option>Headsets</option><option>Racing Wheels</option><option>PS4 Games</option><option>PS5 Games</option><option>Gift Cards</option><option>Gaming Chairs</option><option>Gaming Setups</option><option>Room Lighting</option></select></div>
+      <div class="ig-field"><label for="npPrice">Price (PKR) *</label><input class="ig-input" id="npPrice" type="number" min="1" placeholder="Price (PKR) *"/></div>
+      <div class="ig-field"><label for="npWas">Old price (PKR, optional)</label><input class="ig-input" id="npWas" type="number" min="0" placeholder="Old price (PKR, optional)"/></div>
+      <div class="ig-field"><label for="npStock">Stock quantity *</label><input class="ig-input" id="npStock" type="number" min="0" placeholder="Stock quantity *"/></div>
+    </div>
+    <div class="ig-field"><label for="npImgs">Photo URLs — one per line, up to 3</label><textarea class="ig-textarea" id="npImgs" rows="3" placeholder="Paste Supabase Storage links from the product-images bucket (one per line). The first photo is the card photo."></textarea><span class="ig-hint">Tip: upload photos first in Supabase → Storage → product-images, then paste the public URLs here.</span></div>
+    <div style="display:flex;gap:18px;flex-wrap:wrap;margin:0 0 14px;align-items:center">
+      <label style="font-size:14px"><input type="checkbox" id="npHot"/> 🔥 Hot deal</label>
+      <label style="font-size:14px"><input type="checkbox" id="npNew"/> 🆕 New</label>
+    </div>
+    <div class="ig-modal-foot" style="margin-top:0">
+      <span class="ig-muted ig-small" id="npMsg" style="margin-right:auto"></span>
+      <button class="ig-btn ig-btn-ghost" type="button" data-ig-close-modal="prodModal">Cancel</button>
+      <button class="ig-btn ig-btn-primary" id="npAdd" type="button">Add Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit product modal (price / old price / stock / photos, optimistic locking via version) -->
+<div class="ig-overlay" id="prodEditModal" role="dialog" aria-modal="true" aria-label="Edit product">
+  <div class="ig-modal">
+    <div class="ig-modal-head"><h2 class="ig-card-title" style="font-size:16px">Edit product</h2><button class="ig-icon-btn" type="button" data-ig-close-modal="prodEditModal" aria-label="Close">✕</button></div>
+    <p style="margin:0 0 14px"><b id="epName">—</b></p>
+    <input type="hidden" id="epUuid"/><input type="hidden" id="epVersion"/>
+    <div class="ig-form-grid">
+      <div class="ig-field"><label for="epPrice">Price (PKR) *</label><input class="ig-input" id="epPrice" type="number" min="1"/></div>
+      <div class="ig-field"><label for="epWas">Old price (PKR)</label><input class="ig-input" id="epWas" type="number" min="0"/></div>
+      <div class="ig-field"><label for="epStock">Stock</label><input class="ig-input" id="epStock" type="number" min="0"/></div>
+    </div>
+    <div class="ig-field"><label for="epPhotos">Photo URLs — one per line (first is the card photo)</label><textarea class="ig-textarea" id="epPhotos" rows="3"></textarea></div>
+    <div class="ig-modal-foot" style="margin-top:0">
+      <span class="ig-muted ig-small" id="epMsg" style="margin-right:auto"></span>
+      <button class="ig-btn ig-btn-ghost" type="button" data-ig-close-modal="prodEditModal">Cancel</button>
+      <button class="ig-btn ig-btn-primary" id="epSave" type="button">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="ig-toast" id="toast"></div>
+<script src="/adminaccess/ui.js"></script>
+<script src="/adminaccess/app.js"></script>
 </body>
 </html>
