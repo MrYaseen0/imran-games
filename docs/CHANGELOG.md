@@ -3,6 +3,63 @@
 Append-only log. Add a dated entry every time something changes — a
 fix, a migration, a deploy. Never rewrite old entries.
 
+## 2026-11-19 — Admin Wave 4 (fix + rebuild): root-relative paths, reference dashboard
+
+- **Root cause of the Wave 3 live failure:** Vercel cleanUrls serves the
+  dashboard at `/adminaccess` (no trailing slash), so every relative
+  asset URL resolved against the site root and 404'd (`admin.css`,
+  `ui.js`, `app.js` → `/admin.css` etc.). No CSS, no JS — unstyled
+  dashboard, no products, dead routes, dead logout. Fix: every asset
+  and navigation URL in `login.html`, `index.html`, and `app.js` is now
+  root-relative (`/adminaccess/admin.css`, `/adminaccess/app.js`,
+  `/vendor/…`, `/logo.png`, `/adminaccess/login.html`); verified by
+  script to resolve from both `/adminaccess` and `/adminaccess/`.
+  Login logic, CAPTCHA config, and auth settings unchanged.
+- **Dashboard rebuilt to the reference (screenshot 02):** KPI cards
+  (Revenue, Orders, Orders Paid, Low stock items — not Visitors) with
+  sparklines + deltas from `get_kpi_deltas`; Market Overview line chart
+  (Weekly/Monthly/Yearly) from `v_revenue_daily`; Sales by Category
+  donut from `v_sales_by_category`; Recent Orders table; Inventory &
+  Activity panel + Live Flow + History restyled to the design system
+  (light + dark). Real 0s and empty states — no demo numbers.
+- **Orders (screenshot 03):** KPI cards (Orders, Orders Paid,
+  Discounts, Refunds) + manual "+ Add Order" form (customer, phone,
+  city, address, payment, items from live products, discount, delivery
+  fee, status, notes, "deduct stock" toggle via
+  `deduct_stock_for_order` — never `reserve_stock`); inline status
+  edit, tap-twice delete (Owner only), explicit "Restore stock" on
+  canceled + deducted orders. Recent Orders table, paginated.
+- **Products (screenshot 04):** category filter (live `categories`
+  table), product tiles (pink tint, real photo, price + was-price,
+  green discount badge, "No ratings yet" — no invented stars) with
+  Edit/Delete, 8/page pagination; Product Lists table (inline
+  price/stock/photo editing, optimistic locking, tap-twice delete),
+  10/page. Add form moved to a modal; edit form is a modal too.
+- **Reports / Customers / Settings:** revenue-by-day chart + top
+  products + orders by status (real views); customers view by phone;
+  account card with the real role from `admin_role()`, theme choice
+  (Light/Dark/System), filterable audit log (PKT).
+- **Roles in the UI:** Owner/Manager/Viewer — Viewer hides all write
+  buttons, Manager hides delete buttons; the database (RLS) still
+  enforces everything. Avatar shows the real role.
+- Not live-tested yet — preview deploy + live login → dashboard →
+  orders → products → logout is the orchestrator's QA. No deploy, no
+  commit, no SQL run in this wave.
+
+## 2026-11-19 — Admin Wave 3: login/dashboard split + app shell
+
+- Split `/adminaccess`: new `login.html` (only thing logged-out visitors
+  receive — login/forgot/reset cards + invisible hCaptcha, same sitekey),
+  `index.html` rewritten as the dashboard shell only (sidebar, topbar,
+  hash routes `#/dashboard` … `#/settings`, no login markup), new
+  `app.js` (session guard, routing, shell wiring, dashboard data
+  functions moved verbatim). Login restyled with `admin.css` (§12
+  appended, §10 rules untouched). See `docs/admin/AUTH.md` for the full
+  list of moved functions and the adaptations (reset redirectTo →
+  `login.html`; sign-out → `login.html?signed-out=1`; `showAdmin`
+  handover). Login logic, CAPTCHA config, and auth settings unchanged.
+  Not live-tested yet — live login → dashboard → logout is Wave 3 QA.
+
 ## 2026-11-19 — Project knowledge base created
 
 - Added `AGENTS.md` (router, <200 lines) + `docs/` (architecture,

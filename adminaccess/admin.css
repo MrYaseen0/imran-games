@@ -807,3 +807,74 @@ body.ig-rail .ig-main { margin-left: var(--sidebar-rail-width); }
   .ig-grid-products { grid-template-columns: 1fr; }
   .ig-grid-4 { grid-template-columns: 1fr; }
 }
+
+/* --------------------------------------------------------------------------
+   12. Login (Wave 3 restyle — additive only, appended 2026-11-19)
+   The login logic is unchanged; only the look moved from the old purple
+   gradient to this design system (tokens above). Only login.html uses
+   these classes. The .ig-login-wrap / .ig-login-card rules in §10 are
+   untouched — the rules below fill in the form elements §10 did not cover.
+   -------------------------------------------------------------------------- */
+.ig-login-page { min-height: 100vh; }
+.ig-login-head { text-align: center; padding: 44px 16px 8px; }
+.ig-login-head img { height: 74px; max-width: 82vw; object-fit: contain; }
+.ig-login-hello {
+  display: inline-block; margin-top: 22px;
+  background: var(--primary-soft);
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  font-size: 22px; font-weight: 700;
+  padding: 8px 22px; border-radius: 999px;
+}
+.ig-login-card label {
+  display: block; font-size: 13px; font-weight: 600;
+  color: var(--text); margin: 14px 0 6px;
+}
+.ig-login-pass { position: relative; }
+.ig-login-pass input { padding-right: 44px; }
+.ig-login-pass button {
+  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
+  border: 0; background: none; font-size: 17px; cursor: pointer; padding: 6px;
+  color: var(--text);
+}
+.ig-login-row {
+  display: flex; justify-content: space-between; align-items: center;
+  margin: 14px 0 18px; font-size: 13px;
+}
+.ig-login-remember {
+  display: flex !important; align-items: center; gap: 6px;
+  margin: 0 !important; font-weight: 400 !important; color: var(--text-muted);
+}
+.ig-login-remember input { accent-color: var(--primary); }
+.ig-login-msg {
+  margin: 12px 0 0; font-size: 13px; color: var(--text-muted);
+  min-height: 18px; text-align: center;
+}
+.ig-login-back { text-align: center; font-size: 13px; margin: 14px 0 0; }
+.ig-login-tiny { text-align: center; color: var(--text-muted); font-size: 12px; margin: 18px 0 0; }
+@media (max-width: 560px) {
+  .ig-login-hello { font-size: 18px; }
+  .ig-login-head img { height: 56px; }
+  .ig-login-card { padding: 28px 20px 22px; }
+}
+/* Rail toggle lives in the dashboard topbar; the mobile drawer replaces it. */
+@media (max-width: 767px) { #railToggle { display: none; } }
+
+/* --------------------------------------------------------------------------
+   13. Wave 4 additions — order form grid, inventory stat tiles, 5-up grid
+   (additive only, appended 2026-11-19)
+   -------------------------------------------------------------------------- */
+.ig-form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 14px; }
+@media (max-width: 767px) { .ig-form-grid { grid-template-columns: 1fr; } }
+.ig-grid-5 { grid-template-columns: repeat(5, 1fr); }
+@media (max-width: 1279px) { .ig-grid-5 { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 767px) { .ig-grid-5 { grid-template-columns: repeat(2, 1fr); } }
+.ig-stat-mini {
+  background: var(--input-bg);
+  border: 1px solid var(--table-line);
+  border-radius: 8px;
+  padding: 14px;
+}
+.ig-stat-mini b { font-size: 22px; display: block; margin-top: 2px; }
+.ig-tile-actions .ig-btn { flex: 1; }
+#adminList .ig-input { padding: 8px 10px; }

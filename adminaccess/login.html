@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="robots" content="noindex, nofollow"/>
+<meta name="color-scheme" content="light dark"/>
+<title>Imran Games — Admin Login</title>
+<meta name="description" content="Private admin area for Imran Games, Peshawar. Not indexed."/>
+<link rel="icon" href="/logo.png"/>
+<script>
+/* No-flash theme: set data-theme before admin.css loads (see DESIGN_SYSTEM.md §3). */
+try{var t=localStorage.getItem("ig-admin-theme");
+  if(!t)t=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";
+  document.documentElement.setAttribute("data-theme",t);}catch(e){
+  document.documentElement.setAttribute("data-theme","light");}
+</script>
+<link rel="stylesheet" href="/adminaccess/admin.css"/>
+<script src="/vendor/supabase-js-2.119.1.min.js"></script>
+<script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+<script src="/adminaccess/ui.js"></script>
+</head>
+<body class="ig-admin ig-login-page">
+  <div class="ig-login-head">
+    <img src="/logo.png" alt="Imran Games logo"/>
+    <div><span class="ig-login-hello">Hello 👋 Welcome!</span></div>
+  </div>
+  <div class="ig-login-wrap">
+    <div class="ig-login-card" id="loginCard">
+      <h1>Login</h1>
+      <p class="ig-sub">Please login to admin dashboard</p>
+      <label for="adminEmail">Email/Username*</label>
+      <input class="ig-input" id="adminEmail" type="email" placeholder="admin@solon.com" autocomplete="username"/>
+      <label for="adminPass">Password*</label>
+      <div class="ig-login-pass">
+        <input class="ig-input" id="adminPass" type="password" placeholder="••••••••" autocomplete="current-password"/>
+        <button type="button" id="togglePass" aria-label="Show password">👁</button>
+      </div>
+      <div class="ig-login-row">
+        <label class="ig-login-remember"><input type="checkbox" id="rememberMe"/> Remember me</label>
+        <a href="#" id="forgotLink">Forgot password?</a>
+      </div>
+      <div class="h-captcha" data-sitekey="4a987a46-c580-4114-8158-bf841bfe08de" data-size="invisible"></div>
+      <button class="ig-btn ig-btn-primary ig-btn-block" id="adminUnlock" type="button">Login</button>
+      <p id="adminMsg" class="ig-login-msg"></p>
+      <p class="ig-login-back"><a href="/">← Back to shop</a></p>
+    </div>
+    <div class="ig-login-card" id="forgotCard" style="display:none">
+      <h1>Reset password</h1>
+      <p class="ig-sub">We will email you a reset link for your admin account.</p>
+      <label for="fpEmail">Admin email*</label>
+      <input class="ig-input" id="fpEmail" type="email" placeholder="admin@solon.com" autocomplete="username"/>
+      <div style="height:16px"></div>
+      <button class="ig-btn ig-btn-primary ig-btn-block" id="fpSend" type="button">Send reset link</button>
+      <p id="fpMsg" class="ig-login-msg"></p>
+      <p class="ig-login-back"><a href="#" id="backToLogin">← Back to login</a></p>
+    </div>
+    <div class="ig-login-card" id="resetCard" style="display:none">
+      <h1>Set new password</h1>
+      <p class="ig-sub">Choose a new password for your admin account.</p>
+      <label for="newPass">New password*</label>
+      <input class="ig-input" id="newPass" type="password" placeholder="At least 12 characters" autocomplete="new-password"/>
+      <label for="newPass2">Confirm new password*</label>
+      <input class="ig-input" id="newPass2" type="password" placeholder="Repeat new password" autocomplete="new-password"/>
+      <div style="height:16px"></div>
+      <button class="ig-btn ig-btn-primary ig-btn-block" id="resetBtn" type="button">Update password</button>
+      <p id="resetMsg" class="ig-login-msg"></p>
+      <p class="ig-login-back"><a href="#" id="backToLogin2">← Back to login</a></p>
+    </div>
+    <p class="ig-login-tiny">Private admin area — Imran Games. This page is not linked from the shop.</p>
+  </div>
+  <div class="ig-toast" id="toast"></div>
+<script>
+/* ==========================================================================
+   Imran Games — Admin Login (login.html)
+   Wave 3 (2026-11-19): the login side of the split. This page is the ONLY
+   thing logged-out visitors receive — no dashboard markup, no product or
+   analytics code. The login LOGIC below is moved verbatim from the old
+   adminaccess/index.html (same file, same handlers, same messages).
+   The only logic changes are the split adaptations documented in
+   docs/admin/AUTH.md (reset redirectTo → login.html; showAdmin hands over
+   to index.html; dashboard redirect reasons shown here on boot).
+   ========================================================================== */
+var SB_URL="https://vnbaizpqucimomrfvfpd.supabase.co";
+var SB_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZuYmFpenBxdWNpbW9tcmZ2ZnBkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ5ODA4NDMsImV4cCI6MjExMDU1Njg0M30.9-Zsqx811GKk0QP7ASoxQATbATzwmBtNy521jYeE1mg";
+/* H-05 (2026-11-19): Remember me defaults to UNCHECKED — tokens live in
+   sessionStorage unless the box is checked (localStorage). A missing flag is
+   treated as unchecked (sessionStorage), so old localStorage sessions are
+   not silently restored as persistent. */
+var igStorage={
+  getItem:function(k){try{return (localStorage.getItem("ig_remember")==="1"?localStorage:sessionStorage).getItem(k)}catch(e){return null}},
+  setItem:function(k,v){try{(localStorage.getItem("ig_remember")==="1"?localStorage:sessionStorage).setItem(k,v)}catch(e){}},
+  removeItem:function(k){try{localStorage.removeItem(k)}catch(e){}try{sessionStorage.removeItem(k)}catch(e){}}
+};
+/* H-05: idle timeout — 30 minutes without activity signs the admin out.
+   Activity = mouse/keyboard/touch/scroll + any network request. Last-activity
+   is persisted (throttled) so a stale session is also refused at boot. */
+var IG_IDLE_MS=30*60*1000; /* 30 minutes — do not shorten in the shipped page */
+var igLastActivity=Date.now();
+var _igLastPersisted=0;
+function igBumpActivity(){igLastActivity=Date.now();if(igLastActivity-_igLastPersisted>30000){_igLastPersisted=igLastActivity;try{localStorage.setItem("ig_last_activity",String(igLastActivity))}catch(e){}}}
+function igStoredLastActivity(){try{var v=parseInt(localStorage.getItem("ig_last_activity")||"0",10);return v>0?v:0}catch(e){return 0}}
+function igClearAuthStorage(){
+  /* L-03: explicitly remove stored auth tokens from BOTH storages — the SDK's
+     own cleanup is not relied on alone. Supabase token keys start with "sb-". */
+  try{Object.keys(localStorage).forEach(function(k){if(k.indexOf("sb-")===0)localStorage.removeItem(k)})}catch(e){}
+  try{Object.keys(sessionStorage).forEach(function(k){if(k.indexOf("sb-")===0)sessionStorage.removeItem(k)})}catch(e){}
+  try{localStorage.removeItem("ig_remember")}catch(e){}
+  try{localStorage.removeItem("ig_last_activity")}catch(e){}
+  try{sessionStorage.removeItem("ig_last_activity")}catch(e){}
+}
+var sb=null; /* created lazily by ensureSb() — a client-init failure must never kill the Login button */
+try{if(window.supabase&&window.supabase.createClient){sb=window.supabase.createClient(SB_URL,SB_ANON,{auth:{storage:igStorage,autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}});}}catch(e){sb=null;}
+
+/* This page never unlocks a dashboard inline — a valid session hands over
+   to index.html (see showAdmin). The flag stays false so the idle interval
+   below is a no-op here. */
+var ADMIN_UNLOCKED=false;
+
+/* H-05: wire activity events + network activity into the idle clock, and check
+   once a minute — 30 idle minutes signs the admin out with a clear message. */
+["mousemove","keydown","mousedown","touchstart","wheel","scroll"].forEach(function(ev){try{window.addEventListener(ev,igBumpActivity,{passive:true})}catch(e){try{window.addEventListener(ev,igBumpActivity)}catch(e2){}}});
+try{var _igFetch=window.fetch;window.fetch=function(){igBumpActivity();return _igFetch.apply(this,arguments);};}
+catch(e){/* fetch cannot be wrapped — user events still reset the clock */}
+setInterval(function(){
+  if(!ADMIN_UNLOCKED)return;
+  if(Date.now()-igLastActivity>IG_IDLE_MS){
+    try{signOutAdmin();}catch(e){}
+    igSetMsg("Signed out after 30 minutes of inactivity — log in again.");
+  }
+},60000);
+
+/* ===== LOGIN — handler registered FIRST, before any other init, so the button can never sit dead ===== */
+function igSetMsg(t){try{var m=document.getElementById("adminMsg");if(m)m.textContent=t;}catch(e){}}
+function igLoadSupabaseLib(){
+  if(window.supabase&&window.supabase.createClient)return Promise.resolve(true);
+  return new Promise(function(resolve){
+    var done=false;
+    var finish=function(ok){if(!done){done=true;resolve(ok);}};
+    try{
+      var s=document.createElement("script");
+      s.src="/vendor/supabase-js-2.119.1.min.js";
+      s.onload=function(){finish(!!(window.supabase&&window.supabase.createClient));};
+      s.onerror=function(){finish(false);};
+      document.head.appendChild(s);
+      setTimeout(function(){finish(!!(window.supabase&&window.supabase.createClient));},10000);
+    }catch(e){finish(false);}
+  });
+}
+async function ensureSb(){
+  if(sb)return sb;
+  try{
+    if(window.supabase&&window.supabase.createClient){
+      sb=window.supabase.createClient(SB_URL,SB_ANON,{auth:{storage:igStorage,autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}});
+      if(sb)return sb;
+    }
+  }catch(e){sb=null;}
+  var ok=await igLoadSupabaseLib();
+  if(!ok)return null;
+  try{
+    sb=window.supabase.createClient(SB_URL,SB_ANON,{auth:{storage:igStorage,autoRefreshToken:true,persistSession:true,detectSessionInUrl:true}});
+  }catch(e){sb=null;}
+  return sb;
+}
+async function igDoLogin(){
+  var emailEl=document.getElementById("adminEmail"),passEl=document.getElementById("adminPass"),btn=document.getElementById("adminUnlock");
+  var email=emailEl?emailEl.value.trim():"";
+  var pass=passEl?passEl.value:"";
+  if(!email||!pass){igSetMsg("Enter your admin email and password.");return;}
+  if(btn)btn.disabled=true;
+  igSetMsg("Signing in…");
+  try{
+    try{localStorage.setItem("ig_remember",document.getElementById("rememberMe").checked?"1":"0");}catch(e){}
+    var client=await ensureSb();
+    if(!client){
+      igSetMsg("Sign-in library did not load — check your connection and reload.");
+      if(btn)btn.disabled=false;
+      return;
+    }
+    /* hCaptcha invisible (2026-11-19): no checkbox on the form. On submit the
+       invisible widget runs in the background and returns a token; a challenge
+       only appears when hCaptcha finds the attempt suspicious. The token is
+       sent when present; an empty token is fine while the server has CAPTCHA
+       disabled, and is rejected once the server enforces it. */
+    var captchaToken="";
+    try{
+      if(window.hcaptcha&&window.hcaptcha.execute){
+        window.hcaptcha.execute();
+        for(var waited=0;waited<30000;waited+=250){
+          await new Promise(function(res){setTimeout(res,250);});
+          try{var t=window.hcaptcha.getResponse()||"";if(t){captchaToken=t;break;}}catch(e){break;}
+        }
+      }else if(window.hcaptcha&&window.hcaptcha.getResponse){
+        captchaToken=window.hcaptcha.getResponse()||"";
+      }
+    }catch(e){captchaToken="";}
+    var signInOpts=captchaToken?{captchaToken:captchaToken}:{};
+    var result=null;
+    try{
+      result=await Promise.race([
+        client.auth.signInWithPassword({email:email,password:pass},signInOpts),
+        new Promise(function(res){setTimeout(function(){res({__igTimeout:true});},15000);})
+      ]);
+    }catch(e){result={error:e};}
+    if(result&&result.__igTimeout){
+      /* M-06 (2026-11-19): raw-auth fallback removed — SDK only. A timeout is a
+         connection problem, not a reason to hand-roll auth. */
+      igSetMsg("Sign-in timed out — check your connection and try again.");
+      if(btn)btn.disabled=false;
+      return;
+    }
+    if(result&&result.error){
+      var emsg=(result.error&&result.error.message)||"";
+      if(/invalid login credentials/i.test(emsg)){
+        try{await logFailedLogin(email);}catch(e){}
+        igSetMsg("✖ Wrong email or password — try again.");
+      }else{
+        /* L-02: never echo raw Supabase error text — one generic message; the
+           detail goes to the console only. */
+        try{console.warn("login error:",emsg);}catch(e){}
+        igSetMsg("✖ Wrong email or password — try again.");
+      }
+      try{if(window.hcaptcha&&window.hcaptcha.reset)window.hcaptcha.reset();}catch(e){}
+      if(btn)btn.disabled=false;
+      return;
+    }
+    var who=(result&&result.data&&result.data.user&&result.data.user.email)||email;
+    /* C-01: non-admins are signed out inside the helper; no login_success audit. */
+    if(!(await igShowAdminIfAllowed(who,client))){if(btn)btn.disabled=false;return;}
+    try{await logAudit("login_success","admin",null,who,{});}catch(e){}
+    try{loadAuditLog();}catch(e){}
+    igSetMsg("");
+    try{showToast("Signed in ✓");}catch(e){}
+  }catch(err){
+    /* L-02: generic message only — never echo the raw error. */
+    try{console.warn("login error:",err&&err.message);}catch(e){}
+    igSetMsg("✖ Sign-in failed — try again.");
+  }
+  if(btn)btn.disabled=false;
+}
+try{
+  document.getElementById("adminUnlock").addEventListener("click",igDoLogin);
+  document.getElementById("adminPass").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();igDoLogin();}});
+  document.getElementById("adminEmail").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();igDoLogin();}});
+}catch(e){/* login form elements missing — page cannot show the form at all */}
+
+/* ===== C-01 (2026-11-19): admin-role gate — defence in depth =====
+   Server-side enforcement is the RLS policies in supabase.sql /
+   migrations/2026-11-19-c01-admin-flag.sql. This JS check only decides
+   whether the dashboard is shown: a non-admin who signs in is signed
+   straight back out and never sees the admin UI. */
+async function isCurrentUserAdmin(client){
+  var c=client||sb;
+  if(!c)return false;
+  try{
+    var r=await c.rpc("is_admin");
+    return !r.error && r.data===true;
+  }catch(e){return false;}
+}
+async function igShowAdminIfAllowed(email,client){
+  var admin=await isCurrentUserAdmin(client);
+  if(!admin){
+    try{await (client||sb).auth.signOut();}catch(e){}
+    igSetMsg("This account doesn't have admin access.");
+    return false;
+  }
+  showAdmin(email);
+  return true;
+}
+function showAdmin(email){
+  /* Wave 3 split adaptation: the dashboard lives on index.html now, so
+     "showing the admin" means handing over to it. The redirect is deferred
+     1500ms so the login_success audit that igDoLogin awaits right after
+     this returns has time to be dispatched before navigation. */
+  setTimeout(function(){location.replace("/adminaccess/");},1500);
+}
+function loadAuditLog(){
+  /* No-op on the login page: there is no audit list here. igDoLogin calls
+     this in a try/catch after a successful sign-in; the dashboard loads the
+     real list (see app.js). */
+}
+
+/* ===== AUDIT — login events only on this page (login_success / login_failed) ===== */
+var SB_AUDIT=SB_URL+"/rest/v1/audit_log";
+var ADMIN_IP=null;
+async function getAdminIP(){
+  if(ADMIN_IP)return ADMIN_IP;
+  try{
+    var ctl=new AbortController();var to=setTimeout(function(){ctl.abort()},3000);
+    var r=await fetch("https://api.ipify.org?format=json",{signal:ctl.signal});
+    clearTimeout(to);
+    var j=await r.json();ADMIN_IP=(j&&j.ip)||"unknown";
+  }catch(e){ADMIN_IP="unknown";}
+  return ADMIN_IP;
+}
+async function currentActorEmail(){
+  try{if(sb){var s=await sb.auth.getSession();if(s&&s.data&&s.data.session&&s.data.session.user)return s.data.session.user.email}}catch(e){}
+  return null;
+}
+async function sbHeaders(){
+  var token=SB_ANON;
+  if(sb){try{var sess=await sb.auth.getSession();if(sess&&sess.data&&sess.data.session)token=sess.data.session.access_token}catch(e){}}
+  return {"apikey":SB_ANON,"Authorization":"Bearer "+token,"Content-Type":"application/json","Prefer":"return=representation"};
+}
+async function logAudit(action,entity,recordId,recordName,details){
+  try{
+    var email=await currentActorEmail();if(!email)return;
+    var ip=await getAdminIP();
+    var headers=await sbHeaders();
+    await fetch(SB_AUDIT,{method:"POST",headers:headers,body:JSON.stringify({actor_email:email,action:action,entity:entity||"product",record_id:recordId||null,record_name:recordName||null,details:details||{},ip_address:ip,user_agent:navigator.userAgent||null})});
+  }catch(e){/* audit must never block an admin action */}
+}
+async function logFailedLogin(email){
+  try{
+    var ip=await getAdminIP();
+    await fetch(SB_URL+"/rest/v1/rpc/log_failed_login",{method:"POST",headers:{"apikey":SB_ANON,"Authorization":"Bearer "+SB_ANON,"Content-Type":"application/json"},body:JSON.stringify({p_email:email,p_ip:ip,p_ua:navigator.userAgent||null})});
+  }catch(e){}
+}
+
+/* ===== LOGIN PAGE — eye toggle, forgot password, reset, boot ===== */
+function showToast(msg){var t=document.getElementById("toast");if(!t)return;t.textContent=msg;t.classList.add("show");clearTimeout(showToast._t);showToast._t=setTimeout(function(){t.classList.remove("show")},2600);}
+document.getElementById("togglePass").addEventListener("click",function(){
+  var inp=document.getElementById("adminPass");
+  var show=inp.type==="password";inp.type=show?"text":"password";
+  this.textContent=show?"🙈":"👁";this.setAttribute("aria-label",show?"Hide password":"Show password");
+});
+function showCard(which){
+  ["loginCard","forgotCard","resetCard"].forEach(function(id){document.getElementById(id).style.display=(id===which)?"block":"none";});
+}
+document.getElementById("forgotLink").addEventListener("click",function(e){e.preventDefault();showCard("forgotCard");});
+document.getElementById("backToLogin").addEventListener("click",function(e){e.preventDefault();showCard("loginCard");});
+document.getElementById("backToLogin2").addEventListener("click",function(e){e.preventDefault();showCard("loginCard");});
+document.getElementById("fpSend").addEventListener("click",async function(){
+  var email=document.getElementById("fpEmail").value.trim();
+  var msg=document.getElementById("fpMsg");
+  if(!email||email.indexOf("@")===-1){msg.textContent="✖ Enter your admin email address.";return}
+  msg.textContent="Sending…";
+  try{
+    if(!sb)throw new Error("unavailable");
+    var r=await sb.auth.resetPasswordForEmail(email,{redirectTo:"https://imrangamesofficials.vercel.app/adminaccess/login.html"});
+    if(r.error)throw r.error;
+    msg.textContent="✓ If that email is the admin email, a reset link was sent — check the inbox (and spam).";
+  }catch(err){
+    msg.textContent="✖ Could not send a reset link — email sending is not set up for this project. Ask Yaseen to reset the password in Supabase.";
+  }
+});
+document.getElementById("resetBtn").addEventListener("click",async function(){
+  var p1=document.getElementById("newPass").value;
+  var p2=document.getElementById("newPass2").value;
+  var msg=document.getElementById("resetMsg");
+  if(!p1||p1.length<12){msg.textContent="✖ New password must be at least 12 characters.";return}
+  if(p1!==p2){msg.textContent="✖ The two passwords do not match.";return}
+  msg.textContent="Updating…";
+  try{
+    var r=await sb.auth.updateUser({password:p1});
+    if(r.error)throw r.error;
+    try{if(sb)await sb.auth.signOut()}catch(e){}
+    try{igClearAuthStorage();}catch(e){}
+    showCard("loginCard");
+    document.getElementById("adminMsg").textContent="✓ Password updated — log in with your new password.";
+  }catch(err){msg.textContent="✖ "+(err.message||"Reset link expired — request a new one.");}
+});
+function checkRecovery(){
+  if(((location.hash||"").indexOf("type=recovery")!==-1)){
+    showCard("resetCard");
+    return true;
+  }
+  return false;
+}
+/* ===== boot (guarded — a boot failure must never break the already-registered Login button) ===== */
+try{
+  /* Wave 3: the dashboard redirects back here with a reason — show it. */
+  var _q=new URLSearchParams(location.search);
+  if(_q.get("signed-out")==="idle"){igSetMsg("Signed out after 30 minutes of inactivity — log in again.");}
+  else if(_q.get("signed-out")==="1"){igSetMsg("Signed out.");}
+  else if(_q.get("error")==="not-admin"){igSetMsg("This account doesn't have admin access.");}
+}catch(e){}
+try{
+  var _isRecovery=checkRecovery();
+  if(sb&&!_isRecovery){sb.auth.getSession().then(async function(r){if(r&&r.data&&r.data.session){
+    /* H-05: refuse a stale restored session at boot — last activity over 30 min
+       ago means the session must not auto-restore. (No record at all — e.g. a
+       session stored before this change — is allowed once; the idle timer
+       signs it out 30 min after this page load.) */
+    var _last=igStoredLastActivity();
+    if(_last&&Date.now()-_last>IG_IDLE_MS){try{await sb.auth.signOut()}catch(e){}igClearAuthStorage();igSetMsg("Signed out after 30 minutes of inactivity — log in again.");return;}
+    igBumpActivity();
+    try{await igShowAdminIfAllowed(r.data.session.user?r.data.session.user.email:"",sb);}catch(e){}}}).catch(function(){});}
+}catch(e){}
+</script>
+</body>
+</html>
