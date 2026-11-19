@@ -3,6 +3,17 @@
 Append-only log. Add a dated entry every time something changes — a
 fix, a migration, a deploy. Never rewrite old entries.
 
+## 2026-11-19 — Reviews section removed + Wave 5 production deploy (orchestrator)
+
+- **Shop (`index.html`):** the whole CUSTOMER REVIEWS section is gone —
+  HTML section, the `REVIEWS` sample data (incl. its inline images),
+  the `revGrid` render, the nav + footer "Reviews" links, and the
+  reviews CSS. No sample stars remain anywhere on the shop; the `stars()`
+  helper still renders real ratings only when a product has one (none
+  do today). Inline JS still passes `node --check`.
+- **Production deploy** of Wave 5 (commit d43e33c + this removal) to
+  https://imrangamesofficials.vercel.app/ on Yaseen's "deploy".
+
 ## 2026-11-19 — Wave 5 follow-up (orchestrator): banner fix + fake JSON-LD ratings removed
 
 - **Validation banner (`adminaccess/app.js`):** the "Fix the highlighted
