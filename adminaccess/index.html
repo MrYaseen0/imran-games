@@ -9,9 +9,10 @@
 <meta name="description" content="Private admin area for Imran Games, Peshawar. Not indexed."/>
 <link rel="icon" href="/logo.png"/>
 <script>
-/* No-flash theme: set data-theme before admin.css loads (see DESIGN_SYSTEM.md §3). */
+/* No-flash theme: set data-theme before admin.css loads (see DESIGN_SYSTEM.md §3).
+   Wave 5: default is the BLUE light theme when nothing is saved — never the OS theme. */
 try{var t=localStorage.getItem("ig-admin-theme");
-  if(!t)t=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";
+  if(!t)t="light";
   document.documentElement.setAttribute("data-theme",t);}catch(e){
   document.documentElement.setAttribute("data-theme","light");}
 </script>
@@ -177,7 +178,7 @@ try{var t=localStorage.getItem("ig-admin-theme");
           <p class="ig-muted ig-small" style="margin:0 0 8px">Edit the price, old price, stock or photo URLs, then press Save. Delete asks first — tap twice to confirm. Every change goes live on the shop right away.</p>
           <div class="ig-table-wrap">
             <table class="ig-table">
-              <thead><tr><th>Photo</th><th>Product</th><th>Price</th><th>Old price</th><th>Stock</th><th>Photos</th><th class="ig-actions">Actions</th></tr></thead>
+              <thead><tr><th>Photo</th><th>Product</th><th>Price</th><th>Old price</th><th>Deal price</th><th>Stock</th><th>Photos</th><th class="ig-actions">Actions</th></tr></thead>
               <tbody id="adminList"></tbody>
             </table>
           </div>
@@ -253,47 +254,48 @@ try{var t=localStorage.getItem("ig-admin-theme");
   </div>
 </div>
 
-<!-- Add product modal (reuses the existing np* add handler in app.js) -->
-<div class="ig-overlay" id="prodModal" role="dialog" aria-modal="true" aria-label="Add a new product">
-  <div class="ig-modal">
-    <div class="ig-modal-head"><h2 class="ig-card-title" style="font-size:16px">＋ Add a new product</h2><button class="ig-icon-btn" type="button" data-ig-close-modal="prodModal" aria-label="Close">✕</button></div>
+<!-- Product modal — ONE modal for Add AND Edit (Wave 5). Fields + images
+     (1–4) with drag & drop, device upload, and Image URL import via the
+     import-image Edge Function. See docs/admin/PRODUCT_IMAGES.md. -->
+<div class="ig-overlay" id="prodModal" role="dialog" aria-modal="true" aria-label="Product">
+  <div class="ig-modal ig-modal-wide">
+    <div class="ig-modal-head"><h2 class="ig-card-title" style="font-size:16px" id="pmTitle">Add a new product</h2><button class="ig-icon-btn" type="button" data-ig-close-modal="prodModal" aria-label="Close">✕</button></div>
+    <input type="hidden" id="pmUuid"/><input type="hidden" id="pmVersion"/>
     <div class="ig-form-grid">
-      <div class="ig-field"><label for="npName">Product name *</label><input class="ig-input" id="npName" placeholder="Product name *"/></div>
-      <div class="ig-field"><label for="npBrand">Brand</label><input class="ig-input" id="npBrand" placeholder="Brand (e.g. Sony PlayStation)"/></div>
-      <div class="ig-field"><label for="npCat">Category</label><select class="ig-select" id="npCat"><option>Consoles</option><option>Premium Tech</option><option>Controllers</option><option>Headsets</option><option>Racing Wheels</option><option>PS4 Games</option><option>PS5 Games</option><option>Gift Cards</option><option>Gaming Chairs</option><option>Gaming Setups</option><option>Room Lighting</option></select></div>
-      <div class="ig-field"><label for="npPrice">Price (PKR) *</label><input class="ig-input" id="npPrice" type="number" min="1" placeholder="Price (PKR) *"/></div>
-      <div class="ig-field"><label for="npWas">Old price (PKR, optional)</label><input class="ig-input" id="npWas" type="number" min="0" placeholder="Old price (PKR, optional)"/></div>
-      <div class="ig-field"><label for="npStock">Stock quantity *</label><input class="ig-input" id="npStock" type="number" min="0" placeholder="Stock quantity *"/></div>
+      <div class="ig-field"><label for="pmName">Product name *</label><input class="ig-input" id="pmName" placeholder="Product name *" maxlength="120"/><span class="ig-error" id="pmNameErr" hidden></span></div>
+      <div class="ig-field"><label for="pmBrand">Brand *</label><input class="ig-input" id="pmBrand" placeholder="Brand (e.g. Sony PlayStation)" maxlength="80"/><span class="ig-error" id="pmBrandErr" hidden></span></div>
+      <div class="ig-field"><label for="pmCat">Category *</label><select class="ig-select" id="pmCat"><option value="">Loading categories…</option></select><span class="ig-error" id="pmCatErr" hidden></span></div>
+      <div class="ig-field"><label for="pmPrice">New price (PKR) *</label><input class="ig-input" id="pmPrice" type="number" min="1" step="1" placeholder="New price (PKR) *"/><span class="ig-error" id="pmPriceErr" hidden></span></div>
+      <div class="ig-field"><label for="pmOld">Old price (PKR, optional)</label><input class="ig-input" id="pmOld" type="number" min="0" step="1" placeholder="Old price (PKR, optional)"/><span class="ig-error" id="pmOldErr" hidden></span></div>
+      <div class="ig-field"><label for="pmDeal">Deal price (PKR, optional)</label><input class="ig-input" id="pmDeal" type="number" min="0" step="1" placeholder="Deal price — below the new price"/><span class="ig-error" id="pmDealErr" hidden></span></div>
+      <div class="ig-field"><label for="pmStock">Stock quantity *</label><input class="ig-input" id="pmStock" type="number" min="0" step="1" placeholder="Stock quantity *"/><span class="ig-error" id="pmStockErr" hidden></span></div>
+      <div class="ig-field"><label>Badges</label>
+        <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;padding:10px 0">
+          <label class="ig-toggle"><input type="checkbox" id="pmHot"/><span class="ig-track"></span> Hot deal</label>
+          <label class="ig-toggle"><input type="checkbox" id="pmNew"/><span class="ig-track"></span> New</label>
+        </div>
+      </div>
     </div>
-    <div class="ig-field"><label for="npImgs">Photo URLs — one per line, up to 3</label><textarea class="ig-textarea" id="npImgs" rows="3" placeholder="Paste Supabase Storage links from the product-images bucket (one per line). The first photo is the card photo."></textarea><span class="ig-hint">Tip: upload photos first in Supabase → Storage → product-images, then paste the public URLs here.</span></div>
-    <div style="display:flex;gap:18px;flex-wrap:wrap;margin:0 0 14px;align-items:center">
-      <label style="font-size:14px"><input type="checkbox" id="npHot"/> 🔥 Hot deal</label>
-      <label style="font-size:14px"><input type="checkbox" id="npNew"/> 🆕 New</label>
+    <div class="ig-field">
+      <label>Photos — 1 to 4 (first photo is the card photo)</label>
+      <div class="ig-uploader" id="pmDrop" tabindex="0" role="button" aria-label="Choose photos from your device">
+        <div style="font-size:15px;margin-bottom:4px">Drag &amp; drop photos here</div>
+        <div class="ig-muted ig-small">JPG, PNG or WebP — max 8 MB each. Photos are compressed to WebP (max 1600px) before upload.</div>
+        <button class="ig-btn ig-btn-ghost ig-btn-sm" type="button" id="pmChoose" style="margin-top:12px">Choose from device</button>
+        <input type="file" id="pmFile" accept="image/jpeg,image/png,image/webp" multiple hidden/>
+      </div>
+      <div class="ig-pm-urlrow">
+        <input class="ig-input" id="pmImgUrl" placeholder="Image URL — Google Drive share link, Facebook image link, or any direct image link" inputmode="url"/>
+        <button class="ig-btn ig-btn-ghost" type="button" id="pmImgUrlAdd">Add</button>
+      </div>
+      <span class="ig-hint">Pasted links are copied into Supabase Storage — the original link is never hotlinked. A Drive file must be shared as “Anyone with the link”.</span>
+      <div class="ig-pm-thumbs" id="pmThumbs"></div>
+      <div class="ig-pm-meta"><span id="pmCount" class="ig-muted ig-small">0 of 4 photos</span><span class="ig-error" id="pmImgErr" hidden></span></div>
     </div>
     <div class="ig-modal-foot" style="margin-top:0">
-      <span class="ig-muted ig-small" id="npMsg" style="margin-right:auto"></span>
+      <span class="ig-muted ig-small" id="pmMsg" style="margin-right:auto"></span>
       <button class="ig-btn ig-btn-ghost" type="button" data-ig-close-modal="prodModal">Cancel</button>
-      <button class="ig-btn ig-btn-primary" id="npAdd" type="button">Add Product</button>
-    </div>
-  </div>
-</div>
-
-<!-- Edit product modal (price / old price / stock / photos, optimistic locking via version) -->
-<div class="ig-overlay" id="prodEditModal" role="dialog" aria-modal="true" aria-label="Edit product">
-  <div class="ig-modal">
-    <div class="ig-modal-head"><h2 class="ig-card-title" style="font-size:16px">Edit product</h2><button class="ig-icon-btn" type="button" data-ig-close-modal="prodEditModal" aria-label="Close">✕</button></div>
-    <p style="margin:0 0 14px"><b id="epName">—</b></p>
-    <input type="hidden" id="epUuid"/><input type="hidden" id="epVersion"/>
-    <div class="ig-form-grid">
-      <div class="ig-field"><label for="epPrice">Price (PKR) *</label><input class="ig-input" id="epPrice" type="number" min="1"/></div>
-      <div class="ig-field"><label for="epWas">Old price (PKR)</label><input class="ig-input" id="epWas" type="number" min="0"/></div>
-      <div class="ig-field"><label for="epStock">Stock</label><input class="ig-input" id="epStock" type="number" min="0"/></div>
-    </div>
-    <div class="ig-field"><label for="epPhotos">Photo URLs — one per line (first is the card photo)</label><textarea class="ig-textarea" id="epPhotos" rows="3"></textarea></div>
-    <div class="ig-modal-foot" style="margin-top:0">
-      <span class="ig-muted ig-small" id="epMsg" style="margin-right:auto"></span>
-      <button class="ig-btn ig-btn-ghost" type="button" data-ig-close-modal="prodEditModal">Cancel</button>
-      <button class="ig-btn ig-btn-primary" id="epSave" type="button">Save</button>
+      <button class="ig-btn ig-btn-primary" id="pmSave" type="button">Save product</button>
     </div>
   </div>
 </div>

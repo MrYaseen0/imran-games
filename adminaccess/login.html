@@ -9,9 +9,10 @@
 <meta name="description" content="Private admin area for Imran Games, Peshawar. Not indexed."/>
 <link rel="icon" href="/logo.png"/>
 <script>
-/* No-flash theme: set data-theme before admin.css loads (see DESIGN_SYSTEM.md §3). */
+/* No-flash theme: set data-theme before admin.css loads (see DESIGN_SYSTEM.md §3).
+   Wave 5: default is the BLUE light theme when nothing is saved — never the OS theme. */
 try{var t=localStorage.getItem("ig-admin-theme");
-  if(!t)t=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";
+  if(!t)t="light";
   document.documentElement.setAttribute("data-theme",t);}catch(e){
   document.documentElement.setAttribute("data-theme","light");}
 </script>

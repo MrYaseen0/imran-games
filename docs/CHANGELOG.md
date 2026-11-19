@@ -3,6 +3,103 @@
 Append-only log. Add a dated entry every time something changes — a
 fix, a migration, a deploy. Never rewrite old entries.
 
+## 2026-11-19 — Wave 5 follow-up (orchestrator): banner fix + fake JSON-LD ratings removed
+
+- **Validation banner (`adminaccess/app.js`):** the "Fix the highlighted
+  fields first." banner now hides as soon as every field error is gone
+  (was lingering after a fix until the next submit).
+- **Shop JSON-LD (`index.html`):** removed all 40 hardcoded
+  `aggregateRating` values (e.g. 4.9/412) from the static product
+  ItemList JSON-LD — ratings are NULL in the database, so no rating is
+  claimed anywhere now. All 5 ld+json blocks still parse as valid JSON.
+
+## 2026-11-19 — Admin Wave 5 fix round (Agent 8): truthful import errors, robust upload decode, real ratings/photos
+
+- **Edge Function `import-image` redeployed (ACTIVE v2, `verify_jwt` on):**
+  a non-2xx fetch now says the link could not be opened **with the HTTP
+  status** (e.g. HTTP 400 — private, expired, or not a direct image
+  link); the "not a direct image" message is now only for a 2xx response
+  whose content-type is not jpg/png/webp. 403/404 and Drive messages
+  unchanged. No-auth POST still 401. Security unchanged (SSRF,
+  content-type, 8 MB, 10 s, admin check, Drive conversion).
+- **Local upload decode (`adminaccess/app.js` `igPmCompress`):** fallback
+  chain `createImageBitmap` → `<img>` + object URL → FileReader data URL
+  + `<img>`; still compresses to WebP ≤1600px @0.85. A failure names the
+  file and its size and points at the Image URL field; 0-byte files are
+  refused plainly in the picker too.
+- **Validation:** each modal field's error clears as soon as that field
+  is edited (input/change listeners); the "Fix the highlighted fields
+  first." banner still clears on the next submit attempt.
+- **Shop card (`index.html` `toPageProduct`/`cardHTML`/`openModal`):** the
+  hardcoded RATINGS map is gone — ratings now come from the live
+  `products.rating` / `review_count` (NULL today, verified), so a product
+  with no rating shows **no stars and no number**. Photo count label is
+  the real `image_urls` count ("1 Photo" / "3 Photos"), never a hardcoded
+  "3 Photos".
+- **Product tiles:** Edit/Delete buttons are always visible (was
+  hover-only — unusable on touch devices).
+- **Delete refresh:** the deleted row/tile is removed from the list
+  immediately (both list and tile delete paths), then the reload re-syncs
+  — the row no longer lingers after the "Deleted ✓" toast.
+- Not live-tested yet — browser retest (upload, Drive import, bad URL,
+  delete refresh, shop card) is the orchestrator's job.
+
+## 2026-11-19 — Admin Wave 5: product add/edit/delete flow + deal price
+
+- **One modal for Add AND Edit** (`adminaccess/index.html`, `app.js`):
+  name/brand/category (11 live categories) required; old price optional;
+  new price required and ≤ old price when old is set; deal price
+  optional and < new price; stock whole ≥ 0; Hot/New toggles; inline
+  validation, loading state, success toast. Save writes the row
+  immediately with optimistic locking (version +1, stale save refused).
+  Product Lists table gained a Deal price column; tiles show the deal
+  price when set. Every add/edit/delete writes `audit_log`.
+- **Images 1–4:** drag & drop + Choose from device (multi-select),
+  compressed to WebP ≤ 1600px in the browser, XHR upload with a real
+  progress bar, unique filenames, straight to the `product-images`
+  bucket; ONE Image URL field — Drive share links and Facebook/direct
+  image links go through the `import-image` Edge Function, which copies
+  the bytes into the bucket and returns a Supabase URL (never hotlinked).
+  Thumbnails drag to reorder (first = card photo, "Cover" badge),
+  remove per image; files uploaded in a session that is closed without
+  saving are deleted (no orphans).
+- **Delete** keeps the tap-twice confirm and now also removes the
+  product's bucket files (exact `image_urls` paths + product-uuid
+  prefix listing); audit entry records whether the cleanup succeeded.
+- **Migration live** (`migrations/2026-11-19-product-images.sql`,
+  backup `~/workspace/imran-games-admin-backup/2026-11-19-wave5-pre-migration/`):
+  adds only `deal_price numeric` (CHECK > 0); guards the
+  `supabase_realtime` publication entry; bucket `product-images` public
+  with 8 MB + jpg/png/webp limits; the 3 permissive Storage policies
+  replaced with admin-gated ones (`is_admin()`). Public products SELECT
+  untouched. Rollback in `migrations/2026-11-19-product-images-rollback.sql`.
+  `supabase.sql` synced (Wave 5 section at the end).
+- **Edge Function `import-image` deployed** (ACTIVE v1, verify_jwt on):
+  verifies the caller's JWT + `is_admin()` RPC, SSRF protection
+  (https only, private/internal IPs blocked, ≤ 3 redirects re-checked
+  per hop), content-type jpg/png/webp, 8 MB cap, 10 s timeout, Drive
+  links converted to direct form, plain-language errors.
+  URL: `https://vnbaizpqucimomrfvfpd.supabase.co/functions/v1/import-image`
+  (see `docs/admin/PRODUCT_IMAGES.md`).
+- **Shop deal price** (`index.html` `toPageProduct`, minimal change):
+  when `deal_price` is set and below the new price, the deal price is
+  the shown price and `was_price` stays the struck-through old price.
+  `deal_price` is NULL on all 42 products today, so behaviour is
+  unchanged until an admin sets a deal. Shop Realtime already existed
+  (channel `ig-products`); admin Realtime now also refreshes dashboard
+  KPIs on product changes.
+- **Theme/color pass (same wave):** default theme is the BLUE light
+  theme when nothing is saved (no-flash snippet, toggle, Settings
+  "System" all agree); toggle works on all 6 routes and persists;
+  contrast fixes — muted text #7A7A85 → #5F5F6B, light success
+  #22C55E → #15803D, light danger #E11D1D → #B91C1C, dark danger
+  #FF5C5C → #DC2626, link #3B3BFF → #A5A5FF in dark, badge/pill
+  colors raised to ≥ 4.5:1, `color-scheme` per theme for native
+  controls. No layout change.
+- **Not deployed, not committed** — preview + production deploy wait
+  for the owner's go-ahead. Live-browser test of the modal, uploads,
+  Drive import and the dummy product is still the orchestrator's job.
+
 ## 2026-11-19 — Admin Wave 4 (fix + rebuild): root-relative paths, reference dashboard
 
 - **Root cause of the Wave 3 live failure:** Vercel cleanUrls serves the

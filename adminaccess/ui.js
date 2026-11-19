@@ -33,23 +33,25 @@
   }
 
   /* ------------------------------------------------------------------------
-     Theme — localStorage key "ig-admin-theme", default prefers-color-scheme.
+     Theme — localStorage key "ig-admin-theme", default is the BLUE light
+     theme (Wave 5, owner decision). Nothing saved means light, even on a
+     dark-mode OS — the no-flash snippet, the toggle and the Settings
+     "System" choice all agree on this. "System" only clears the saved
+     preference; the effective theme then returns to light.
      NO-FLASH: the snippet below must run in <head> BEFORE admin.css loads.
      ui.js initTheme() is only the fallback for pages that load it late.
-     Paste in <head> (Wave 3):
+     Paste in <head> (Wave 3, default updated Wave 5):
        <script>
        try{var t=localStorage.getItem("ig-admin-theme");
-         if(!t)t=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";
+         if(!t)t="light";
          document.documentElement.setAttribute("data-theme",t);}catch(e){
          document.documentElement.setAttribute("data-theme","light");}
        </script>
      ------------------------------------------------------------------------ */
   var THEME_KEY = "ig-admin-theme";
   function systemTheme() {
-    try {
-      return (global.matchMedia && global.matchMedia("(prefers-color-scheme: dark)").matches)
-        ? "dark" : "light";
-    } catch (e) { return "light"; }
+    /* No saved preference: the default theme is light (blue sidebar). */
+    return "light";
   }
   function getTheme() {
     try {

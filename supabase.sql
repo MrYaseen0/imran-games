@@ -119,15 +119,19 @@ language plpgsql
 security definer
 set search_path = public
 as $$
-declare
-  v_held int;
 begin
-  select coalesce(sum(qty), 0) into v_held from public.reservations
-    where product_id = p_product_id and session_key = p_session;
-  if v_held > 0 then
-    delete from public.reservations where product_id = p_product_id and session_key = p_session;
-    update public.products set stock = stock + v_held where id = p_product_id;
-  end if;
+  with deleted as (
+    delete from public.reservations
+    where product_id = p_product_id and session_key = p_session
+    returning qty
+  ),
+  totals as (
+    select coalesce(sum(qty), 0) as total from deleted
+  )
+  update public.products
+    set stock = stock + (select total from totals)
+    where id = p_product_id
+      and (select total from totals) > 0;
 end;
 $$;
 
@@ -138,16 +142,242 @@ security definer
 set search_path = public
 as $$
 declare
-  r record;
   v_count int := 0;
 begin
-  for r in select product_id, qty from public.reservations where expires_at <= now() loop
-    update public.products set stock = stock + r.qty where id = r.product_id;
-    v_count := v_count + 1;
-  end loop;
-  delete from public.reservations where expires_at <= now();
+  with deleted as (
+    delete from public.reservations
+    where expires_at <= now()
+    returning product_id, qty
+  ),
+  totals as (
+    select product_id, sum(qty) as total
+    from deleted
+    group by product_id
+  ),
+  restored as (
+    update public.products p
+      set stock = stock + t.total
+      from totals t
+      where t.product_id = p.id
+      returning p.id
+  )
+  select count(*) into v_count from deleted;
   return v_count;
 end;
 $$;
 
 grant execute on function public.reserve_stock(uuid, int, text), public.release_stock(uuid, int, text), public.release_expired_reservations() to anon, authenticated;
+
+-- ============================================================================
+-- C-01 fix (2026-11-19): admin flag + admin-only write policies.
+-- This section DOCUMENTS the live migration applied 2026-11-19
+-- (migrations/2026-11-19-c01-admin-flag.sql). It is kept here so supabase.sql
+-- stays the complete, reviewed source of truth for the schema. Before C-01,
+-- any authenticated Supabase user was treated as admin by /adminaccess:
+-- the products write policies and the audit_log select policy were
+-- permissive ("authenticated", true), so any signed-in account could
+-- write products and read the audit log. RLS policies are OR'd, so adding
+-- an admin-only policy alone does NOT fix C-01 — the permissive policies
+-- below MUST be dropped (and are dropped in the live migration).
+-- No sample inserts are included here; admin rows are added by the owner
+-- in the Supabase dashboard / SQL Editor only.
+-- ============================================================================
+
+-- 1. Admin flag table: one row per admin, keyed by the Auth user id.
+-- No policies on purpose: no client access at all — only the SECURITY
+-- DEFINER function below reads it.
+create table if not exists public.admins (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  created_at timestamptz default now()
+);
+alter table public.admins enable row level security;
+
+-- 2. Admin check (SECURITY DEFINER so RLS on admins cannot block it).
+-- Callable from the admin page via sb.rpc('is_admin') with the anon key;
+-- the JS gate in adminaccess/index.html is defence in depth only — the
+-- RLS policies below are the real enforcement.
+create or replace function public.is_admin()
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (select 1 from public.admins where user_id = auth.uid())
+$$;
+
+grant execute on function public.is_admin() to anon, authenticated;
+
+-- 3. products: the public SELECT policy ("products readable by everyone")
+-- is unchanged — the shop still reads the catalogue anonymously.
+-- All writes (insert / update / delete) now require an admin.
+drop policy if exists "products_write_admin" on public.products;
+create policy "products_write_admin" on public.products
+  for all
+  using (auth.role() = 'authenticated' and public.is_admin())
+  with check (auth.role() = 'authenticated' and public.is_admin());
+
+-- Drop the old permissive products write policies (the actual C-01 hole).
+drop policy if exists "products insert by authenticated" on public.products;
+drop policy if exists "products update by authenticated" on public.products;
+drop policy if exists "products delete by authenticated" on public.products;
+
+-- 4. audit_log: the live table already exists (id, created_at, actor_email,
+-- action, entity, record_id, record_name, details jsonb, ip_address,
+-- user_agent). This create is therefore a no-op and must NOT alter it.
+create table if not exists public.audit_log (
+  id uuid primary key default gen_random_uuid(),
+  email text,
+  action text,
+  ip_address text,
+  created_at timestamptz default now()
+);
+
+-- Inserts stay authenticated-only (admins log their own actions);
+-- selects are now admin-only. The old permissive select policy is dropped.
+drop policy if exists "audit_log insert by authenticated" on public.audit_log;
+drop policy if exists "audit_log select by authenticated" on public.audit_log;
+create policy "audit_log_insert_authenticated" on public.audit_log
+  for insert
+  with check (auth.role() = 'authenticated');
+create policy "audit_log_select_admin" on public.audit_log
+  for select
+  using (auth.role() = 'authenticated' and public.is_admin());
+
+-- ===== H-03 (2026-11-19): login hardening — lockout =====
+-- Sign-up disabled + password minimum 12 are Auth config (Management API), not SQL.
+-- Step 4: lockout state column on the admin flag table.
+alter table public.admins add column if not exists locked_until timestamptz;
+
+-- Step 5: is_admin() also denies while locked. Same function as C-01 — it gates
+-- both the JS admin gate (sb.rpc('is_admin')) and the RLS write policies, so a
+-- locked admin loses the dashboard AND writes even though Auth still issues a session.
+create or replace function public.is_admin()
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (
+    select 1 from public.admins
+    where user_id = auth.uid()
+      and (locked_until is null or locked_until <= now())
+  );
+$$;
+
+-- Step 6: log_failed_login() extended in place (signature unchanged so the JS call
+-- keeps working). Adds SET search_path (was missing), a per-IP throttle (10+/hour
+-- from one IP are silently dropped), and the lock trigger: 5 failures for one
+-- email in 15 minutes sets locked_until = now() + 15 minutes on that admin's row.
+create or replace function public.log_failed_login(p_email text, p_ip text, p_ua text)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_ip_recent_count int;
+  v_email_recent_count int;
+begin
+  select count(*) into v_ip_recent_count
+  from public.audit_log
+  where action = 'login_failed'
+    and ip_address = coalesce(p_ip, 'unknown')
+    and created_at > now() - interval '1 hour';
+
+  if v_ip_recent_count >= 10 then
+    return;
+  end if;
+
+  insert into public.audit_log (actor_email, action, entity, record_name, ip_address, user_agent, details)
+  values (p_email, 'login_failed', 'admin', null, coalesce(p_ip,'unknown'), p_ua, jsonb_build_object('email_tried', p_email));
+
+  select count(*) into v_email_recent_count
+  from public.audit_log
+  where action = 'login_failed'
+    and actor_email = p_email
+    and created_at > now() - interval '15 minutes';
+
+  if v_email_recent_count >= 5 then
+    update public.admins a
+      set locked_until = now() + interval '15 minutes'
+      from auth.users u
+      where u.id = a.user_id and u.email = p_email;
+  end if;
+end;
+$$;
+
+grant execute on function public.log_failed_login(text, text, text) to anon, authenticated;
+-- NOTE (H-03 residual risk, accepted with mitigations): log_failed_login is
+-- anon-callable, so an attacker who knows the admin email can spam the RPC and
+-- trigger a 15-minute lock. Mitigations: CAPTCHA on sign-in (owner setup, still
+-- pending), per-IP throttle above, short 15-min lock + dashboard unlock
+-- (update public.admins set locked_until = null). GoTrue password-verification
+-- hook is the stronger alternative if this risk is later judged unacceptable.
+
+-- ============================================================================
+-- Wave 5 (2026-11-19): product add/edit/delete flow — deal price + images.
+-- Applied live via supabase.py (migrations/2026-11-19-product-images.sql).
+-- Documented here so supabase.sql stays the complete source of truth.
+-- Rollback: migrations/2026-11-19-product-images-rollback.sql.
+-- ============================================================================
+
+-- 1. Deal price: optional special price, shown on the shop (and admin tiles)
+--    instead of price when set and below price. NULL = no deal.
+alter table public.products
+  add column if not exists deal_price numeric
+  constraint products_deal_price_positive check (deal_price is null or deal_price > 0);
+
+-- 2. Realtime on products: the shop and the admin already subscribe; the
+--    table must be in the publication for changes to arrive live.
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime'
+      and schemaname = 'public'
+      and tablename = 'products'
+  ) then
+    execute 'alter publication supabase_realtime add table public.products';
+  end if;
+end $$;
+
+-- 3. Storage bucket for product photos (public read; admin-only write).
+--    8 MB / jpg+png+webp limits are enforced here AND by the import-image
+--    Edge Function + the admin client (the bucket limits are the backstop).
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('product-images', 'product-images', true, 8388608,
+        array['image/jpeg', 'image/png', 'image/webp'])
+on conflict (id) do update
+  set public = true,
+      file_size_limit = excluded.file_size_limit,
+      allowed_mime_types = excluded.allowed_mime_types;
+
+-- 4. Storage policies: public read; only admins may insert/update/delete.
+--    Replaces the old permissive write policies (bucket check only — anyone
+--    could upload/delete). The public products SELECT policy is untouched.
+drop policy if exists "product images upload by admin" on storage.objects;
+drop policy if exists "product images update by admin" on storage.objects;
+drop policy if exists "product images delete by admin" on storage.objects;
+drop policy if exists "product_images_select_public" on storage.objects;
+drop policy if exists "product_images_insert_admin" on storage.objects;
+drop policy if exists "product_images_update_admin" on storage.objects;
+drop policy if exists "product_images_delete_admin" on storage.objects;
+
+create policy "product_images_select_public" on storage.objects
+  for select to public
+  using (bucket_id = 'product-images');
+
+create policy "product_images_insert_admin" on storage.objects
+  for insert to authenticated
+  with check (bucket_id = 'product-images' and is_admin());
+
+create policy "product_images_update_admin" on storage.objects
+  for update to authenticated
+  using (bucket_id = 'product-images' and is_admin())
+  with check (bucket_id = 'product-images' and is_admin());
+
+create policy "product_images_delete_admin" on storage.objects
+  for delete to authenticated
+  using (bucket_id = 'product-images' and is_admin());

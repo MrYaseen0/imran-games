@@ -33,13 +33,17 @@
   --table-head-bg: #e3dede;
   --table-line: #bdbdbd;
   --text: #0d0d0d;
-  --text-muted: #7a7a85;
+  --text-muted: #5f5f6b; /* Wave 5 theme pass: was #7a7a85 (4.25:1 on white — failed). Now 6.3:1. */
   --primary: #0a00ff;
   --primary-hover: #0800cc;
   --primary-soft: rgba(10, 0, 255, 0.08);
-  --success: #22c55e;
-  --danger: #e11d1d;
+  --link: #0a00ff; /* text links on surfaces (same as primary in light; lighter in dark) */
+  --success: #15803d; /* Wave 5: was #22c55e (2.3:1 as text on white — failed). Now 5.0:1. */
+  --success-strong: #15803d; /* white text on this: 5.0:1 in both themes (buttons) */
+  --danger: #b91c1c; /* Wave 5: was #e11d1d (white-on-danger 4.8:1, pill text 3.8:1 — failed). Now 6.5:1. */
+  --danger-text: #b91c1c; /* danger text on surfaces */
   --warning: #f59e0b;
+  --warning-text: #92400e; /* amber text on light surfaces (stars) — 5.7:1 on tiles */
   --info: #00aeef;
   --chart-blue: #0a00ff;
   --chart-green: #a8d98a;
@@ -83,13 +87,17 @@
   --table-head-bg: #1a2a70;
   --table-line: rgba(255, 255, 255, 0.14);
   --text: #ffffff;
-  --text-muted: #a9b2e0;
+  --text-muted: #a9b2e0; /* 6.9:1 on navy cards — passes */
   --primary: #3b3bff;
   --primary-hover: #5a5aff;
   --primary-soft: rgba(59, 59, 255, 0.2);
-  --success: #22c55e;
-  --danger: #ff5c5c;
+  --link: #a5a5ff; /* Wave 5: links on navy surfaces — #3b3bff was 2.2:1 (failed). Now 6.4:1. */
+  --success: #22c55e; /* 6.3:1 as text on navy cards — passes */
+  --success-strong: #15803d; /* white text on this: 5.0:1 (buttons) */
+  --danger: #dc2626; /* Wave 5: was #ff5c5c (white-on-danger 3.1:1 — failed). Now 4.9:1. */
+  --danger-text: #ff8a8a; /* danger text on navy surfaces: 6.3:1 */
   --warning: #f59e0b;
+  --warning-text: #fbbf24; /* amber text on navy surfaces: 6.2:1 */
   --info: #38c6ff;
   --chart-blue: #3b3bff;
   --chart-green: #a8d98a;
@@ -106,6 +114,12 @@
   --focus-ring: 0 0 0 3px rgba(59, 59, 255, 0.45);
 }
 
+/* Wave 5 theme pass: native controls (select dropdowns, date inputs,
+   scrollbars) follow the admin theme, not the OS — otherwise a dark
+   admin page gets light OS dropdown options and vice versa. */
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+
 /* --------------------------------------------------------------------------
    2. Base + typography
    -------------------------------------------------------------------------- */
@@ -119,7 +133,7 @@ body.ig-admin {
   color: var(--text);
   -webkit-font-smoothing: antialiased;
 }
-.ig-admin a { color: var(--primary); }
+.ig-admin a { color: var(--link); }
 .ig-admin img { max-width: 100%; }
 .ig-admin button { font-family: inherit; }
 
@@ -413,7 +427,7 @@ body.ig-rail .ig-main { margin-left: var(--sidebar-rail-width); }
 .ig-kpi-label { font-size: 12px; color: var(--text-muted); font-weight: 600; }
 .ig-kpi-delta { font-size: 12px; font-weight: 800; }
 .ig-kpi-delta.pos { color: var(--success); }
-.ig-kpi-delta.neg { color: var(--danger); }
+.ig-kpi-delta.neg { color: var(--danger-text); }
 .ig-kpi-delta.flat { color: var(--text-muted); }
 .ig-kpi-value { font-size: 26px; font-weight: 800; line-height: 1.2; margin: 6px 0 2px; }
 .ig-kpi-sub { font-size: 12px; color: var(--text-muted); }
@@ -434,7 +448,7 @@ body.ig-rail .ig-main { margin-left: var(--sidebar-rail-width); }
   overflow: hidden;
 }
 .ig-segmented button {
-  border: 0; background: transparent; color: var(--primary);
+  border: 0; background: transparent; color: var(--link);
   font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
   padding: 6px 12px; cursor: pointer; text-transform: uppercase;
 }
@@ -460,7 +474,7 @@ body.ig-rail .ig-main { margin-left: var(--sidebar-rail-width); }
   border: 1px solid var(--table-line);
 }
 .ig-btn-danger { background: var(--danger); color: #fff; }
-.ig-btn-success { background: var(--success); color: #fff; }
+.ig-btn-success { background: var(--success-strong); color: #fff; }
 .ig-btn-sm { padding: 6px 12px; font-size: 12px; }
 .ig-btn-block { width: 100%; }
 
@@ -484,7 +498,7 @@ body.ig-rail .ig-main { margin-left: var(--sidebar-rail-width); }
 .ig-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
 .ig-field > label { font-size: 13px; font-weight: 600; }
 .ig-field .ig-hint { font-size: 12px; color: var(--text-muted); }
-.ig-field .ig-error { font-size: 12px; color: var(--danger); font-weight: 600; }
+.ig-field .ig-error { font-size: 12px; color: var(--danger-text); font-weight: 600; }
 .ig-input[aria-invalid="true"], .ig-select[aria-invalid="true"] { border-color: var(--danger); }
 
 /* Toggle switch. */
@@ -517,12 +531,12 @@ body.ig-rail .ig-main { margin-left: var(--sidebar-rail-width); }
   padding: 4px 10px; border-radius: var(--radius-pill);
   white-space: nowrap; text-transform: capitalize;
 }
-.ig-pill-pending { background: rgba(245, 158, 11, 0.16); color: #b45309; }
+.ig-pill-pending { background: rgba(245, 158, 11, 0.16); color: #92400e; } /* Wave 5: was #b45309 (4.4:1 — failed). Now 6.2:1. */
 .ig-pill-paid { background: rgba(10, 0, 255, 0.12); color: var(--primary); }
 .ig-pill-processing { background: rgba(99, 102, 241, 0.16); color: #4f46e5; }
 .ig-pill-shipped { background: rgba(20, 184, 166, 0.16); color: #0f766e; }
-.ig-pill-delivered { background: rgba(34, 197, 94, 0.16); color: #15803d; }
-.ig-pill-canceled { background: rgba(225, 29, 29, 0.14); color: var(--danger); }
+.ig-pill-delivered { background: rgba(34, 197, 94, 0.16); color: #166534; } /* Wave 5: was #15803d (4.4:1 — failed). Now 6.3:1. */
+.ig-pill-canceled { background: rgba(225, 29, 29, 0.14); color: var(--danger-text); }
 .ig-pill-refunded { background: rgba(122, 122, 133, 0.18); color: var(--text-muted); }
 :root[data-theme="dark"] .ig-pill-pending { color: #fbbf24; }
 :root[data-theme="dark"] .ig-pill-paid { color: #a5a5ff; }
@@ -538,7 +552,7 @@ body.ig-rail .ig-main { margin-left: var(--sidebar-rail-width); }
   padding: 3px 8px; border-radius: var(--radius-pill);
   background: var(--danger); color: #fff; white-space: nowrap;
 }
-.ig-badge-hot { background: linear-gradient(90deg, var(--primary), #ff5c00); }
+.ig-badge-hot { background: #c2410c; } /* Wave 5: was a blue→orange gradient — white text on the orange end was 3.1:1 (failed). Solid deep orange: 5.2:1. */
 .ig-badge-new { background: var(--info); color: #04121c; }
 .ig-badge-soldout { background: #111; color: #fff; }
 .ig-badge-discount { background: var(--discount-bg); color: var(--discount-text); }
@@ -590,7 +604,7 @@ body.ig-rail .ig-main { margin-left: var(--sidebar-rail-width); }
   background: var(--card-bg); color: var(--text);
   font: inherit; font-weight: 700; cursor: pointer;
 }
-.ig-pagination button:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+.ig-pagination button:hover:not(:disabled) { border-color: var(--primary); color: var(--link); }
 .ig-pagination button.active { background: var(--primary); border-color: var(--primary); color: #fff; }
 .ig-pagination button:disabled { opacity: 0.45; cursor: not-allowed; }
 .ig-pagination .ig-page-info { color: var(--text-muted); margin-left: auto; }
@@ -639,12 +653,13 @@ body.ig-rail .ig-main { margin-left: var(--sidebar-rail-width); }
 .ig-tile .ig-tile-price { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
 .ig-tile .ig-tile-price b { font-size: 14px; }
 .ig-tile .ig-tile-price s { font-size: 12px; color: var(--text-muted); }
-.ig-tile .ig-tile-rating { font-size: 12px; color: var(--warning); margin-top: 4px; }
+.ig-tile .ig-tile-rating { font-size: 12px; color: var(--warning-text); margin-top: 4px; }
 .ig-tile .ig-tile-rating .ig-no-rating { color: var(--text-muted); font-style: italic; }
 .ig-tile .ig-tile-actions {
-  display: none; gap: 6px; margin-top: 10px;
+  display: flex; gap: 6px; margin-top: 10px;
 }
-.ig-tile:hover .ig-tile-actions, .ig-tile:focus-within .ig-tile-actions { display: flex; }
+/* Wave 5 fix: Edit/Delete are always visible — hover-only buttons do not
+   exist on touch devices. (The old :hover/:focus-within rule is gone.) */
 
 /* --------------------------------------------------------------------------
    9. Modal, drawer, toast, tabs, date-range picker
@@ -710,7 +725,7 @@ body.ig-rail .ig-main { margin-left: var(--sidebar-rail-width); }
   padding: 10px 14px; cursor: pointer;
   border-bottom: 2px solid transparent; margin-bottom: -1px;
 }
-.ig-tabs button.active { color: var(--primary); border-bottom-color: var(--primary); }
+.ig-tabs button.active { color: var(--link); border-bottom-color: var(--primary); }
 
 /* Date-range picker pill (page header, right side). */
 .ig-daterange {
@@ -822,7 +837,7 @@ body.ig-rail .ig-main { margin-left: var(--sidebar-rail-width); }
   display: inline-block; margin-top: 22px;
   background: var(--primary-soft);
   border: 1px solid var(--primary);
-  color: var(--primary);
+  color: var(--link);
   font-size: 22px; font-weight: 700;
   padding: 8px 22px; border-radius: 999px;
 }
@@ -878,3 +893,42 @@ body.ig-rail .ig-main { margin-left: var(--sidebar-rail-width); }
 .ig-stat-mini b { font-size: 22px; display: block; margin-top: 2px; }
 .ig-tile-actions .ig-btn { flex: 1; }
 #adminList .ig-input { padding: 8px 10px; }
+
+/* --------------------------------------------------------------------------
+   14. Wave 5 — product modal: image uploader (1–4 photos)
+   (additive only, appended 2026-11-19)
+   -------------------------------------------------------------------------- */
+.ig-modal-wide { max-width: 680px; }
+.ig-pm-urlrow { display: flex; gap: 10px; margin-top: 12px; }
+.ig-pm-urlrow .ig-input { flex: 1; min-width: 0; }
+.ig-pm-thumbs { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 12px; }
+.ig-pm-thumb { position: relative; width: 104px; }
+.ig-pm-thumb img {
+  width: 104px; height: 104px; object-fit: cover;
+  border-radius: 8px; border: 2px solid var(--table-line);
+  display: block; background: var(--search-bg);
+}
+.ig-pm-thumb.first img { border-color: var(--primary); }
+.ig-pm-thumb.dragging { opacity: 0.45; }
+.ig-pm-thumb.dragover img { border-color: var(--primary); }
+.ig-pm-cover {
+  position: absolute; top: 6px; left: 6px;
+  background: var(--primary); color: #fff;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.03em;
+  padding: 2px 7px; border-radius: 999px;
+}
+.ig-pm-remove {
+  position: absolute; top: 6px; right: 6px;
+  width: 24px; height: 24px; border-radius: 50%; border: 0;
+  background: rgba(13, 13, 30, 0.75); color: #fff;
+  font-size: 13px; line-height: 1; cursor: pointer;
+  display: grid; place-items: center;
+}
+.ig-pm-remove:hover { background: var(--danger); }
+.ig-pm-prog { height: 5px; border-radius: 99px; background: var(--search-bg); margin-top: 6px; overflow: hidden; }
+.ig-pm-prog > span { display: block; height: 100%; background: var(--primary); width: 0%; transition: width 0.15s ease; }
+.ig-pm-prog.indet > span { width: 40% !important; animation: ig-pm-indet 1s infinite ease-in-out alternate; }
+@keyframes ig-pm-indet { from { margin-left: 0; } to { margin-left: 60%; } }
+.ig-pm-name { font-size: 11px; color: var(--text-muted); margin-top: 4px; word-break: break-all; }
+.ig-pm-meta { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; margin-top: 10px; font-size: 12px; }
+.ig-uploader:focus-visible { outline: none; box-shadow: var(--focus-ring); }

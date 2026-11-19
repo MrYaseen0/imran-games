@@ -96,8 +96,10 @@ function toAdminProduct(r,fallbackId){
   var rawImgs=(r.image_urls||[]).filter(function(u){return !!u});
   var imgs=rawImgs.slice();
   if(!imgs.length)imgs=["/logo.png"];
-  while(imgs.length<3)imgs.push(imgs[0]);
-  return {id:id,uuid:r.id,slug:slug,name:r.name,brand:r.brand||"",cat:cm[0],catLabel:cm[1],price:r.price,old:(r.was_price||r.price),stock:r.stock,soldOut:r.stock===0,hot:!!r.is_hot,isNew:!!r.is_new,imgs:imgs,img:imgs[0],rawImgs:rawImgs,version:(r.version||1)};
+  /* Wave 5: no padding — a product has 1–4 real photos, never duplicates.
+     deal is the optional special price (NULL = no deal). */
+  var deal=(r.deal_price!=null&&Number(r.deal_price)>0)?Number(r.deal_price):null;
+  return {id:id,uuid:r.id,slug:slug,name:r.name,brand:r.brand||"",cat:cm[0],catLabel:cm[1],price:r.price,old:(r.was_price||r.price),deal:deal,stock:r.stock,soldOut:r.stock===0,hot:!!r.is_hot,isNew:!!r.is_new,imgs:imgs,img:imgs[0],rawImgs:rawImgs,version:(r.version||1)};
 }
 async function loadProducts(){
   try{
@@ -117,7 +119,11 @@ async function loadProducts(){
 }
 function subscribeRealtime(){
   if(!sb){setInterval(function(){loadProducts()},30000);return}
-  sb.channel("ig-admin-products").on("postgres_changes",{event:"*",schema:"public",table:"products"},function(){loadProducts();}).subscribe();
+  sb.channel("ig-admin-products").on("postgres_changes",{event:"*",schema:"public",table:"products"},function(){
+    loadProducts();
+    /* Wave 5: the dashboard KPIs (incl. Low stock) refresh live too. */
+    try{if(igCurrentRoute()==="dashboard")loadDashboard();}catch(e){}
+  }).subscribe();
 }
 
 var ADMIN_UNLOCKED=false;
@@ -351,16 +357,17 @@ function renderAdminList(){
   PROD_LIST_PAGE=pg.page;
   var page=rows.slice((pg.page-1)*PROD_LIST_SIZE,pg.page*PROD_LIST_SIZE);
   if(!page.length){
-    box.innerHTML='<tr><td colspan="7"><div class="ig-state"><b>No products match</b><p>'+(PRODUCTS.length?"Try a different search or category.":"No products yet — add one with “+ Add New Item”.")+'</p></div></td></tr>';
+    box.innerHTML='<tr><td colspan="8"><div class="ig-state"><b>No products match</b><p>'+(PRODUCTS.length?"Try a different search or category.":"No products yet — add one with “+ Add New Item”.")+'</p></div></td></tr>';
   }else{
     box.innerHTML=page.map(function(p){
       /* H-04: every interpolated value is escaped; the image URL is validated and
          falls back to the local logo when unsafe. Numbers are coerced to numbers. */
       return '<tr class="arow" data-uuid="'+escHtml(p.uuid)+'" data-version="'+(Number(p.version)||1)+'">'
       +'<td><img src="'+escHtml(igSafeImgUrl(p.img)||"/logo.png")+'" alt="" style="width:52px;height:52px;object-fit:cover;border-radius:10px"/></td>'
-      +'<td><b style="font-size:13px">'+escHtml(p.name)+'</b><br/><span class="ig-muted ig-small">'+escHtml(p.catLabel)+' • '+escHtml(p.brand)+(p.soldOut?' • <span style="color:var(--danger)">SOLD OUT</span>':'')+'</span></td>'
+      +'<td><b style="font-size:13px">'+escHtml(p.name)+'</b><br/><span class="ig-muted ig-small">'+escHtml(p.catLabel)+' • '+escHtml(p.brand)+(p.soldOut?' • <span style="color:var(--danger-text)">SOLD OUT</span>':'')+(p.deal?' • <span style="color:var(--success)">DEAL '+escHtml(IGAdminUI.formatPKR(p.deal))+'</span>':'')+'</span></td>'
       +'<td><input class="aprice ig-input" type="number" value="'+(Number(p.price)||0)+'" style="width:96px"/></td>'
       +'<td><input class="awas ig-input" type="number" value="'+(Number(p.old)||0)+'" style="width:96px"/></td>'
+      +'<td><input class="adeal ig-input" type="number" value="'+(p.deal!=null?p.deal:"")+'" placeholder="—" style="width:96px"/></td>'
       +'<td><input class="astock ig-input" type="number" value="'+(Number(p.stock)||0)+'" style="width:76px"/></td>'
       +'<td><textarea class="aphotos ig-textarea" rows="2" style="min-width:180px;font-size:12px">'+escHtml((p.rawImgs||[]).join("\n"))+'</textarea></td>'
       +'<td class="ig-actions">'+(igCanWrite()?'<button class="ig-btn ig-btn-primary ig-btn-sm asave" type="button">Save</button> ':"")+(igCanDelete()?'<button class="ig-btn ig-btn-ghost ig-btn-sm adel" type="button">Delete</button>':"")+'</td>'
@@ -379,36 +386,417 @@ function showToast(msg){var t=document.getElementById("toast");if(!t)return;t.te
 document.getElementById("adminLock").addEventListener("click",signOutAdmin);
 document.getElementById("adminLockTop").addEventListener("click",signOutAdmin);
 document.getElementById("avatarLogout").addEventListener("click",signOutAdmin);
-document.getElementById("npAdd").addEventListener("click",async function(){
-  var name=document.getElementById("npName").value.trim();
-  var brand=document.getElementById("npBrand").value.trim()||"Imran Games";
-  var cat=document.getElementById("npCat").value;
-  var price=parseInt(document.getElementById("npPrice").value,10);
-  var was=parseInt(document.getElementById("npWas").value,10);
-  var stock=parseInt(document.getElementById("npStock").value,10);
-  var urls=document.getElementById("npImgs").value.split("\n").map(function(s){return s.trim()}).filter(Boolean).slice(0,3);
-  var msg=document.getElementById("npMsg");
-  if(!name||!(price>0)||isNaN(stock)){msg.textContent="✖ Fill in the name, a price above 0, and stock.";return}
-  if(!urls.length){msg.textContent="✖ Paste at least 1 photo URL (Supabase Storage link).";return}
-  /* H-04: reject unsafe photo URLs at write time too (render path also validates). */
-  if(urls.some(function(u){return !igSafeImgUrl(u)})){msg.textContent="✖ Photo URLs must be https:// links or site-relative paths.";return}
-  while(urls.length<3)urls.push(urls[0]);
-  var slug=nextNumId+"-"+slugify(name);
-  msg.textContent="Adding…";
+/* ===== WAVE 5 — product modal: one modal for Add AND Edit ================
+   Images 1–4: drag & drop / Choose from device (compressed to WebP ≤1600px,
+   XHR upload with a real progress bar) or ONE Image URL field (Google
+   Drive share links, Facebook image links, any direct link) — the URL is
+   sent to the import-image Edge Function, which COPIES it into the
+   product-images bucket; the original link is never stored or hotlinked.
+   Save writes the row immediately (optimistic locking via version).
+   Delete removes the row AND its Storage files. Every add/edit/delete
+   writes an audit_log entry. See docs/admin/PRODUCT_IMAGES.md.
+   ========================================================================== */
+var PM={mode:"add",uuid:null,version:1,images:[],draftKey:null,sessionPaths:[],saved:false,open:false};
+var PM_CATS=[];
+var PM_FALLBACK_CATS=["Consoles","Premium Tech","Controllers","Headsets","Racing Wheels","PS4 Games","PS5 Games","Gift Cards","Gaming Chairs","Gaming Setups","Room Lighting"];
+var PM_MAX_IMAGES=4, PM_MAX_BYTES=8*1024*1024;
+var PM_ALLOWED_TYPES={"image/jpeg":1,"image/png":1,"image/webp":1};
+function igPmEl(id){return document.getElementById(id);}
+function igPmUUID(){try{if(window.crypto&&crypto.randomUUID)return crypto.randomUUID();}catch(e){}return "d"+Date.now().toString(36)+Math.random().toString(36).slice(2,10);}
+function igStoragePathFromUrl(url){
+  var s=String(url||"");
+  var prefix=SB_URL+"/storage/v1/object/public/product-images/";
+  if(s.indexOf(prefix)===0)return s.slice(prefix.length);
+  return "";
+}
+async function igStorageRemove(paths){
+  paths=(paths||[]).filter(Boolean);
+  if(!paths.length)return true;
   try{
-    var added=await sbWrite("POST","",{name:name,slug:slug,category:cat,brand:brand,price:price,was_price:isNaN(was)?price:was,stock:stock,is_hot:document.getElementById("npHot").checked,is_new:document.getElementById("npNew").checked,image_urls:urls});if(!added||!added.length)throw new Error("Add failed — nothing was saved. Check that you are signed in and try again.");
-    await logAudit("product_added","product",added[0].id,name,{price:price,was_price:isNaN(was)?price:was,stock:stock,category:cat});
-    loadAuditLog();renderAnalytics();
-    nextNumId++;
-    msg.textContent="✓ Added — live on the shop now.";
-    ["npName","npBrand","npPrice","npWas","npStock","npImgs"].forEach(function(id){document.getElementById(id).value=""});
-    document.getElementById("npHot").checked=false;document.getElementById("npNew").checked=false;
-    loadProducts();
-    /* Wave 4: the add form lives in a modal now — close it and toast. */
-    try{IGAdminUI.closeModal("prodModal");}catch(e){}
-    showToast("Added ✓ — live on the shop now");
-  }catch(err){msg.textContent="✖ "+err.message;}
-});
+    var h=await sbHeaders();
+    var res=await fetch(SB_URL+"/storage/v1/object/product-images",{method:"DELETE",headers:h,body:JSON.stringify({prefixes:paths})});
+    return res.ok;
+  }catch(e){return false;}
+}
+/* Delete every Storage file that belongs to a product: the exact paths
+   stored in image_urls, plus anything listed under the product-uuid
+   prefix (files uploaded while editing). Returns true when nothing is
+   left behind (or there was nothing to delete). */
+async function igDeleteProductFiles(p){
+  if(!p)return true;
+  var paths=[];
+  (p.rawImgs||[]).forEach(function(u){var pt=igStoragePathFromUrl(u);if(pt&&paths.indexOf(pt)===-1)paths.push(pt);});
+  try{
+    var h=await sbHeaders();
+    var res=await fetch(SB_URL+"/storage/v1/object/list/product-images",{method:"POST",headers:h,body:JSON.stringify({prefix:p.uuid+"/",limit:100})});
+    if(res.ok){var listed=await res.json();(listed||[]).forEach(function(o){if(o&&o.name){var pt=p.uuid+"/"+o.name;if(paths.indexOf(pt)===-1)paths.push(pt);}});}
+  }catch(e){/* listing is best-effort — the exact paths above are the main set */}
+  if(!paths.length)return true;
+  return await igStorageRemove(paths);
+}
+async function igFillPmCats(selected){
+  var sel=igPmEl("pmCat");if(!sel)return;
+  if(!PM_CATS.length){
+    try{var rows=await igRest("GET","/categories?select=name&order=sort_order.asc");PM_CATS=(rows||[]).map(function(r){return r.name;});}catch(e){PM_CATS=[];}
+    if(!PM_CATS.length)PM_CATS=PM_FALLBACK_CATS.slice();
+  }
+  sel.innerHTML=PM_CATS.map(function(c){return '<option value="'+escHtml(c)+'">'+escHtml(c)+'</option>';}).join("");
+  if(selected&&PM_CATS.indexOf(selected)!==-1)sel.value=selected;
+}
+function igOpenProductModal(mode,uuid){
+  if(!igCanWrite()){showToast("Your role is read-only.");return}
+  var p=null;
+  if(mode==="edit"){
+    p=PRODUCTS.find(function(x){return x.uuid===uuid});
+    if(!p)return;
+  }
+  PM.mode=mode;PM.uuid=p?p.uuid:null;PM.version=p?(p.version||1):1;
+  PM.images=[];PM.sessionPaths=[];PM.saved=false;PM.open=true;
+  PM.draftKey=igPmUUID();
+  igPmEl("pmTitle").textContent=mode==="edit"?"Edit product":"Add a new product";
+  igPmEl("pmUuid").value=PM.uuid||"";
+  igPmEl("pmVersion").value=PM.version;
+  igPmEl("pmName").value=p?p.name:"";
+  igPmEl("pmBrand").value=p?p.brand:"";
+  igPmEl("pmPrice").value=p?p.price:"";
+  igPmEl("pmOld").value=p?(p.old!==p.price?p.old:""):"";
+  igPmEl("pmDeal").value=p?(p.deal!=null?p.deal:""):"";
+  igPmEl("pmStock").value=p?p.stock:"";
+  igPmEl("pmHot").checked=p?!!p.hot:false;
+  igPmEl("pmNew").checked=p?!!p.isNew:false;
+  igPmEl("pmImgUrl").value="";
+  igPmEl("pmMsg").textContent="";
+  ["pmNameErr","pmBrandErr","pmCatErr","pmPriceErr","pmOldErr","pmDealErr","pmStockErr","pmImgErr"].forEach(function(id){var e=igPmEl(id);if(e){e.hidden=true;e.textContent="";}});
+  ["pmName","pmBrand","pmCat","pmPrice","pmOld","pmDeal","pmStock"].forEach(function(id){var e=igPmEl(id);if(e)e.removeAttribute("aria-invalid");});
+  if(p){
+    PM.images=(p.rawImgs||[]).slice(0,PM_MAX_IMAGES).map(function(u){
+      return {url:u,path:igStoragePathFromUrl(u),state:"ready",progress:100,name:u.split("/").pop()||"photo"};
+    });
+  }
+  igFillPmCats(p?p.catLabel:null);
+  igRenderPmThumbs();
+  var saveBtn=igPmEl("pmSave");saveBtn.textContent="Save product";saveBtn.disabled=false;
+  IGAdminUI.openModal("prodModal");
+}
+function igRenderPmThumbs(){
+  var box=igPmEl("pmThumbs");if(!box)return;
+  box.innerHTML="";
+  PM.images.forEach(function(im,i){
+    var d=document.createElement("div");
+    d.className="ig-pm-thumb"+(i===0?" first":"");
+    d.draggable=(im.state==="ready");
+    var img=document.createElement("img");
+    img.alt="Photo "+(i+1);
+    img.src=im.url?(igSafeImgUrl(im.url)||"/logo.png"):(im.preview||"/logo.png");
+    d.appendChild(img);
+    if(i===0){var cb=document.createElement("span");cb.className="ig-pm-cover";cb.textContent="Cover";d.appendChild(cb);}
+    var rm=document.createElement("button");
+    rm.type="button";rm.className="ig-pm-remove";rm.textContent="✕";rm.setAttribute("aria-label","Remove photo "+(i+1));
+    rm.addEventListener("click",function(ev){ev.stopPropagation();igPmRemoveImage(i);});
+    d.appendChild(rm);
+    if(im.state==="uploading"){
+      var pr=document.createElement("div");
+      pr.className="ig-pm-prog"+(im.progress==null?" indet":"");
+      var sp=document.createElement("span");
+      if(im.progress!=null)sp.style.width=Math.round(im.progress)+"%";
+      pr.appendChild(sp);d.appendChild(pr);
+      var nm=document.createElement("div");nm.className="ig-pm-name";
+      nm.textContent=im.progress==null?"Importing…":"Uploading… "+Math.round(im.progress)+"%";
+      d.appendChild(nm);
+    }else if(im.name){
+      var nm2=document.createElement("div");nm2.className="ig-pm-name";nm2.textContent=im.name;d.appendChild(nm2);
+    }
+    d.addEventListener("dragstart",function(ev){ev.dataTransfer.setData("text/plain",String(i));d.classList.add("dragging");});
+    d.addEventListener("dragend",function(){d.classList.remove("dragging");});
+    d.addEventListener("dragover",function(ev){ev.preventDefault();d.classList.add("dragover");});
+    d.addEventListener("dragleave",function(){d.classList.remove("dragover");});
+    d.addEventListener("drop",function(ev){
+      ev.preventDefault();d.classList.remove("dragover");
+      var from=parseInt(ev.dataTransfer.getData("text/plain"),10);
+      if(isNaN(from)||from===i)return;
+      var it=PM.images.splice(from,1)[0];
+      PM.images.splice(i,0,it);
+      igRenderPmThumbs();
+    });
+    box.appendChild(d);
+  });
+  var c=igPmEl("pmCount");
+  if(c)c.textContent=PM.images.length+" of "+PM_MAX_IMAGES+" photos — first photo is the card photo";
+  var addBtn=igPmEl("pmImgUrlAdd");
+  if(addBtn)addBtn.disabled=PM.images.length>=PM_MAX_IMAGES;
+  var ch=igPmEl("pmChoose");
+  if(ch)ch.disabled=PM.images.length>=PM_MAX_IMAGES;
+}
+function igPmRemoveImage(i){
+  var im=PM.images[i];if(!im)return;
+  PM.images.splice(i,1);
+  /* A file uploaded in this modal session that is removed before saving
+     is deleted straight away so it never becomes an orphan. Files that
+     belong to the saved product are deleted on Save instead (so Cancel
+     keeps the product's photos). */
+  if(im.path&&PM.sessionPaths.indexOf(im.path)!==-1){
+    PM.sessionPaths.splice(PM.sessionPaths.indexOf(im.path),1);
+    igStorageRemove([im.path]);
+  }
+  igRenderPmThumbs();
+}
+function igPmSetImgError(msg){
+  var e=igPmEl("pmImgErr");
+  if(!e)return;
+  if(msg){e.textContent=msg;e.hidden=false;}else{e.textContent="";e.hidden=true;}
+}
+function igPmHandleFiles(list){
+  var files=Array.prototype.slice.call(list||[]);
+  for(var k=0;k<files.length;k++){
+    if(PM.images.length>=PM_MAX_IMAGES){igPmSetImgError("Only 4 photos per product — remove one first.");break;}
+    var f=files[k];
+    if(!f.size){igPmSetImgError("“"+f.name+"” is empty (0 bytes) — pick a different photo or use the Image URL field.");continue;}
+    if(!PM_ALLOWED_TYPES[f.type]){igPmSetImgError("“"+f.name+"” is not a JPG, PNG or WebP photo.");continue;}
+    if(f.size>PM_MAX_BYTES){igPmSetImgError("“"+f.name+"” is over 8 MB.");continue;}
+    igPmSetImgError("");
+    var entry={url:null,path:null,state:"uploading",progress:0,name:f.name,preview:""};
+    try{entry.preview=URL.createObjectURL(f);}catch(e){}
+    PM.images.push(entry);
+    igRenderPmThumbs();
+    igPmUploadFile(entry,f);
+  }
+}
+function igPmFmtSize(n){
+  if(!n)return "0 bytes";
+  if(n<1024)return n+" bytes";
+  if(n<1024*1024)return (n/1024).toFixed(n<10240?1:0)+" KB";
+  return (n/1048576).toFixed(1)+" MB";
+}
+/* Draw any decoded image source (Image, ImageBitmap) to canvas and
+   compress to WebP, max 1600px on the long side, quality 0.85. */
+function igPmCanvasBlob(src,w,h){
+  return new Promise(function(resolve,reject){
+    try{
+      var scale=Math.min(1,1600/Math.max(w,h));
+      var cw=Math.max(1,Math.round(w*scale)),ch=Math.max(1,Math.round(h*scale));
+      var cv=document.createElement("canvas");cv.width=cw;cv.height=ch;
+      var ctx=cv.getContext("2d");
+      if(!ctx){reject(new Error("Canvas is unavailable in this browser"));return;}
+      ctx.drawImage(src,0,0,cw,ch);
+      cv.toBlob(function(blob){
+        if(!blob)reject(new Error("Could not compress that photo."));
+        else resolve(blob);
+      },"image/webp",0.85);
+    }catch(e){reject(e);}
+  });
+}
+function igPmLoadImageFromUrl(url){
+  return new Promise(function(resolve,reject){
+    var img=new Image();
+    img.onload=function(){resolve(img);};
+    img.onerror=function(){reject(new Error("decode"));};
+    img.src=url;
+  });
+}
+/* Wave 5 fix: robust decode — the cloud-browser test failed with
+   "That file could not be read as a photo" on valid PNGs, so try three
+   decodes in order: (a) createImageBitmap, (b) <img> + object URL,
+   (c) FileReader data URL + <img>. A failure names the file and its
+   size, and points at the Image URL field instead. */
+async function igPmCompress(file){
+  var label="“"+(file&&file.name?file.name:"photo")+"” ("+igPmFmtSize(file?file.size:0)+")";
+  if(!file||file.size===0){
+    throw new Error(label+" is empty (0 bytes) — pick a different photo or use the Image URL field.");
+  }
+  /* (a) createImageBitmap — the most reliable decode in modern browsers. */
+  if(window.createImageBitmap){
+    try{
+      var bmp=await createImageBitmap(file);
+      try{return await igPmCanvasBlob(bmp,bmp.width,bmp.height);}
+      finally{try{bmp.close();}catch(e){}}
+    }catch(e){/* fall through to the next decode */}
+  }
+  /* (b) <img> + object URL (the previous path). */
+  var url=null;
+  try{url=URL.createObjectURL(file);}catch(e){url=null;}
+  if(url){
+    try{
+      var img=await igPmLoadImageFromUrl(url);
+      return await igPmCanvasBlob(img,img.naturalWidth||img.width,img.naturalHeight||img.height);
+    }catch(e){/* fall through to the last decode */}
+    finally{try{URL.revokeObjectURL(url);}catch(e){}}
+  }
+  /* (c) FileReader data URL + <img> — last resort for browsers where
+     object URLs cannot be decoded (some cloud/remote browsers). */
+  try{
+    var dataUrl=await new Promise(function(resolve,reject){
+      var fr=new FileReader();
+      fr.onload=function(){resolve(fr.result);};
+      fr.onerror=function(){reject(new Error("decode"));};
+      fr.readAsDataURL(file);
+    });
+    var img2=await igPmLoadImageFromUrl(dataUrl);
+    return await igPmCanvasBlob(img2,img2.naturalWidth||img2.width,img2.naturalHeight||img2.height);
+  }catch(e){/* all three decodes failed */}
+  throw new Error(label+" could not be read as a photo in this browser — try the Image URL field instead.");
+}
+function igPmXhrUpload(path,blob,token,onProgress){
+  return new Promise(function(resolve){
+    var xhr=new XMLHttpRequest();
+    xhr.open("POST",SB_URL+"/storage/v1/object/product-images/"+path,true);
+    xhr.setRequestHeader("apikey",SB_ANON);
+    xhr.setRequestHeader("Authorization","Bearer "+token);
+    xhr.setRequestHeader("Content-Type","image/webp");
+    xhr.setRequestHeader("x-upsert","false");
+    xhr.upload.onprogress=function(ev){if(ev.lengthComputable&&onProgress)onProgress(ev.loaded/ev.total*100);};
+    xhr.onload=function(){resolve(xhr.status>=200&&xhr.status<300);};
+    xhr.onerror=function(){resolve(false);};
+    xhr.send(blob);
+  });
+}
+async function igPmUploadFile(entry,file){
+  var prefix=(PM.mode==="edit"&&PM.uuid)?PM.uuid:("draft-"+PM.draftKey);
+  var path=prefix+"/"+igPmUUID()+".webp";
+  try{
+    var blob=await igPmCompress(file);
+    var sess=null;
+    try{var s=await sb.auth.getSession();sess=s&&s.data?s.data.session:null;}catch(e){}
+    if(!sess)throw new Error("Not signed in — log in again and retry.");
+    var ok=await igPmXhrUpload(path,blob,sess.access_token,function(pct){entry.progress=pct;igRenderPmThumbs();});
+    if(!ok)throw new Error("Upload failed — try again.");
+    entry.url=SB_URL+"/storage/v1/object/public/product-images/"+path;
+    entry.path=path;
+    entry.state="ready";entry.progress=100;
+    PM.sessionPaths.push(path);
+    if(entry.preview){try{URL.revokeObjectURL(entry.preview);}catch(e){}entry.preview="";}
+  }catch(err){
+    var ix=PM.images.indexOf(entry);
+    if(ix!==-1)PM.images.splice(ix,1);
+    igPmSetImgError(err&&err.message?err.message:"Upload failed — try again.");
+  }
+  igRenderPmThumbs();
+}
+async function igPmImportUrl(){
+  var input=igPmEl("pmImgUrl");
+  var raw=(input.value||"").trim();
+  if(!raw){igPmSetImgError("Paste an image link first.");return;}
+  if(PM.images.length>=PM_MAX_IMAGES){igPmSetImgError("Only 4 photos per product — remove one first.");return;}
+  if(!igSafeImgUrl(raw)){igPmSetImgError("That link is not a secure (https) image link.");return;}
+  var btn=igPmEl("pmImgUrlAdd");if(btn)btn.disabled=true;
+  var entry={url:null,path:null,state:"uploading",progress:null,name:"Importing…",preview:""};
+  PM.images.push(entry);
+  igRenderPmThumbs();
+  try{
+    var sess=null;
+    try{var s=await sb.auth.getSession();sess=s&&s.data?s.data.session:null;}catch(e){}
+    if(!sess)throw new Error("Not signed in — log in again and retry.");
+    var res=await fetch(SB_URL+"/functions/v1/import-image",{method:"POST",headers:{"apikey":SB_ANON,"Authorization":"Bearer "+sess.access_token,"Content-Type":"application/json"},body:JSON.stringify({url:raw,prefix:(PM.mode==="edit"&&PM.uuid)?PM.uuid:("draft-"+PM.draftKey)})});
+    var data=null;try{data=await res.json();}catch(e){}
+    if(!res.ok)throw new Error((data&&data.error)||("Import failed (HTTP "+res.status+")"));
+    if(!data||!data.url)throw new Error("Import failed — no image came back.");
+    entry.url=data.url;entry.path=data.path||igStoragePathFromUrl(data.url);
+    entry.state="ready";entry.progress=100;entry.name=(data.path||"").split("/").pop()||"imported image";
+    if(entry.path)PM.sessionPaths.push(entry.path);
+    input.value="";
+    igPmSetImgError("");
+  }catch(err){
+    var ix=PM.images.indexOf(entry);
+    if(ix!==-1)PM.images.splice(ix,1);
+    igPmSetImgError(err&&err.message?err.message:"That image could not be imported.");
+  }
+  if(btn)btn.disabled=false;
+  igRenderPmThumbs();
+}
+function igPmSetErr(id,msg){
+  var e=igPmEl(id);
+  if(e){if(msg){e.textContent=msg;e.hidden=false;}else{e.textContent="";e.hidden=true;}}
+}
+function igPmValidate(){
+  var errs=[];
+  var name=igPmEl("pmName").value.trim();
+  var brand=igPmEl("pmBrand").value.trim();
+  var cat=igPmEl("pmCat").value;
+  var price=parseInt(igPmEl("pmPrice").value,10);
+  var oldRaw=igPmEl("pmOld").value;var old=(oldRaw==null||String(oldRaw).trim()==="")?null:parseInt(oldRaw,10);
+  var dealRaw=igPmEl("pmDeal").value;var deal=(dealRaw==null||String(dealRaw).trim()==="")?null:parseInt(dealRaw,10);
+  var stockRaw=igPmEl("pmStock").value;var stock=parseInt(stockRaw,10);
+  var bad=function(inputId,errId,msg){var el=igPmEl(inputId);if(el)el.setAttribute("aria-invalid","true");igPmSetErr(errId,msg);errs.push(msg);};
+  var ok=function(inputId,errId){var el=igPmEl(inputId);if(el)el.removeAttribute("aria-invalid");igPmSetErr(errId,"");};
+  if(!name)bad("pmName","pmNameErr","Product name is required.");
+  else if(name.length>120)bad("pmName","pmNameErr","Product name must be 120 characters or less.");
+  else ok("pmName","pmNameErr");
+  if(!brand)bad("pmBrand","pmBrandErr","Brand is required.");else ok("pmBrand","pmBrandErr");
+  if(!cat)bad("pmCat","pmCatErr","Pick a category.");else ok("pmCat","pmCatErr");
+  if(isNaN(price)||price<=0)bad("pmPrice","pmPriceErr","New price must be above 0.");else ok("pmPrice","pmPriceErr");
+  if(old!=null&&(isNaN(old)||old<0))bad("pmOld","pmOldErr","Old price cannot be negative.");
+  else if(old!=null&&!isNaN(price)&&price>old)bad("pmOld","pmOldErr","New price must be at or below the old price.");
+  else ok("pmOld","pmOldErr");
+  if(deal!=null&&(isNaN(deal)||deal<=0))bad("pmDeal","pmDealErr","Deal price must be above 0.");
+  else if(deal!=null&&!isNaN(price)&&deal>=price)bad("pmDeal","pmDealErr","Deal price must be below the new price.");
+  else ok("pmDeal","pmDealErr");
+  if(isNaN(stock)||stock<0||String(stockRaw).indexOf(".")!==-1)bad("pmStock","pmStockErr","Stock must be a whole number, 0 or more.");
+  else ok("pmStock","pmStockErr");
+  var ready=PM.images.filter(function(im){return im.state==="ready"&&im.url;});
+  if(PM.images.some(function(im){return im.state==="uploading";}))igPmSetImgError("Wait for the uploads to finish first.");
+  else if(ready.length<1)igPmSetImgError("Add at least 1 photo.");
+  else if(ready.length>PM_MAX_IMAGES)igPmSetImgError("Only 4 photos per product.");
+  else igPmSetImgError("");
+  if(PM.images.some(function(im){return im.state==="uploading";})||ready.length<1)errs.push("photos");
+  return errs.length?null:{name:name,brand:brand,category:cat,price:price,was_price:old==null?price:old,deal_price:deal,stock:stock,is_hot:igPmEl("pmHot").checked,is_new:igPmEl("pmNew").checked,image_urls:ready.slice(0,PM_MAX_IMAGES).map(function(im){return im.url;})};
+}
+async function igSaveProductModal(){
+  var v=igPmValidate();
+  var msg=igPmEl("pmMsg");
+  if(!v){msg.textContent="✖ Fix the highlighted fields first.";return;}
+  var btn=igPmEl("pmSave");btn.disabled=true;btn.textContent="Saving…";
+  msg.textContent="Saving…";
+  try{
+    if(PM.mode==="add"){
+      var slug=nextNumId+"-"+slugify(v.name);
+      var added=await sbWrite("POST","",{name:v.name,slug:slug,category:v.category,brand:v.brand,price:v.price,was_price:v.was_price,deal_price:v.deal_price,stock:v.stock,is_hot:v.is_hot,is_new:v.is_new,image_urls:v.image_urls});
+      if(!added||!added.length)throw new Error("Add failed — nothing was saved. Check that you are signed in and try again.");
+      await logAudit("product_added","product",added[0].id,v.name,{price:v.price,was_price:v.was_price,deal_price:v.deal_price,stock:v.stock,category:v.category,photos:v.image_urls.length});
+      nextNumId++;
+      PM.saved=true;
+      try{IGAdminUI.closeModal("prodModal");}catch(e){}
+      loadProducts();loadAuditLog();renderAnalytics();
+      showToast("Added ✓ — live on the shop now");
+    }else{
+      var p=PRODUCTS.find(function(x){return x.uuid===PM.uuid});
+      if(!p)throw new Error("That product is gone — refresh and try again.");
+      var loadedVer=PM.version||p.version||1;
+      var oldPaths=(p.rawImgs||[]).map(igStoragePathFromUrl).filter(Boolean);
+      var patchBody={name:v.name,brand:v.brand,category:v.category,price:v.price,was_price:v.was_price,deal_price:v.deal_price,stock:v.stock,is_hot:v.is_hot,is_new:v.is_new,image_urls:v.image_urls,version:loadedVer+1};
+      var upd=await sbWrite("PATCH","?id=eq."+PM.uuid+"&version=eq."+loadedVer,patchBody);
+      if(!upd||!upd.length){msg.textContent="✖ Someone changed this product — refresh and try again.";btn.disabled=false;btn.textContent="Save product";loadProducts();return;}
+      /* Files removed from the product in this edit are deleted now. */
+      var newPaths=v.image_urls.map(igStoragePathFromUrl).filter(Boolean);
+      var removed=oldPaths.filter(function(pt){return newPaths.indexOf(pt)===-1;});
+      var cleaned=true;
+      if(removed.length)cleaned=await igStorageRemove(removed);
+      await logAudit("product_edited","product",PM.uuid,v.name,{old_price:p.price,new_price:v.price,old_was_price:p.old,new_was_price:v.was_price,old_deal_price:p.deal,new_deal_price:v.deal_price,old_stock:p.stock,new_stock:v.stock,old_photos:p.rawImgs.length,new_photos:v.image_urls.length,storage_files_removed:cleaned});
+      PM.saved=true;
+      try{IGAdminUI.closeModal("prodModal");}catch(e){}
+      loadProducts();loadAuditLog();renderAnalytics();
+      showToast(cleaned?"Saved ✓ — live on the shop now":"Saved ✓ (some removed photos could not be deleted from Storage)");
+    }
+  }catch(err){
+    msg.textContent="✖ "+(err&&err.message?err.message:"Could not save.");
+    btn.disabled=false;btn.textContent="Save product";
+  }
+}
+/* If the modal closes WITHOUT saving (Cancel, overlay click, ESC), delete
+   any files uploaded in this session — they are not referenced by any
+   product and would otherwise be orphaned. */
+try{
+  var _pmModal=document.getElementById("prodModal");
+  if(_pmModal&&window.MutationObserver){
+    new MutationObserver(function(){
+      if(!PM.open)return;
+      if(_pmModal.classList.contains("open"))return;
+      PM.open=false;
+      if(PM.saved)return;
+      var orphans=PM.sessionPaths.slice();
+      PM.sessionPaths=[];
+      if(orphans.length)igStorageRemove(orphans);
+    }).observe(_pmModal,{attributes:true,attributeFilter:["class"]});
+  }
+}catch(e){}
 document.getElementById("adminList").addEventListener("click",async function(e){
   var row=e.target.closest(".arow");if(!row)return;
   var uuid=row.getAttribute("data-uuid");
@@ -416,14 +804,18 @@ document.getElementById("adminList").addEventListener("click",async function(e){
   if(e.target.closest(".asave")){
     var price=parseInt(row.querySelector(".aprice").value,10);
     var was=parseInt(row.querySelector(".awas").value,10);
+    var dealRaw=(row.querySelector(".adeal")||{}).value;
+    var deal=(dealRaw==null||String(dealRaw).trim()==="")?null:parseInt(dealRaw,10);
     var stock=parseInt(row.querySelector(".astock").value,10);
     if(!(price>0)||isNaN(stock)){showToast("✖ Price must be above 0 and stock a number");return}
+    /* Wave 5: deal price must be below the new price (and above 0). */
+    if(deal!=null&&(isNaN(deal)||deal<=0||deal>=price)){showToast("✖ Deal price must be below the new price");return}
     var photoEl=row.querySelector(".aphotos");
-    var photoUrls=photoEl?photoEl.value.split("\n").map(function(s){return s.trim()}).filter(Boolean).slice(0,3):[];
+    var photoUrls=photoEl?photoEl.value.split("\n").map(function(s){return s.trim()}).filter(Boolean).slice(0,4):[];
     /* H-04: reject unsafe photo URLs at write time too. */
     if(photoUrls.some(function(u){return !igSafeImgUrl(u)})){showToast("✖ Photo URLs must be https:// links or site-relative paths");return}
     var btn=e.target.closest(".asave");btn.textContent="Saving…";
-    try{var loadedVer=parseInt(row.getAttribute("data-version")||"1",10);if(!(loadedVer>0))loadedVer=(p&&p.version)||1;var patchBody={price:price,was_price:isNaN(was)?price:was,stock:stock,version:loadedVer+1};if(photoUrls.length)patchBody.image_urls=photoUrls;var upd=await sbWrite("PATCH","?id=eq."+uuid+"&version=eq."+loadedVer,patchBody);if(!upd||!upd.length){showToast("Someone changed this product — refresh and try again");btn.textContent="Save";loadProducts();return}var auditDetails={old_price:p?p.price:null,new_price:price,old_was_price:p?p.old:null,new_was_price:isNaN(was)?price:was,old_stock:p?p.stock:null,new_stock:stock};if(photoUrls.length)auditDetails.new_image_urls=photoUrls;await logAudit("product_edited","product",uuid,p?p.name:null,auditDetails);loadAuditLog();renderAnalytics();showToast("Saved ✓ — live on the shop now");loadProducts();}
+    try{var loadedVer=parseInt(row.getAttribute("data-version")||"1",10);if(!(loadedVer>0))loadedVer=(p&&p.version)||1;var patchBody={price:price,was_price:isNaN(was)?price:was,deal_price:deal,stock:stock,version:loadedVer+1};if(photoUrls.length)patchBody.image_urls=photoUrls;var upd=await sbWrite("PATCH","?id=eq."+uuid+"&version=eq."+loadedVer,patchBody);if(!upd||!upd.length){showToast("Someone changed this product — refresh and try again");btn.textContent="Save";loadProducts();return}var auditDetails={old_price:p?p.price:null,new_price:price,old_was_price:p?p.old:null,new_was_price:isNaN(was)?price:was,old_deal_price:p?p.deal:null,new_deal_price:deal,old_stock:p?p.stock:null,new_stock:stock};if(photoUrls.length)auditDetails.new_image_urls=photoUrls;await logAudit("product_edited","product",uuid,p?p.name:null,auditDetails);loadAuditLog();renderAnalytics();showToast("Saved ✓ — live on the shop now");loadProducts();}
     catch(err){showToast("✖ "+err.message);btn.textContent="Save";}
   }
   if(e.target.closest(".adel")){
@@ -436,7 +828,17 @@ document.getElementById("adminList").addEventListener("click",async function(e){
       setTimeout(function(){try{delBtn.removeAttribute("data-arm");delBtn.textContent="Delete";delBtn.style.background="";delBtn.style.borderColor="";}catch(e){}},5000);
       return;
     }
-    try{var del=await sbWrite("DELETE","?id=eq."+uuid);if(!del||!del.length)throw new Error("Delete failed — nothing was deleted. Are you still signed in?");await logAudit("product_deleted","product",uuid,p?p.name:null,{price:p?p.price:null,stock:p?p.stock:null});loadAuditLog();renderAnalytics();showToast("Deleted ✓");loadProducts();}
+    try{var del=await sbWrite("DELETE","?id=eq."+uuid);if(!del||!del.length)throw new Error("Delete failed — nothing was deleted. Are you still signed in?");
+    /* Wave 5: remove the product's Storage files too — no orphaned images. */
+    var cleaned=await igDeleteProductFiles(p);
+    await logAudit("product_deleted","product",uuid,p?p.name:null,{price:p?p.price:null,stock:p?p.stock:null,storage_files_removed:cleaned});
+    loadAuditLog();renderAnalytics();
+    showToast(cleaned?"Deleted ✓":"Deleted ✓ (some photos could not be removed from Storage — check the bucket)");
+    /* Wave 5 fix: drop the row from the list at once — do not wait for
+       the reload round-trip, or the deleted row lingers after the toast. */
+    var ix=PRODUCTS.findIndex(function(x){return x.uuid===uuid;});
+    if(ix!==-1){PRODUCTS.splice(ix,1);renderAdminList();try{renderProductTiles();}catch(e){}}
+    loadProducts();}
     catch(err){showToast("✖ "+err.message);}
   }
 });
@@ -512,7 +914,8 @@ igInitRoute();
 /* Chart.js cannot resolve CSS var() in canvas colours — real hex per theme. */
 function igChartTheme(){
   var dark=document.documentElement.getAttribute("data-theme")==="dark";
-  return {tick:dark?"#A9B2E0":"#7A7A85",grid:dark?"rgba(255,255,255,.12)":"rgba(20,20,60,.08)",blue:dark?"#5A5AFF":"#0A00FF"};
+  /* Wave 5: tick labels use the muted-text token — light was #7A7A85 (4.25:1, failed). */
+  return {tick:dark?"#A9B2E0":"#5F5F6B",grid:dark?"rgba(255,255,255,.12)":"rgba(20,20,60,.08)",blue:dark?"#5A5AFF":"#0A00FF"};
 }
 function igTodayPKT(){try{return new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Karachi"});}catch(e){return new Date().toISOString().slice(0,10);}}
 function igRangeDays(n){
@@ -819,12 +1222,14 @@ function renderProductTiles(){
     grid.appendChild(IGAdminUI.emptyState({title:"No products match",message:PRODUCTS.length?"Try a different search or category.":"No products yet — add one with “+ Add New Item”."}));
   }else{
     page.forEach(function(p){
-      var tile=IGAdminUI.buildProductTile({name:p.name,category:p.catLabel,price:p.price,oldPrice:p.old,imageUrl:p.img,isHot:p.hot,isNew:p.isNew,soldOut:p.soldOut,rating:null,reviewCount:null});
+      /* Wave 5: tiles show the deal price (with the old price struck
+         through) whenever a deal is set — same as the shop. */
+      var tile=IGAdminUI.buildProductTile({name:p.name,category:p.catLabel,price:(p.deal!=null?p.deal:p.price),oldPrice:p.old,imageUrl:p.img,isHot:p.hot,isNew:p.isNew,soldOut:p.soldOut,rating:null,reviewCount:null});
       if(igCanWrite()||igCanDelete()){
         var act=document.createElement("div");act.className="ig-tile-actions";
         if(igCanWrite()){
           var eb=document.createElement("button");eb.type="button";eb.className="ig-btn ig-btn-primary ig-btn-sm";eb.textContent="Edit";
-          eb.addEventListener("click",function(){igOpenEditProduct(p.uuid);});
+          eb.addEventListener("click",function(){igOpenProductModal("edit",p.uuid);});
           act.appendChild(eb);
         }
         if(igCanDelete()){
@@ -858,43 +1263,8 @@ async function loadProductsPage(){
   renderProductTiles();
   renderAdminList();
 }
-function igOpenEditProduct(uuid){
-  var p=PRODUCTS.find(function(x){return x.uuid===uuid});if(!p)return;
-  document.getElementById("epUuid").value=p.uuid;
-  document.getElementById("epVersion").value=p.version||1;
-  document.getElementById("epName").textContent=p.name;
-  document.getElementById("epPrice").value=p.price;
-  document.getElementById("epWas").value=p.old;
-  document.getElementById("epStock").value=p.stock;
-  document.getElementById("epPhotos").value=(p.rawImgs||[]).join("\n");
-  document.getElementById("epMsg").textContent="";
-  IGAdminUI.openModal("prodEditModal");
-}
-async function igSaveEditProduct(){
-  var uuid=document.getElementById("epUuid").value;
-  var p=PRODUCTS.find(function(x){return x.uuid===uuid});if(!p)return;
-  var price=parseInt(document.getElementById("epPrice").value,10);
-  var was=parseInt(document.getElementById("epWas").value,10);
-  var stock=parseInt(document.getElementById("epStock").value,10);
-  var msg=document.getElementById("epMsg");
-  if(!(price>0)||isNaN(stock)){msg.textContent="✖ Price must be above 0 and stock a number";return}
-  var photoUrls=document.getElementById("epPhotos").value.split("\n").map(function(s){return s.trim()}).filter(Boolean).slice(0,3);
-  if(photoUrls.some(function(u){return !igSafeImgUrl(u)})){msg.textContent="✖ Photo URLs must be https:// links or site-relative paths";return}
-  var btn=document.getElementById("epSave");btn.textContent="Saving…";
-  try{
-    var loadedVer=parseInt(document.getElementById("epVersion").value||"1",10);if(!(loadedVer>0))loadedVer=p.version||1;
-    var patchBody={price:price,was_price:isNaN(was)?price:was,stock:stock,version:loadedVer+1};
-    if(photoUrls.length)patchBody.image_urls=photoUrls;
-    var upd=await sbWrite("PATCH","?id=eq."+uuid+"&version=eq."+loadedVer,patchBody);
-    if(!upd||!upd.length){msg.textContent="Someone changed this product — refresh and try again";btn.textContent="Save";loadProducts();return}
-    await logAudit("product_edited","product",uuid,p.name,{old_price:p.price,new_price:price,old_was_price:p.old,new_was_price:isNaN(was)?price:was,old_stock:p.stock,new_stock:stock});
-    loadAuditLog();renderAnalytics();
-    btn.textContent="Save";
-    try{IGAdminUI.closeModal("prodEditModal");}catch(e){}
-    showToast("Saved ✓ — live on the shop now");
-    loadProducts();
-  }catch(err){msg.textContent="✖ "+err.message;btn.textContent="Save";}
-}
+/* Wave 5: edit now goes through the unified product modal (igOpenProductModal) —
+   the old price-only edit modal (prodEditModal) is gone. */
 async function igDeleteProductTile(btn,p){
   if(btn.getAttribute("data-arm")!=="1"){
     btn.setAttribute("data-arm","1");btn.textContent="Sure? Tap again";
@@ -904,8 +1274,16 @@ async function igDeleteProductTile(btn,p){
   try{
     var del=await sbWrite("DELETE","?id=eq."+p.uuid);
     if(!del||!del.length)throw new Error("Delete failed — nothing was deleted. Are you still signed in?");
-    await logAudit("product_deleted","product",p.uuid,p.name,{price:p.price,stock:p.stock});
-    loadAuditLog();renderAnalytics();showToast("Deleted ✓");loadProducts();
+    /* Wave 5: remove the product's Storage files too — no orphaned images. */
+    var cleaned=await igDeleteProductFiles(p);
+    await logAudit("product_deleted","product",p.uuid,p.name,{price:p.price,stock:p.stock,storage_files_removed:cleaned});
+    loadAuditLog();renderAnalytics();
+    showToast(cleaned?"Deleted ✓":"Deleted ✓ (some photos could not be removed from Storage — check the bucket)");
+    /* Wave 5 fix: drop the tile from the list at once — do not wait for
+       the reload round-trip, or the deleted tile lingers after the toast. */
+    var ix2=PRODUCTS.findIndex(function(x){return x.uuid===p.uuid;});
+    if(ix2!==-1){PRODUCTS.splice(ix2,1);renderAdminList();try{renderProductTiles();}catch(e){}}
+    loadProducts();
   }catch(err){showToast("✖ "+err.message);}
 }
 
@@ -1040,12 +1418,33 @@ document.getElementById("ofItems").addEventListener("click",function(e){
   ofRenderItems();
 });
 ["ofDisc","ofFee"].forEach(function(id){var el=document.getElementById(id);if(el)el.addEventListener("input",function(){ofRenderItems();});});
-document.getElementById("prodAddBtn").addEventListener("click",function(){
-  if(!igCanWrite()){showToast("Your role is read-only.");return}
-  IGAdminUI.openModal("prodModal");
+/* Wave 5: one modal for Add AND Edit — prodAddBtn opens it in "add" mode. */
+document.getElementById("prodAddBtn").addEventListener("click",function(){igOpenProductModal("add");});
+document.getElementById("pmSave").addEventListener("click",function(){igSaveProductModal();});
+document.getElementById("pmChoose").addEventListener("click",function(){document.getElementById("pmFile").click();});
+document.getElementById("pmDrop").addEventListener("click",function(e){if(e.target.closest("#pmChoose"))return;document.getElementById("pmFile").click();});
+document.getElementById("pmFile").addEventListener("change",function(){igPmHandleFiles(this.files);this.value="";});
+document.getElementById("pmDrop").addEventListener("dragover",function(e){e.preventDefault();this.classList.add("dragging");});
+document.getElementById("pmDrop").addEventListener("dragleave",function(){this.classList.remove("dragging");});
+document.getElementById("pmDrop").addEventListener("drop",function(e){e.preventDefault();this.classList.remove("dragging");igPmHandleFiles(e.dataTransfer.files);});
+document.getElementById("pmDrop").addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();document.getElementById("pmFile").click();}});
+document.getElementById("pmImgUrlAdd").addEventListener("click",function(){igPmImportUrl();});
+document.getElementById("pmImgUrl").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();igPmImportUrl();}});
+/* Wave 5 fix: clear each field's own error as soon as that field is
+   edited, and hide the "Fix the highlighted fields first." banner once
+   every field error is gone (it no longer lingers after a fix). */
+function igPmMaybeClearBanner(){
+  var anyErr=["pmNameErr","pmBrandErr","pmCatErr","pmPriceErr","pmOldErr","pmDealErr","pmStockErr","pmImgErr"].some(function(id){var e=igPmEl(id);return e&&!e.hidden&&e.textContent;});
+  if(!anyErr){var m=igPmEl("pmMsg");if(m)m.textContent="";}
+}
+[["pmName","pmNameErr"],["pmBrand","pmBrandErr"],["pmCat","pmCatErr"],["pmPrice","pmPriceErr"],["pmOld","pmOldErr"],["pmDeal","pmDealErr"],["pmStock","pmStockErr"]].forEach(function(pair){
+  var el=document.getElementById(pair[0]);if(!el)return;
+  el.addEventListener(el.tagName==="SELECT"?"change":"input",function(){
+    el.removeAttribute("aria-invalid");igPmSetErr(pair[1],"");igPmMaybeClearBanner();
+  });
 });
+document.getElementById("pmImgUrl").addEventListener("input",function(){igPmSetImgError("");igPmMaybeClearBanner();});
 document.getElementById("prodCatFilter").addEventListener("change",function(){PROD_CAT_FILTER=this.value;PROD_TILE_PAGE=1;renderProductTiles();});
-document.getElementById("epSave").addEventListener("click",function(){igSaveEditProduct();});
 document.getElementById("ordersTableWrap").addEventListener("change",async function(e){
   var sel=e.target.closest(".ord-status");if(!sel)return;
   var id=sel.getAttribute("data-id"),st=sel.value;
@@ -1091,8 +1490,11 @@ document.getElementById("ordersTableWrap").addEventListener("click",async functi
 document.getElementById("setThemeLight").addEventListener("click",function(){IGAdminUI.setTheme("light");});
 document.getElementById("setThemeDark").addEventListener("click",function(){IGAdminUI.setTheme("dark");});
 document.getElementById("setThemeSystem").addEventListener("click",function(){
-  var t=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";
-  try{document.documentElement.setAttribute("data-theme",t);localStorage.removeItem("ig-admin-theme");}catch(e){}
+  /* Wave 5: "System" clears the saved preference — and the default theme
+     is the BLUE light theme, not the OS theme. So this returns to light. */
+  try{localStorage.removeItem("ig-admin-theme");}catch(e){}
+  try{document.documentElement.setAttribute("data-theme","light");}catch(e){}
+  try{IGAdminUI.initTheme();}catch(e){}
 });
 document.getElementById("auditFilter").addEventListener("change",function(){igRenderSettingsAudit();});
 document.getElementById("auditSearch").addEventListener("input",function(){igRenderSettingsAudit();});
