@@ -99,3 +99,20 @@ html.anim .s1-orb i{opacity:0}
 .sheet :focus-visible,.sheet a:focus-visible{outline-color:#8a0057}
 .sh-search input:focus-visible{opacity:1;pointer-events:auto}
 .sh-search:focus-within{box-shadow:0 0 0 2px #00e5ff}
+/* lower page polish: tighter rhythm, richer cards, footer */
+section{padding:30px 0 4px}
+.sec-head{margin-bottom:16px}
+.grid{gap:16px}
+.card{background:radial-gradient(120% 60% at 50% 0,rgba(236,0,140,.10),transparent 60%),linear-gradient(180deg,#171B31,#0e1122);border-color:rgba(255,255,255,.08)}
+.card:before{content:"";position:absolute;left:0;right:0;top:0;height:2px;z-index:3;background:linear-gradient(90deg,transparent,#ec008c,#00aeef,transparent);opacity:0;transition:opacity .3s}
+.card:hover:before{opacity:1}
+.card .price{font-size:1.18em;text-shadow:0 0 14px rgba(236,0,140,.35)}
+.card .add{box-shadow:0 8px 22px -8px rgba(236,0,140,.7)}
+.card .imgwrap{background:radial-gradient(circle at 50% 40%,rgba(0,174,239,.16),transparent 70%)}
+footer{margin-top:36px;position:relative;background:radial-gradient(70% 120% at 50% 0,rgba(236,0,140,.14),transparent 70%),#070912;border-top:0}
+footer:before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,#ec008c,#00aeef,#ec008c,transparent);background-size:200% 100%;animation:fline 6s linear infinite}
+@keyframes fline{to{background-position:200% 0}}
+.foot h5{font-style:italic;text-transform:uppercase;color:#fff}
+.foot a{transition:color .2s,transform .2s}.foot a:hover{transform:translateX(4px)}
+.aboutbox,.legacy-strip .cats>*{backdrop-filter:blur(6px)}
+@media(prefers-reduced-motion:reduce){footer:before{animation:none}}
