@@ -26,3 +26,6 @@ Stacked live drop-shadow filters on large product layers caused 200-300 ms first
 
 ## v3.3 Full-visibility margins
 Check now uses each product's layout box against the left/right viewport edge (margin >= 7.5% of half width + 6 px, for bob rotateY 8deg plus tilt 6deg perspective growth) and against the top of the Hot deals sheet (>= 16 px). Fixed: slide 2 and 4 and 9 at <=860px, slide 1 and 5 at 861-1100px, slide 5 at <=720px. Result: 0 violations at 390x844, 768x1024, 1024x768, 1440x900.
+
+## v4 Intro type (user request 22:10)
+Per slide: gold kicker "IMRAN GAMES" (Space Grotesk), bold italic product name (Kanit 900 italic, white fill, accent stroke and glow), neon script line (Mr Dafoe). Fonts self-hosted in fonts/ (both SIL OFL, from Google Fonts). No text boxes or backgrounds. Reveal: kicker tracks in, name wipes up with skew, script writes on, then a slow neon breathe, started with the slide entry. Names are the supplied product names from the slide alt text; script lines are descriptors from the same text, no prices or sales claims. Desktop: products scaled to 0.88 to open a band; text in front in that band; credit note moved to bottom left. Phone and tablet: text in a band under the product. Slide 1 keeps its headline and gets the product name beside the product. Reduced motion: static text.

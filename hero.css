@@ -491,3 +491,50 @@ span.hchip{cursor:default}
 @media(min-width:861px) and (max-width:1100px){#hero .s1 .prod{--x:86%!important;--y:calc(var(--hh) + 150px)!important}.slide.s5{--u:min(60vw,66vh)}}
 @media(max-width:860px){#hero .s2 .prod{--w:min(80vw,66vh)!important}#hero .s4 .prod{--w:86vw!important}.slide.s9{--u:72vw}}
 @media(max-width:720px){.slide.s5{--u:90vw}}
+
+/* ---------- v4 intro type: company kicker, bold italic product name, neon script. No boxes, behind the product ---------- */
+@font-face{font-family:"Kanit";src:url(fonts/Kanit-900i.woff2) format("woff2");font-weight:900;font-style:italic;font-display:swap}
+@font-face{font-family:"Mr Dafoe";src:url(fonts/MrDafoe.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
+.slide.s1{--tc:#EC008C}.slide.s2{--tc:#00E5FF}.slide.s3{--tc:#FF3CAC}.slide.s4{--tc:#FFB36B}.slide.s5{--tc:#EC008C}.slide.s6{--tc:#FF2FB0}.slide.s7{--tc:#EC008C}.slide.s8{--tc:#00E5FF}.slide.s9{--tc:#00AEEF}.slide.s10{--tc:#FF2FB0}
+.tt{position:absolute;z-index:2;left:50%;top:calc(var(--hh) + 20vh);transform:translateX(-50%);text-align:center;pointer-events:none;width:max-content;max-width:94vw;display:flex;flex-direction:column;align-items:center}
+.tt .k{font:600 clamp(11px,1.05vw,15px)/1 "Space Grotesk",Inter,sans-serif;font-style:normal;letter-spacing:.42em;text-transform:uppercase;color:#F2C14E;margin:0 0 .9em .42em;text-shadow:0 0 14px rgba(242,193,78,.55);display:block}
+.tt .t1{display:block;font:900 italic min(10.2vw,calc(88vw / (var(--n) * .62)),190px)/.92 "Kanit","Unbounded",sans-serif;text-transform:uppercase;letter-spacing:-.01em;color:#fff;-webkit-text-stroke:.045em var(--tc);paint-order:stroke fill;text-shadow:0 0 .22em color-mix(in srgb,var(--tc) 70%,transparent),0 .06em .5em rgba(0,0,0,.35);padding:.04em .12em}
+.tt .t2{display:block;font:400 min(6.6vw,calc(88vw / (var(--n) * .62) * .62),118px)/1 "Mr Dafoe","Brush Script MT",cursive;font-style:normal;color:#fff;margin-top:-.42em;transform:rotate(-5deg);text-shadow:0 0 .06em #fff,0 0 .22em var(--tc),0 0 .55em var(--tc),0 0 1em color-mix(in srgb,var(--tc) 60%,transparent);padding:.1em .2em;white-space:nowrap}
+.tt span{display:inline-block}
+/* reveal: kicker tracks in, name wipes up with skew, script writes on left to right, then neon breathes */
+.tt .k,.tt .t1 span,.tt .t2 span{opacity:0}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .tt .k{animation:ttK 1s var(--ease) .15s both}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .tt .t1 span{animation:ttT 1.05s cubic-bezier(.2,.9,.25,1) .28s both}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .tt .t2 span{animation:ttS 1.15s cubic-bezier(.5,0,.2,1) .7s both}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .tt .t2{animation:ttGlow 3.6s ease-in-out 2s infinite alternate}
+@keyframes ttK{from{opacity:0;letter-spacing:.9em;transform:translateY(8px)}to{opacity:1;letter-spacing:.42em;transform:none}}
+@keyframes ttT{0%{opacity:0;transform:translateY(60%) skewX(-10deg);clip-path:inset(0 0 100% 0)}60%{opacity:1}100%{opacity:1;transform:none;clip-path:inset(-20% -10% -20% -10%)}}
+@keyframes ttS{0%{opacity:1;clip-path:inset(-30% 100% -30% -5%)}100%{opacity:1;clip-path:inset(-30% -10% -30% -5%)}}
+@keyframes ttGlow{from{opacity:.92}to{opacity:1}}
+/* slide 1: product name sits near the product, beside the existing headline */
+@media(min-width:861px){.s1 .tt{left:81%;top:calc(var(--hh) + 60vh)}.s1 .tt .t1{font-size:min(4.6vw,calc(22vw / (var(--n) * .62)),72px)}.s1 .tt .t2{font-size:min(3.4vw,44px)}.s1 .tt .k{display:none}}
+@media(min-width:861px) and (max-width:1100px){.s1 .tt{left:78%;top:calc(var(--hh) + 63vh)}}
+/* phone + tablet: text under the product in the free band */
+@media(max-width:860px){
+ .tt{top:auto;bottom:150px}
+ .tt .k{font-size:10px;margin-bottom:.6em}
+ .tt .t1{font-size:min(11.5vw,calc(90vw / (var(--n) * .62)),84px)}
+ .tt .t2{font-size:min(7.2vw,52px)}
+ .s1 .tt{left:auto;right:5vw;transform:none;bottom:276px;align-items:flex-end}
+ .s1 .tt .k,.s1 .tt .t2{display:none}.s1 .tt .t1{font-size:7.4vw}
+}
+@media(prefers-reduced-motion:reduce){.tt .k,.tt .t1 span,.tt .t2 span{opacity:1!important;animation:none!important;clip-path:none!important}.tt .t2{animation:none!important}}
+/* v4.1: name sits in front, in a band under the product (stage scaled slightly to make room) */
+@media(min-width:861px){
+ .slide:not(.s1) .stage{transform:scale(.88);transform-origin:50% 14%}
+ .slide:not(.s1) .tt{top:auto;bottom:calc(70px + 3vh);z-index:6}
+ .slide:not(.s1) .tt .t1{font-size:min(7.4vw,calc(70vw / (var(--n) * .62)),118px)}
+ .slide:not(.s1) .tt .t2{font-size:min(4.6vw,calc(70vw / (var(--n) * .62) * .62),76px);margin-top:-.5em}
+ .slide:not(.s1) .tt .k{margin-bottom:.4em}
+}
+@media(max-width:860px){.tt{z-index:6}.slide:not(.s1) .stage{transform:scale(.94);transform-origin:50% 8%}}
+@media(min-width:861px){.cnote,.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .cnote{left:max(24px,4vw)!important;bottom:calc(70px + 3vh)!important;max-width:22vw;white-space:normal;text-align:left;border-radius:18px}.cnote{transform:translate3d(0,16px,0)!important}.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .cnote{transform:translate3d(0,0,0)!important}}
+@media(max-width:860px){.s4 .tt,.s5 .tt,.s8 .tt{bottom:190px}}
+@media(min-width:861px){.s1 .tt{z-index:6}}
+@media(min-width:861px) and (max-width:1100px){.s1 .tt{left:auto;right:4vw;transform:none;top:auto;bottom:calc(70px + 3vh);align-items:flex-end}.s1 .tt .t1{font-size:min(4.2vw,56px)}.s1 .tt .t2{display:none}}
+@media(min-width:721px) and (max-width:860px){.s1 .tt .t1{font-size:6vw}}
