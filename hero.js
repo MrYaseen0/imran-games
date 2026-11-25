@@ -32,7 +32,7 @@ function cardHTML(p,thumb){
   var d=pct(p),sold=p.soldOut||p.stock===0;
   var wished=(typeof wish!=="undefined"&&wish[p.id]);
   return '<div class="th"><img src="'+esc(thumb)+'" alt="" loading="lazy" decoding="async"></div>'+
-   '<div class="tx"><h3>'+esc(shortName(p))+'</h3>'+
+   '<div class="tx"><p class="gh">'+esc(shortName(p))+'</p>'+
    '<div class="pr">'+money(p.price)+(d?'<s>'+money(p.old)+'</s><em>-'+d+'%</em>':'')+'</div>'+
    '<div class="ac">'+(sold?'<button class="add" data-soldout="1" aria-disabled="true">Sold out</button>':'<button class="add" data-add="'+p.id+'">Add to Cart</button>')+
    '<button class="hrt'+(wished?' on':'')+'" data-wish="'+p.id+'" aria-label="Add '+esc(shortName(p))+' to wishlist"><svg width="18" height="18" viewBox="0 0 24 24" fill="'+(wished?'currentColor':'none')+'" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/></svg></button></div></div>';
