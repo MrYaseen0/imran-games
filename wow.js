@@ -71,6 +71,13 @@ if(ch&&"IntersectionObserver"in window){
   new IntersectionObserver(function(e){vis=e[0].isIntersecting;if(vis)req()},{rootMargin:"100px"}).observe(ch);
 }else vis=!!ch;
 frame();
+/* hero floating gear follows the pointer a little */
+if(!reduce&&matchMedia("(hover:hover) and (pointer:fine)").matches){
+  var orb=document.querySelector(".s1-orb"),ot=0;
+  if(orb){addEventListener("pointermove",function(e){if(ot)return;ot=requestAnimationFrame(function(){ot=0;
+    var nx=e.clientX/innerWidth-.5,ny=e.clientY/innerHeight-.5;
+    [].forEach.call(orb.querySelectorAll("i"),function(el,i){var k=(i+1)*14;el.style.setProperty("--mx",(nx*k).toFixed(1)+"px");el.style.setProperty("--my",(ny*k).toFixed(1)+"px")})})},{passive:true})}
+}
 /* 3D tilt on cards, fine pointers only */
 if(!reduce&&matchMedia("(hover:hover) and (pointer:fine)").matches){
   var cur=null,tm=0;
