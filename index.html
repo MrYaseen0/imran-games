@@ -253,9 +253,8 @@ footer{margin-top:44px;background:#070912;border-top:1px solid var(--line)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 <script>document.documentElement.classList.add("anim")</script>
-<script src="vendor/supabase-js-2.119.1.min.js"></script>
-<link rel="preload" as="image" href="assets/hero/dualshock-4.webp" fetchpriority="high">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&display=swap">
+<link rel="preload" as="image" href="assets/hero/u/neon-ps5.webp" fetchpriority="high"><link rel="preload" as="image" href="assets/hero/g/neon-ps5.webp">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&display=swap" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="hero.css"><link rel="stylesheet" href="gold.css">
 </head>
 <body>
@@ -489,6 +488,7 @@ function igSafeImgUrl(u){var s=String(u||"").trim();if(!s)return "";if(/^(javasc
 /* image safety net: if an embedded photo ever fails to decode, fall back to the photo file next to this page */
 document.addEventListener("error",function(e){var t=e.target;if(!t||t.tagName!=="IMG")return;if(t.getAttribute("data-logo-fb"))return;var fb=t.getAttribute("data-fb");if(!fb)return;var cur=t.getAttribute("src");var r=R(fb);if(r&&cur!==r){t.setAttribute("src",r);return}if(cur!==fb){t.setAttribute("src",fb);return}if(cur&&cur.indexOf("logo.png")===-1){t.setAttribute("data-logo-fb","1");t.setAttribute("src","logo.png")}},true);
 </script>
+<script src="vendor/supabase-js-2.119.1.min.js"></script>
 <script>
 /* ===== DATA — single source, moves 1:1 to Next.js + DB later ===== */
 var PRODUCTS=[];
