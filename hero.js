@@ -52,20 +52,68 @@ function refreshWish(){
   $$(".gcard .hrt",hero).forEach(function(b){var on=!!(typeof wish!=="undefined"&&wish[+b.dataset.wish]);b.classList.toggle("on",on);var s=b.querySelector("svg");if(s)s.setAttribute("fill",on?"currentColor":"none")});
 }
 
-/* ---- hot deals sheet ---- */
+/* ---- hot deals marquee ---- */
+/* Enhanced copies are keyed by the ORIGINAL photo URL. A replaced photo has a new URL, so it falls back to the live original until the copy is rebuilt. */
+var DEAL_IMG={"https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/7-1.webp":"assets/deals/7-03cc8cbe.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/8-1.webp":"assets/deals/8-ea23262d.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/9-1.webp":"assets/deals/9-2720e186.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/10-1.webp":"assets/deals/10-e33bc35b.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/11-1.webp":"assets/deals/11-a100f0be.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/12-1.webp":"assets/deals/12-f92efb0b.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/2-1.webp":"assets/deals/2-bc17fd07.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/13-1.webp":"assets/deals/13-f9b3c095.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/14-1.webp":"assets/deals/14-a9b449bb.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/15-1.webp":"assets/deals/15-23ba3058.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/17-1.webp":"assets/deals/17-5659009b.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/18-1.webp":"assets/deals/18-683bf039.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/19-1.webp":"assets/deals/19-b47a09bc.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/21-1.webp":"assets/deals/21-c2c6f794.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/22-1.webp":"assets/deals/22-77b3893c.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/23-1.webp":"assets/deals/23-f7bfa89c.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/24-1.webp":"assets/deals/24-8635bbba.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/25-1.webp":"assets/deals/25-53d69d62.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/26-1.webp":"assets/deals/26-5f63327f.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/27-1.webp":"assets/deals/27-2811135d.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/28-1.webp":"assets/deals/28-12929b5c.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/16-1.webp":"assets/deals/16-e77f5ec8.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/29-1.webp":"assets/deals/29-604d5d42.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/30-1.webp":"assets/deals/30-bfba61af.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/31-1.webp":"assets/deals/31-aedf79ea.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/32-1.webp":"assets/deals/32-da188d8b.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/33-1.webp":"assets/deals/33-09b0d67f.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/34-1.webp":"assets/deals/34-e441782f.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/35-1.webp":"assets/deals/35-5599f90f.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/36-1.webp":"assets/deals/36-9526847d.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/37-1.webp":"assets/deals/37-84255bbd.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/20-1.webp":"assets/deals/20-c93d0e5b.webp","https://vnbaizpqucimomrfvfpd.supabase.co/storage/v1/object/public/product-images/42-1.webp":"assets/deals/1001-688daaa0.webp"};
+var dmApi=null;
+function dealCard(p,clone,i){
+  var orig=(p.imgs&&p.imgs[0])||"logo.png",src=DEAL_IMG[orig]||orig;
+  var save=p.old-p.price,nm=shortName(p);
+  return '<article class="dd" data-view="'+p.id+'" style="--bg:url(\''+esc(src)+'\')"'+(clone?' aria-hidden="true"':'')+'>'+
+   '<div class="dd-img"><img src="'+esc(src)+'" data-fb="'+esc(orig)+'" alt="" '+((!clone&&i<6)?'loading="eager" fetchpriority="high"':'loading="lazy"')+' decoding="async" width="720" height="576" draggable="false" onerror="if(this.dataset.fb&&this.src.indexOf(this.dataset.fb)<0){this.src=this.dataset.fb}"><b class="dd-off">-'+pct(p)+'%</b></div>'+
+   '<div class="dd-body"><span class="dd-cat">'+esc(p.catLabel||"")+'</span><h3>'+(clone?esc(nm):'<button type="button" class="dd-view" data-view="'+p.id+'">'+esc(nm)+'</button>')+'</h3>'+
+   '<div class="dd-p"><strong>'+money(p.price)+'</strong><s>'+money(p.old)+'</s></div>'+
+   '<div class="dd-meter" style="--w:'+pct(p)+'%" aria-hidden="true"><i></i></div><span class="dd-save">Save '+money(save)+' ('+pct(p)+'% off)</span>'+
+   '<button class="dd-add" type="button" data-add="'+p.id+'"'+(clone?' tabindex="-1"':' aria-label="Add '+esc(nm)+' to cart"')+'><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.4 11h10.2L20 7H6.2"/><circle cx="9" cy="19.5" r="1.3"/><circle cx="17" cy="19.5" r="1.3"/></svg>Add to Cart</button></div></article>';
+}
+function dealMarquee(row){
+  var track,g0,W=1;
+  var rm=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function bind(){track=row.querySelector(".dm-track");g0=row.querySelector(".dm-grp");W=g0.getBoundingClientRect().width||1}
+  bind();
+  if(rm||!track)return null;
+  var SPEED=70,x=0,last=0,hover=false,focus=false,hold=false,drag=null,moved=false,vis=true,raf=0,holdT=0,glide=null;
+  function put(){x=((x%W)+W)%W;track.style.transform="translate3d("+(-x)+"px,0,0)"}
+  function tick(t){
+    var dt=last?Math.min(t-last,50):16;last=t;
+    if(glide){var k=Math.min(1,(t-glide.t0)/glide.d);var e=1-Math.pow(1-k,3);x=glide.from+glide.by*e;if(k>=1)glide=null}
+    else if(!hover&&!focus&&!hold&&!drag)x+=SPEED*dt/1000;
+    put();raf=vis&&!document.hidden?requestAnimationFrame(tick):0;
+  }
+  function start(){if(!raf){last=0;raf=requestAnimationFrame(tick)}}
+  if("IntersectionObserver" in window){new IntersectionObserver(function(en){vis=en[0].isIntersecting;if(vis)start()}).observe(row)}
+  document.addEventListener("visibilitychange",function(){if(!document.hidden)start()});
+  row.addEventListener("mouseenter",function(){hover=true});row.addEventListener("mouseleave",function(){hover=false});
+  row.addEventListener("focusin",function(e){focus=true;var c=e.target.closest(".dd");if(!c||c.closest(".dm-grp")!==g0)return;
+    var rr=row.getBoundingClientRect(),cr=c.getBoundingClientRect();
+    if(cr.left<rr.left+8||cr.right>rr.right-8){glide={t0:performance.now(),d:380,from:x,by:(function(){var by=(cr.left-rr.left-16);return by})()}}});
+  row.addEventListener("focusout",function(e){if(!row.contains(e.relatedTarget))focus=false});
+  row.addEventListener("pointerdown",function(e){if(e.pointerType==="mouse"&&e.button!==0)return;clearTimeout(holdT);hold=true;glide=null;drag={x:e.clientX,p:x,id:e.pointerId};moved=false});
+  row.addEventListener("pointermove",function(e){if(!drag||e.pointerId!==drag.id)return;var dx=e.clientX-drag.x;if(!moved&&Math.abs(dx)>6){moved=true;try{row.setPointerCapture(e.pointerId)}catch(_){}row.classList.add("drag")}if(moved)x=drag.p-dx});
+  function up(e){if(!drag)return;drag=null;row.classList.remove("drag");clearTimeout(holdT);holdT=setTimeout(function(){hold=false},e.pointerType==="mouse"?200:1400)}
+  row.addEventListener("pointerup",up);row.addEventListener("pointercancel",up);
+  row.addEventListener("click",function(e){if(moved){e.stopPropagation();e.preventDefault();moved=false}},true);
+  function step(dir){clearTimeout(holdT);hold=true;var c=g0.querySelector(".dd"),s=c.getBoundingClientRect().width+parseFloat(getComputedStyle(g0).columnGap||0)+0;glide={t0:performance.now(),d:480,from:x,by:dir*s*(window.innerWidth<720?1:2)};holdT=setTimeout(function(){hold=false},1800)}
+  document.querySelectorAll("[data-dm]").forEach(function(b){b.addEventListener("click",function(){step(+b.dataset.dm)})});
+  window.addEventListener("resize",function(){var f=x/W;W=g0.getBoundingClientRect().width;x=f*W});
+  if(window.matchMedia&&matchMedia("(hover:hover)").matches){
+    row.addEventListener("pointermove",function(e){if(e.pointerType!=="mouse"||drag)return;var c=e.target.closest&&e.target.closest(".dd");if(!c)return;var r=c.getBoundingClientRect(),px=(e.clientX-r.left)/r.width,py=(e.clientY-r.top)/r.height;c.style.setProperty("--mx",(px*100)+"%");c.style.setProperty("--my",(py*100)+"%");c.style.setProperty("--ry",((px-.5)*7)+"deg");c.style.setProperty("--rx",((.5-py)*5)+"deg")});
+    row.addEventListener("pointerout",function(e){var c=e.target.closest&&e.target.closest(".dd");if(c&&!c.contains(e.relatedTarget)){c.style.removeProperty("--rx");c.style.removeProperty("--ry");c.style.removeProperty("--mx");c.style.removeProperty("--my")}});
+  }
+  start();
+  return {step:step,rebind:function(){var f=x/W;bind();x=f*W;put()},pos:function(){return x},width:function(){return W}};
+}
 function fillSheet(){
   var row=$("#hdRow");if(!row)return;
   var list=(window.PRODUCTS||[]).filter(function(p){return pct(p)>0&&!p.soldOut&&p.stock>0});
   list.sort(function(a,b){return pct(b)-pct(a)||(b.hot?1:0)-(a.hot?1:0)});
-  list=list.slice(0,3);
   if(!list.length){row.innerHTML='<p class="dnote">New deals land here as soon as they are live.</p>';return}
-  row.innerHTML=list.map(function(p){
-    var img=(p.imgs&&p.imgs[0])||"logo.png";
-    return '<article class="dcard" data-view="'+p.id+'"><img src="'+esc(img)+'" alt="'+esc(shortName(p))+'" loading="lazy" decoding="async" width="92" height="92">'+
-     '<div class="dt"><h3>'+esc(shortName(p))+'</h3><div class="dp">'+money(p.price)+'<s>'+money(p.old)+'</s><em>-'+pct(p)+'%</em></div>'+
-     '<button class="dadd" data-add="'+p.id+'">Add to Cart</button></div></article>';
-  }).join("");
+  var one=list.map(function(p,i){return dealCard(p,false,i)}).join("");
+  var two=list.map(function(p,i){return dealCard(p,true,i)}).join("");
+  row.innerHTML='<div class="dm-track"><div class="dm-grp">'+one+'</div><div class="dm-grp" aria-hidden="true">'+two+'</div></div>';
+  if(dmApi&&dmApi.rebind)dmApi.rebind();else window.dmApi=dmApi=dealMarquee(row);
 }
+
 window.igHeroRender=function(){fillCards();fillSheet();refreshWish()};
 if(window.PRODUCTS&&window.PRODUCTS.length)window.igHeroRender();
 
@@ -79,6 +127,7 @@ function setActiveUI(n){
 function go(n,dir){
   n=(n+N)%N;if(n===cur||busy)return;
   dir=dir||(n>cur?1:-1);
+  lazyLoad(n);lazyLoad(n+1);
   var prev=slides[cur],next=slides[n];
   if(reduce){prev.classList.remove("on");next.classList.add("on");cur=n;setActiveUI(n);return}
   busy=true;
@@ -146,8 +195,9 @@ function lazyLoad(i){
   var s=slides[(i+N)%N];if(!s)return;
   $$("img[data-src]",s).forEach(function(im){im.src=im.dataset.src;im.removeAttribute("data-src")});
 }
-function loadRest(){for(var i=1;i<N;i++)lazyLoad(i)}
-if(document.readyState==="complete")setTimeout(loadRest,300);else window.addEventListener("load",function(){(window.requestIdleCallback||function(f){setTimeout(f,400)})(loadRest)});
+/* staggered so the Hot deals photos (first 6 are high priority) are not queued behind every hero slide image on a slow connection */
+function loadRest(){var i=1;(function nx(){if(i>=N)return;lazyLoad(i++);setTimeout(nx,900)})()}
+if(document.readyState==="complete")setTimeout(loadRest,2500);else window.addEventListener("load",function(){setTimeout(loadRest,2500)});
 
 /* ---- header: scrolled state, drawer, search ---- */
 var hd=$("#siteHeader");
