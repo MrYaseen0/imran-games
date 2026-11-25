@@ -272,3 +272,6 @@ span.hchip{cursor:default}
 @media(max-width:720px) and (max-height:780px){.s1 .prod{--y:calc(var(--hh) + 176px);--w:66vw}}
 .hchip .cs{display:none}
 @media(max-width:720px){.hchip .cf{display:none}.hchip .cs{display:inline}}
+/* parked slides sit off-stage so an incoming product animates in instead of popping */
+.slide:not(.on):not(.out-l):not(.out-r) .prod{opacity:0;transform:translate3d(24vw,0,0) perspective(1200px) rotateY(-20deg) scale(.92)}
+.slide.pre-r .prod,.slide.pre-l .prod{transition:none!important}
