@@ -33,7 +33,7 @@ function renderChapter(){
     var d=d0+(d1-d0)*gather;d=d+(d2-d1)*burst;
     var sc=(.4+.12*gather)+.6*burst;
     var rot=(1-gather)*(i%2?220:-220)+(1-burst)*(i%2?-16:16)*(gather);
-    var x=Math.cos(a)*d*(small?1.12:1.7),y=Math.sin(a)*d*(small?1.05:.78);
+    var x=Math.cos(a)*d*(small?1.12:1.7),y=Math.sin(a)*d*(small?1.05:.95);
     var o=clamp(p/.14,0,1);
     el.style.transform="translate3d(calc(-50% + "+x.toFixed(1)+"px),calc(-50% + "+y.toFixed(1)+"px),0) scale("+sc.toFixed(3)+") rotate("+rot.toFixed(1)+"deg)";
     el.style.opacity=o.toFixed(2);
