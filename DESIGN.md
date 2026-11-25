@@ -20,3 +20,6 @@ Written for this repo. Structure ideas (nav, buttons, cards, oversized headlines
 - Headline: Unbounded 800 uppercase, second line neon pink/cyan glow. Nav, chips, buttons, body: Space Grotesk. Fonts self-hosted in /fonts (latin subset).
 - Imagery: owner-supplied photos only, cut out per product; backgrounds are separate gradient/bokeh layers per slide. Concept images are labelled and never carry price, stock or cart.
 - Not derived from the PlayStation or Nike DESIGN.md sources (they could not be read).
+
+## v3.2 Baked product glows (performance)
+Stacked live drop-shadow filters on large product layers caused 200-300 ms first-frame spikes after a slide change (headless software render). Slides 1-10 now use a pre-baked static glow image (assets/hero/g/*.webp, padded alpha, `img.glow` behind each product, same colors as before). Products stay separate animated layers. Measured worst frame 300 ms -> 133 ms (p95 33 ms, median 16.7 ms). Real-device numbers not measured. Prior version: tag gold-v12. Glow does not follow the soft pop squash on the product (static).

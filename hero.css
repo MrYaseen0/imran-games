@@ -479,3 +479,10 @@ span.hchip{cursor:default}
 .s8 .xlogo{right:4vw;top:calc(var(--hh) + 64px);width:34vw}
 .slide.s9{--u:98vw}
 #hero .s10 .p10-stand{--w:min(470px,86vw)!important}}
+
+/* baked static glow (slides 6-10): replaces stacked live drop-shadow filters (first-paint cost) */
+.s6 .prod img:not(.glow),.s7 .prod img:not(.glow),.s8 .prod img:not(.glow),.s9 .prod img:not(.glow),.s10 .prod img:not(.glow){filter:none}
+.prod img.glow{position:absolute;width:auto;max-width:none;height:auto;left:calc(var(--w) * -.16);top:calc(var(--w) * -.16);width:calc(100% + var(--w) * .32);pointer-events:none;z-index:-1}
+.s1 .prod img:not(.glow),.s2 .prod img:not(.glow),.s3 .prod img:not(.glow),.s4 .prod img:not(.glow),.s5 .prod img:not(.glow){filter:none}
+.prod img.glow{animation:none!important;border-radius:0!important}
+.prod img.glow{filter:none!important}
