@@ -108,6 +108,13 @@ index_html = open(os.path.join(BASE, "index.html")).read()
 m = re.search(r"<style[^>]*>(.*?)</style>", index_html, re.S)
 assert m, "no <style> in index.html"
 css = m.group(1)
+# keep hand-added rules (e.g. .topbar, nav.links) that live in the existing styles.css but not in index.html's <style>
+_old = os.path.join(BASE, "styles.css")
+if os.path.exists(_old):
+    _have = set(l.strip() for l in css.splitlines())
+    _extra = [l for l in open(_old).read().splitlines() if l.strip() and l.strip() not in _have]
+    if _extra:
+        css = css.rstrip("\n") + "\n/* preserved from previous styles.css */\n" + "\n".join(_extra) + "\n"
 open(os.path.join(BASE, "styles.css"), "w").write(css)
 print("styles.css:", len(css), "bytes")
 
@@ -115,7 +122,7 @@ print("styles.css:", len(css), "bytes")
 header = """<header>
  <div class="wrap nav">
   <a class="logo" href="/"><img src="/logo-small.png" alt="Imran Games Officials logo" width="1088" height="585" decoding="async"/><span class="logotext"><b><span class="w1">IMRAN</span> <span class="w2">GAMES</span></b><small>Official Game Shop in Peshawar</small></span></a>
-  <nav class="links"><a href="/">Home</a><a href="/#shop">Shop</a><a href="/#games">Games</a><a href="/#deals">Hot Deals</a><a href="/#discounts">Discounts</a><a href="/#reviews">Reviews</a><a href="/#faq">FAQs</a><a href="/#contact">Contact Us</a></nav>
+  <nav class="links"><a href="/">Home</a><a href="/#shop">Shop</a><a href="/#games">Games</a><a href="/#deals">Hot Deals</a><a href="/#discounts">Discounts</a><a href="/#faq">FAQs</a><a href="/#contact">Contact Us</a></nav>
   <div class="navright"><a class="addbtn blue" style="text-decoration:none" href="/#shop">🛒 Shop Now</a></div>
  </div>
 </header>"""
@@ -131,9 +138,9 @@ footer = footer.replace('<a href="#shop">Accessories</a>', '<a href="/category/p
 footer = footer.replace('href="#deals"', 'href="/#deals"')
 footer = footer.replace('href="#shop"', 'href="/#shop"')
 footer = footer.replace('href="#faq"', 'href="/#faq"')
-footer = footer.replace('href="#reviews"', 'href="/#reviews"')
 footer = footer.replace('href="#contact"', 'href="/#contact"')
 footer = footer.replace('src="logo.png"', 'src="/logo-small.png"')
+footer = footer.replace('src="logo-small.png"', 'src="/logo-small.png"')
 # add a category browse row at the end of the footer contact column is complex; append a slim bar after </footer>
 footer += """
 <div style="background:#070912;border-top:1px solid #1b1f33;padding:18px 0"><div class="wrap" style="display:flex;flex-wrap:wrap;gap:10px 22px;justify-content:center">
@@ -165,6 +172,7 @@ def page_shell(title, meta_desc, canonical, og_image, jsonld, body):
 <meta name="twitter:image" content="%s"/>
 <link rel="stylesheet" href="/styles.css"/>
 <link rel="stylesheet" href="/fonts/kanit.css"/>
+<link rel="stylesheet" href="/sub.css"/>
 <script type="application/ld+json">%s</script>
 </head>
 <body>
@@ -174,6 +182,7 @@ def page_shell(title, meta_desc, canonical, og_image, jsonld, body):
 <script>
 function swapImg(el){var m=document.getElementById('mainImg');m.src=el.dataset.full;m.alt=el.alt;document.querySelectorAll('.thumb').forEach(function(t){t.style.borderColor='#232842'});el.style.borderColor='var(--pink)'}
 </script>
+<script src="/sub.js" defer></script>
 </body>
 </html>""" % (esc(title), esc(meta_desc), esc(canonical), esc(title), esc(meta_desc),
                esc(canonical), esc(og_image), esc(title), esc(meta_desc), esc(og_image),
@@ -331,3 +340,18 @@ index_html = index_html.replace('<a href="#shop">Accessories</a>', '<a href="/ca
 open(os.path.join(BASE, "index.html"), "w").write(index_html)
 print("index.html: ItemList urls updated:", n1, "| footer links updated:", n2)
 print("DONE")
+
+# ---------- enhanced first photos (assets/shop/map.js) ----------
+# Swap each original first photo for its processed counterpart on rendered <img src>.
+# Thumb data-full, gallery photos 2+, og:image and JSON-LD keep the original URLs.
+import glob
+_m = open(os.path.join(BASE, "assets", "shop", "map.js")).read()
+_enh = json.loads(_m[_m.index("{"):_m.rindex("}") + 1])
+_n = 0
+for _f in glob.glob(os.path.join(BASE, "products", "*.html")) + glob.glob(os.path.join(BASE, "category", "*.html")):
+    _s = open(_f).read(); _o = _s
+    for _k, _v in _enh.items():
+        _s = _s.replace('src="%s"' % _v["o"], 'src="/%s"' % _v["e"])
+    if _s != _o:
+        open(_f, "w").write(_s); _n += 1
+print("enhanced-photo pages:", _n)
