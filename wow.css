@@ -183,3 +183,15 @@ footer{margin-top:48px}
 @media(max-width:560px){.card .pricetag{padding:4px 8px;white-space:nowrap;gap:4px}.card .pricetag b{font-size:15px!important}.card .pricetag svg,.card .pricetag i{display:none}}
 @media(max-width:560px){.card h3{display:block;-webkit-line-clamp:unset;overflow:visible;min-height:0}}
 .chip.active{background:#c2007a;color:#fff;border-color:#c2007a}
+/* chapter: never empty at the start */
+.ch-stage:before{content:"";position:absolute;left:50%;top:61%;width:min(70vw,720px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;background:repeating-radial-gradient(circle,rgba(0,174,239,.22) 0 1px,transparent 1px 64px);-webkit-mask-image:radial-gradient(circle,#000 20%,transparent 70%);mask-image:radial-gradient(circle,#000 20%,transparent 70%);animation:chpulse 6s linear infinite;z-index:0}
+@keyframes chpulse{to{transform:translate(-50%,-50%) rotate(60deg) scale(1.08)}}
+@media(prefers-reduced-motion:reduce){.ch-stage:before{animation:none}}
+/* slide 6: keep glows inside the panel */
+#hero .s6 .stage{overflow:clip}
+/* filters readable on phones */
+@media(max-width:560px){
+ .sec-head .filters{display:grid!important;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+ .sec-head .filters select{width:100%;flex:none;min-height:44px;font-size:14px;padding:0 12px;text-overflow:clip}
+ .sec-head .filters select:last-child{grid-column:1/-1}
+}

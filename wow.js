@@ -23,10 +23,10 @@ function renderChapter(){
   var small=W<721;
   var R=Math.min(W*(small?.34:.3),H*(small?.25:.27));
   var gather=ease(clamp(p/.38,0,1)),burst=ease(clamp((p-.38)/.4,0,1));
-  var far=Math.max(W,H)*.85;
+  var far=R*(small?1.25:2.1);
   var cs=.72+.28*gather+.06*burst;
   core.style.transform="translate3d(-50%,-50%,0) scale("+cs.toFixed(3)+") rotate("+((1-gather)*-14+burst*0).toFixed(2)+"deg)";
-  core.style.opacity=clamp(p/.12,0,1).toFixed(2);
+  core.style.opacity=clamp(.55+p/.12,0,1).toFixed(2);
   for(var i=0;i<its.length;i++){
     var el=its[i],a=+el.dataset.a*Math.PI/180,rr=+el.dataset.r;
     var d0=far,d1=R*.22,d2=R*(small?1.05:1.12)*rr;
@@ -34,7 +34,7 @@ function renderChapter(){
     var sc=(.4+.12*gather)+.6*burst;
     var rot=(1-gather)*(i%2?220:-220)+(1-burst)*(i%2?-16:16)*(gather);
     var x=Math.cos(a)*d*(small?1.12:1.7),y=Math.sin(a)*d*(small?1.05:.95);
-    var o=clamp(p/.14,0,1);
+    var o=clamp(.5+p/.14,0,1);
     el.style.transform="translate3d(calc(-50% + "+x.toFixed(1)+"px),calc(-50% + "+y.toFixed(1)+"px),0) scale("+sc.toFixed(3)+") rotate("+rot.toFixed(1)+"deg)";
     el.style.opacity=o.toFixed(2);
     el.style.setProperty("--lo",clamp((burst-.55)/.4,0,1).toFixed(2));
