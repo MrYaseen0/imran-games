@@ -4,7 +4,7 @@
 "use strict";
 var $=function(s,r){return (r||document).querySelector(s)},$$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
 var hero=$("#hero");if(!hero)return;
-var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;if(reduce)document.documentElement.classList.add("is-reduced");
 var slides=$$(".slide",hero),dots=$$(".h-dots button",hero),bgs=$$(".bgl",hero),chips=$$(".hchip[data-go]",hero);
 var cur=0,timer=null,paused=false,busy=false,hoverP=false,focusP=false,touchP=false;
 var N=slides.length;
@@ -77,7 +77,7 @@ function setActiveUI(n){
   slides.forEach(function(s,i){s.setAttribute("aria-hidden",i===n?"false":"true")});
 }
 function go(n,dir){
-  n=(n+N)%N;if(n===cur||busy&&!reduce)return;
+  n=(n+N)%N;if(reduce||n===cur||busy)return;
   dir=dir||(n>cur?1:-1);
   var prev=slides[cur],next=slides[n];
   if(reduce){prev.classList.remove("on");next.classList.add("on");cur=n;setActiveUI(n);return}
