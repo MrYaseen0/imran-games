@@ -274,7 +274,7 @@ Array.prototype.forEach.call(hero.querySelectorAll(".hl .ln>span"),function(sp,l
     var e=document.createElement("i");e.className="ch";e.textContent=c===" "?"\u00a0":c;e.style.setProperty("--i",String(li*7+n));n++;sp.appendChild(e);
   });
 });
-var cnt=document.createElement("div");cnt.className="h-count";cnt.setAttribute("aria-hidden","true");cnt.innerHTML="<b>01</b><span>/ 10</span>";hero.appendChild(cnt);
+var cnt=document.createElement("div");cnt.className="h-count";cnt.setAttribute("aria-hidden","true");cnt.innerHTML="<b>01</b><span>/ 11</span>";hero.appendChild(cnt);
 var dots=hero.querySelectorAll(".h-dots button"),b=cnt.querySelector("b");
 function upd(){for(var i=0;i<dots.length;i++){if(dots[i].classList.contains("on")){var v=(i+1<10?"0":"")+(i+1);if(b.textContent!==v){b.textContent=v;cnt.classList.remove("tick");void cnt.offsetWidth;cnt.classList.add("tick")}break}}}
 if(window.MutationObserver){var mo=new MutationObserver(upd);Array.prototype.forEach.call(dots,function(d){mo.observe(d,{attributes:true,attributeFilter:["class"]})})}
