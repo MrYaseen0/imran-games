@@ -181,3 +181,5 @@ footer{margin-top:48px}
  .filters{display:flex!important;flex-wrap:wrap;gap:8px}.filters select{flex:1 1 30%;min-width:0;width:auto}
 }
 @media(max-width:560px){.card .pricetag{padding:4px 8px;white-space:nowrap;gap:4px}.card .pricetag b{font-size:15px!important}.card .pricetag svg,.card .pricetag i{display:none}}
+@media(max-width:560px){.card h3{display:block;-webkit-line-clamp:unset;overflow:visible;min-height:0}}
+.chip.active{background:#c2007a;color:#fff;border-color:#c2007a}
