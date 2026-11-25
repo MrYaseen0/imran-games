@@ -1,0 +1,76 @@
+/* wow layer: fonts, headline art, motion. Kanit (heavy italic) + Mr Dafoe script only. */
+@font-face{font-family:Kanit;src:url(fonts/Kanit-400.woff2) format("woff2");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:Kanit;src:url(fonts/Kanit-500.woff2) format("woff2");font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:Kanit;src:url(fonts/Kanit-700.woff2) format("woff2");font-weight:600 800;font-style:normal;font-display:swap}
+@font-face{font-family:Kanit;src:url(fonts/Kanit-800i.woff2) format("woff2");font-weight:600 800;font-style:italic;font-display:swap}
+body{font-family:Kanit,system-ui,sans-serif;letter-spacing:.005em}
+h1,h2,h3,h4,.sh-head h2,.sec-head h2,.tt .t1,.b-white,.b-glass,.gcard .add,.dcard .dadd,.card .add,.card .price,.pill,.hchip,button.cta{font-style:italic}
+h2,.sec-head h2,.sh-head h2{font-weight:800;text-transform:uppercase;letter-spacing:.01em}
+.card h3,.card .name,.gcard .gh,.dcard h3{font-style:normal}
+
+/* hero headline art */
+.hl{font-size:0;line-height:0}
+.hl-img{display:block;width:min(46vw,760px);height:auto;margin:0 auto;filter:drop-shadow(0 18px 40px rgba(0,0,0,.45));transform-origin:50% 60%}
+html.anim .hl-img{opacity:0;transform:translateY(34px) scale(.9) rotate(-3deg)}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .hl-img{animation:hlIn 1s cubic-bezier(.2,.9,.2,1) .25s both,hlFloat 6s ease-in-out 1.3s infinite}
+@keyframes hlIn{0%{opacity:0;transform:translateY(40px) scale(.86) rotate(-5deg);filter:blur(10px) drop-shadow(0 0 0 #ff2bd6)}60%{opacity:1;filter:blur(0) drop-shadow(0 0 30px #ff2bd6)}100%{opacity:1;transform:none;filter:drop-shadow(0 18px 40px rgba(0,0,0,.45))}}
+@keyframes hlFloat{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-8px) rotate(.6deg)}}
+@media(min-width:861px){.hl{font-size:0}}
+@media(max-width:720px){.hl-img{width:90vw}}
+
+/* scroll progress */
+.wprog{position:fixed;left:0;top:0;height:3px;width:100%;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,#ec008c,#ff7af0,#00aeef);z-index:200;pointer-events:none;box-shadow:0 0 14px #ec008c}
+
+/* marquee */
+.marq{overflow:hidden;background:linear-gradient(90deg,#ec008c,#7a1bff 50%,#00aeef);transform:skewY(-1.2deg);margin:34px 0;border-block:1px solid rgba(255,255,255,.25)}
+.marq-t{display:flex;width:max-content;animation:marq 32s linear infinite;will-change:transform}
+.marq span{font:900 italic clamp(20px,3.2vw,38px)/1 Kanit,sans-serif;text-transform:uppercase;padding:14px 26px;color:#fff;white-space:nowrap;letter-spacing:.02em}
+.marq span:nth-child(even){color:transparent;-webkit-text-stroke:1.5px #fff}
+.marq i{font-style:normal;color:#fff;opacity:.8;align-self:center}
+@keyframes marq{to{transform:translateX(-50%)}}
+
+/* section heads */
+.sec-head h2{background:linear-gradient(100deg,#fff 30%,#ff9cf1 60%,#7fdcff);-webkit-background-clip:text;background-clip:text;color:transparent}
+html.anim .reveal .sec-head h2{opacity:0;transform:translateX(-46px) skewX(-14deg);transition:opacity .7s ease,transform .8s cubic-bezier(.2,.9,.2,1)}
+html.anim .reveal.in .sec-head h2{opacity:1;transform:none}
+.sec-head h2:after{content:"";display:block;height:3px;width:0;margin-top:8px;border-radius:3px;background:linear-gradient(90deg,#ec008c,#00aeef);transition:width 1s .3s cubic-bezier(.2,.9,.2,1)}
+.reveal.in .sec-head h2:after{width:90px}
+
+/* cards: lift, glow, sheen */
+.card,.gcard,.dcard,.cat,.tile{transition:transform .35s cubic-bezier(.2,.9,.2,1),box-shadow .35s,border-color .35s}
+@media(hover:hover){
+.card:hover,.gcard:hover,.dcard:hover{transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(-8px);border-color:rgba(255,122,240,.7);box-shadow:0 18px 50px -14px rgba(236,0,140,.55),0 0 0 1px rgba(0,174,239,.35)}
+.b-white:hover,.b-glass:hover,.card .add:hover{filter:brightness(1.08)}
+}
+.card .add,.b-white,.dcard .dadd,.gcard .add{position:relative;overflow:hidden}
+.card .add:after,.b-white:after,.dcard .dadd:after,.gcard .add:after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 35%,rgba(255,255,255,.55) 50%,transparent 65%);transform:translateX(-120%)}
+.card .add:hover:after,.dcard .dadd:hover:after,.gcard .add:hover:after{transform:translateX(120%);transition:transform .7s}
+
+/* scroll-driven card entrance (Chromium; others show cards normally) */
+@supports(animation-timeline:view()){
+.reveal .card,.reveal .tile{animation:cardIn linear both;animation-timeline:view();animation-range:entry 0% entry 42%}
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(46px) scale(.94) rotate(.8deg)}to{opacity:1;transform:none}}
+
+/* pinned scroll chapter */
+.chapter{position:relative;height:340vh;margin:30px 0 0}
+.ch-stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:radial-gradient(60% 55% at 50% 52%,rgba(122,27,255,.45),rgba(236,0,140,.12) 55%,transparent 75%),#07080f;isolation:isolate}
+.ch-grid{position:absolute;inset:-20%;background:linear-gradient(rgba(0,174,239,.16) 1px,transparent 1px) 0 0/60px 60px,linear-gradient(90deg,rgba(0,174,239,.16) 1px,transparent 1px) 0 0/60px 60px;transform:perspective(600px) rotateX(62deg) translateY(var(--gy,0px));mask-image:linear-gradient(transparent,#000 40%,#000 70%,transparent);opacity:.55}
+.ch-title{position:absolute;left:0;right:0;top:clamp(76px,11vh,120px);text-align:center;z-index:3;pointer-events:none}
+.ch-title h2{margin:0;font:900 italic clamp(40px,8.5vw,128px)/.9 Kanit,sans-serif;text-transform:uppercase;background:linear-gradient(176deg,#fff 0 45%,#c9c9ee 46% 60%,#fff 61%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 22px rgba(255,43,214,.7))}
+.ch-title p{font:400 clamp(13px,1.5vw,18px)/1.4 Kanit,sans-serif;color:#c9cdea;margin:10px auto 0;max-width:30em;padding:0 20px}
+.ch-script{display:block;font:400 clamp(22px,3.6vw,48px)/1 "Mr Dafoe",cursive;color:#fff;text-shadow:0 0 12px #ec008c,0 0 34px #ec008c,0 0 60px #00aeef;margin-bottom:-.1em;transform:rotate(-4deg)}
+.ch-it,.ch-core{position:absolute;left:50%;top:54%;will-change:transform,opacity;z-index:2}
+.ch-it img,.ch-core img{display:block;width:100%;height:auto;filter:drop-shadow(0 20px 28px rgba(0,0,0,.55)) drop-shadow(0 0 22px rgba(236,0,140,.35))}
+.ch-core{width:auto;height:min(46vh,430px);top:61%;z-index:2}.ch-core img{height:100%;width:auto}
+.ch-it{width:min(17vw,190px);top:60%}
+.ch-it b{position:absolute;left:50%;top:100%;transform:translate(-50%,6px);white-space:nowrap;font:700 italic 11px/1 Kanit,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#aef0ff;padding:5px 9px;border:1px solid rgba(0,174,239,.6);background:rgba(0,20,40,.7);border-radius:4px;opacity:var(--lo,0)}
+.ch-svg{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+.ch-svg line{stroke:#00aeef;stroke-width:1.4;stroke-linecap:round;filter:drop-shadow(0 0 4px #00aeef)}
+.ch-cta{position:absolute;left:0;right:0;bottom:clamp(22px,6vh,60px);text-align:center;z-index:4;opacity:var(--co,0);transform:translateY(calc((1 - var(--co,0)) * 24px))}
+.ch-cta a{display:inline-block;padding:14px 30px;border-radius:999px;background:#fff;color:#0b0d17;font:800 italic 15px Kanit,sans-serif;text-transform:uppercase;text-decoration:none;box-shadow:0 0 34px rgba(236,0,140,.6)}
+.ch-bar{position:absolute;right:16px;top:50%;height:90px;width:3px;margin-top:-45px;background:rgba(255,255,255,.18);border-radius:3px;z-index:4}
+.ch-bar i{display:block;width:100%;height:100%;background:linear-gradient(#ec008c,#00aeef);transform-origin:0 0;transform:scaleY(var(--p,0));border-radius:3px}
+@media(max-width:720px){.ch-core{height:34vh;top:63%}.ch-it{width:25vw;top:62%}.ch-it b{font-size:9px;padding:4px 6px;letter-spacing:.08em}.chapter{height:300vh}}
+.chapter.static{height:auto}.chapter.static .ch-stage{position:relative;height:auto;min-height:100svh}
+@media(prefers-reduced-motion:reduce){.marq-t,.hl-img{animation:none!important}html.anim .hl-img{opacity:1;transform:none}.reveal .card,.reveal .tile{animation:none!important}}
