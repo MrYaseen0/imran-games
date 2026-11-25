@@ -430,3 +430,7 @@ span.hchip{cursor:default}
 @keyframes chairIn{0%{clip-path:inset(100% -40% -40% -40%);transform:scale(.86) translateY(6%);filter:brightness(2.2) saturate(1.6)}60%{filter:brightness(1.4)}100%{clip-path:inset(-40%);transform:none;filter:none}}
 @media(max-width:860px){#hero .s7 .prod{--w:min(78vw,50vh)!important;--y:calc(var(--hh) + 80px)!important}}
 @media(prefers-reduced-motion:reduce){.s7 .p7-chair:before{animation:none}.hero2.ready .slide.s7.on .p7-chair .tilt{animation:none!important}}
+/* spacing fix: headline vs product, mobile copy vs product */
+@media(min-width:861px){.hl{font-size:clamp(34px,5.5vw,92px)}#hero .s1 .prod{--x:90%!important}}
+@media(max-width:720px){.s1 .sub{bottom:104px!important;width:calc(100vw - 48px)!important;left:24px!important}.s1 .sub p{font-size:15px;margin-bottom:14px;max-width:none!important}#hero .s1 .prod{--y:calc(var(--hh) + 160px)!important}}
+@media(min-width:721px) and (max-width:860px){.s1 .hcopy{top:calc(var(--hh) + 92px)!important}}
