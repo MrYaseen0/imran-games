@@ -1,0 +1,20 @@
+/* Gold touch v1 (preview). Remove this file's <link> to revert. Subtle: icons, selected states, hairlines. Neon pink/cyan stays. */
+:root{--gold:#F2C14E;--gold2:#FFE08A;--gold3:#B8862B}
+.iconbtn{border-color:rgba(242,193,78,.45)}
+.iconbtn svg{color:var(--gold2);stroke:var(--gold2)}
+.iconbtn:hover{border-color:var(--gold);box-shadow:0 0 14px rgba(242,193,78,.35)}
+.h-arrow{border-color:rgba(242,193,78,.55)}
+.h-arrow svg{color:var(--gold2);stroke:var(--gold2)}
+.h-arrow:hover{border-color:var(--gold);box-shadow:0 0 16px rgba(242,193,78,.4)}
+.h-dots button.on:after{background:linear-gradient(90deg,var(--gold3),var(--gold2),var(--gold))}
+.h-count b{background:linear-gradient(180deg,var(--gold2),var(--gold3));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.hchip.on,.hchip[aria-pressed=true]{box-shadow:0 0 0 1px var(--gold)}
+.topbar a[href^=tel]{color:var(--gold2)}
+.s8 .xlogo{filter:drop-shadow(0 0 16px rgba(0,229,255,.5)) drop-shadow(0 0 30px rgba(242,193,78,.45))}
+.cnote{border-color:rgba(242,193,78,.5)}
+.iconbtn:not(#cartBtn){color:var(--gold2)}
+.h-arrow{color:var(--gold2)}
+#hero .h-arrow svg,.iconbtn svg path,.iconbtn svg circle{stroke:currentColor}
+.topbar a[href^=tel],.top a[href^=tel],a[href^="tel:"]{color:var(--gold2)}
+.h-dots button:not(.on):after{background:rgba(242,193,78,.4)}
+#searchBtn svg,#searchBtn svg *,#wishBtn svg,#wishBtn svg *{stroke:#FFE08A!important}
