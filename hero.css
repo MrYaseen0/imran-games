@@ -541,3 +541,5 @@ span.hchip{cursor:default}
 /* phone short screens: slide 1 intro sits left of the product so it never covers it */
 @media(max-width:720px) and (max-height:720px){.s1 .tt{left:7vw;right:auto;bottom:228px;align-items:flex-start}.s1 .tt .t1{font-size:7vw}.s1 .tt .t2{font-size:5.2vw}}
 @media(max-width:720px) and (max-height:660px){.s1 .tt{bottom:250px}}
+/* phone short screens: slide 1 product stays above the intro paragraph and buttons */
+@media(max-width:720px) and (max-height:720px){.s1 .sub p{font-size:13px;line-height:1.35;margin-bottom:10px}#hero .s1 .prod{--w:min(29vw,calc((100vh - 404px)/2.3))!important;--y:calc(var(--hh) + 139px)!important}}
