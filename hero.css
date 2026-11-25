@@ -418,3 +418,15 @@ span.hchip{cursor:default}
 .hero2.ready .slide.s6.on .p6-white .tilt{animation-delay:.55s}.hero2.ready .slide.s6.on .p6-black .tilt{animation-delay:.75s}
 @media(max-width:860px){.slide.s6{--u:min(86vw,46vh)}#hero .s6 .p6-helm{--y:calc(var(--hh) + 74px)!important}#hero .s6 .p6-white{--y:calc(var(--hh) + 74px + var(--u) * .822)!important}#hero .s6 .p6-black{--y:calc(var(--hh) + 74px + var(--u) * .844)!important}}
 @media(prefers-reduced-motion:reduce){.s6 .p6-helm:before{animation:none}}
+
+/* ---------- slide 7: Gamers Ultra Chair ---------- */
+.b7{--c1:#FF2FB0;--c2:#1A0B52;--rl:#00AEEF;--rr:#EC008C}
+.slide.s7{--rl:#00AEEF;--rr:#EC008C}
+#hero .s7 .prod{--x:50%!important;--w:min(36vw,43vh)!important;--y:calc(var(--hh) + 8vh)!important}
+.s7 .prod .pshadow{display:none}
+.s7 .prod img{filter:drop-shadow(-8px 0 14px rgba(0,174,239,.7)) drop-shadow(8px 0 14px rgba(236,0,140,.7)) drop-shadow(0 0 40px rgba(123,44,255,.55))}
+.s7 .p7-chair:before{content:"";position:absolute;left:-18%;right:-18%;bottom:-3%;height:18%;border-radius:50%;background:radial-gradient(closest-side,rgba(0,174,239,.75),rgba(236,0,140,.35) 60%,transparent 75%);filter:blur(12px);z-index:-1;animation:halo 4s ease-in-out infinite alternate}
+.hero2.ready .slide.s7.on .p7-chair .tilt{animation:chairIn 1.5s var(--ease) .1s both}
+@keyframes chairIn{0%{clip-path:inset(100% -40% -40% -40%);transform:scale(.86) translateY(6%);filter:brightness(2.2) saturate(1.6)}60%{filter:brightness(1.4)}100%{clip-path:inset(-40%);transform:none;filter:none}}
+@media(max-width:860px){#hero .s7 .prod{--w:min(78vw,50vh)!important;--y:calc(var(--hh) + 80px)!important}}
+@media(prefers-reduced-motion:reduce){.s7 .p7-chair:before{animation:none}.hero2.ready .slide.s7.on .p7-chair .tilt{animation:none!important}}
