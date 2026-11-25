@@ -40,8 +40,8 @@ header.sh.scrolled:before{opacity:1}
 .sh-cart .cartcount{position:static;display:grid;margin-left:2px;background:var(--pink);color:#fff;min-width:22px;height:22px}
 .sh-menu{display:none}
 /* search: icon expands in place into a glass input */
-.sh-search{position:relative;height:44px;width:44px;border-radius:999px;background:var(--glass);border:1px solid var(--glass-line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:width .25s var(--ease),background .25s;overflow:visible}
-.sh-search.open{width:420px;background:rgba(14,16,30,.78)}
+.sh-search{position:relative;height:44px;width:44px;border-radius:999px;background:var(--glass);border:1px solid var(--glass-line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:width .25s var(--ease),margin-left .25s var(--ease),background .25s;overflow:visible}
+.sh-search.open{width:420px;margin-left:-376px;z-index:5;background:rgba(14,16,30,.78)}
 .sh-search .sb{position:absolute;left:0;top:0;width:42px;height:42px;min-height:42px;border-radius:50%;border:0;background:transparent;color:#fff;display:grid;place-items:center;cursor:pointer}
 .sh-search input{position:absolute;left:42px;right:14px;top:0;height:42px;min-height:42px;border:0;outline:0;background:transparent;color:#fff;font:500 14.5px Inter,system-ui,sans-serif;opacity:0;pointer-events:none;transition:opacity .15s}
 .sh-search.open input{opacity:1;pointer-events:auto;transition-delay:.1s}
@@ -177,7 +177,7 @@ span.hchip{cursor:default}
 :where(.hero2,.sheet,.sh) :focus-visible{outline:2px solid var(--blue);outline-offset:3px}
 
 /* slide layouts (desktop). --x centre %, --y top, --wd/--wm widths */
-.s1 .prod{--y:calc(var(--hh) + 270px)}
+.s1 .prod{--y:calc(var(--hh) + 330px);--w:min(36vw,50vh)}
 .s1 .hcopy{top:calc(var(--hh) + 74px)}
 .s5 .hcopy{display:none}
 
@@ -253,9 +253,15 @@ span.hchip{cursor:default}
   .annc{flex-wrap:nowrap;white-space:nowrap;overflow:hidden;font-size:11px;gap:8px}
   .annc i:nth-of-type(3){display:none}
   .annc span:nth-of-type(2){overflow:hidden;text-overflow:ellipsis}
-  .s1 .prod{--y:calc(var(--hh) + 268px)}
+  .s1 .prod{--y:calc(var(--hh) + 212px)}
   .sh-in{gap:8px}
   #wishBtn{display:none}
   .sh .logo b{font-size:14px}
 }
 @media(max-width:400px){.annc a{display:none}.annc i:nth-of-type(2){display:none}}
+@media(max-width:720px){
+  .h-chips .hchip:nth-child(3){display:inline-flex}
+  .h-chips{gap:2px;padding:4px}
+  .hchip{padding:0 9px;font-size:11px;min-height:32px}
+}
+@media(max-width:720px){.sh-search.open{margin-left:0}}

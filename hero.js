@@ -186,7 +186,7 @@ function renderRes(){
     sr.classList.add("show");return;
   }
   var words=q.split(/\s+/);
-  items=(window.PRODUCTS||[]).filter(function(p){var h=(p.name+" "+(p.brand||"")+" "+(p.catLabel||"")).toLowerCase();return words.every(function(w){return h.indexOf(w)>-1})}).slice(0,6);
+  items=(window.PRODUCTS||[]).filter(function(p){var h=(p.name+" "+(p.brand||"")+" "+(p.catLabel||"")).toLowerCase();if(/\bgta\b/.test(h)||h.indexOf("grand theft auto")>-1)h+=" gta";if(h.indexOf("dualshock")>-1)h+=" ds4 controller";return words.every(function(w){return h.indexOf(w)>-1})}).slice(0,6);
   if(!items.length){sr.innerHTML='<div class="none">No match for "'+esc(si.value.trim())+'". Try a console, a game or a controller name.</div>';sr.classList.add("show");return}
   sr.innerHTML='<div class="rt">Products</div>'+items.map(function(p,i){return '<div class="row" role="option" data-i="'+i+'" aria-selected="false"><img src="'+esc((p.imgs&&p.imgs[0])||"logo.png")+'" alt="" loading="lazy" width="44" height="44"><div><b>'+esc(shortName(p))+'</b><span>'+money(p.price)+(p.soldOut?" · Sold out":"")+'</span></div></div>'}).join("");
   sr.classList.add("show");
