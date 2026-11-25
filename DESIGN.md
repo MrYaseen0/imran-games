@@ -7,8 +7,7 @@ Written for this repo. Structure ideas (nav, buttons, cards, oversized headlines
 - Slide glows: violet, cyan-blue, red, amber, magenta (backgrounds only).
 
 ## Type
-- Headline: Anton, uppercase, clamp(56px, 11vw, 168px), 15vw on phones.
-- UI and body: Inter. Brand wordmark keeps the site's Orbitron.
+- (Historical, v1 of the hero, superseded by Hero v3 below.) Headline was Anton and UI was Inter. Current fonts are listed under Hero v3. Brand wordmark keeps the site's Orbitron.
 
 ## Shape
 - Buttons and chips: full pill. Glass cards: 22px radius. Hot Deals sheet: 28px top corners.

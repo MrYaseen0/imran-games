@@ -77,7 +77,7 @@ function setActiveUI(n){
   slides.forEach(function(s,i){s.setAttribute("aria-hidden",i===n?"false":"true")});
 }
 function go(n,dir){
-  n=(n+N)%N;if(reduce||n===cur||busy)return;
+  n=(n+N)%N;if(n===cur||busy)return;
   dir=dir||(n>cur?1:-1);
   var prev=slides[cur],next=slides[n];
   if(reduce){prev.classList.remove("on");next.classList.add("on");cur=n;setActiveUI(n);return}

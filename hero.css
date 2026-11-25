@@ -277,7 +277,7 @@ span.hchip{cursor:default}
 .slide.pre-r .prod,.slide.pre-l .prod{transition:none!important}
 @media(max-width:380px){.hchip{padding:0 6px;font-size:10px}.h-chips{padding:3px}}
 
-.is-reduced .h-arrow,.is-reduced .h-dots{display:none!important}
+.is-reduced .h-arrow{transition:none!important}
 
 @media(max-width:380px){.gcard .th{display:none}.gcard .tx h3{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.s5 .gcard .th{display:block}}
 @media(max-width:720px){.s5 .gcard .add{padding:0 12px;font-size:12.5px;white-space:nowrap}}
@@ -434,3 +434,4 @@ span.hchip{cursor:default}
 @media(min-width:861px){.hl{font-size:clamp(34px,5.5vw,92px)}#hero .s1 .prod{--x:90%!important}}
 @media(max-width:720px){.s1 .sub{bottom:104px!important;width:calc(100vw - 48px)!important;left:24px!important}.s1 .sub p{font-size:15px;margin-bottom:14px;max-width:none!important}#hero .s1 .prod{--y:calc(var(--hh) + 160px)!important}}
 @media(min-width:721px) and (max-width:860px){.s1 .hcopy{top:calc(var(--hh) + 92px)!important}}
+@media(min-width:1101px){#hero .s1 .prod{--x:81.5%!important;--w:min(21vw,25vh)!important}}
