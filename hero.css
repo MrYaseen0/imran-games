@@ -527,7 +527,7 @@ span.hchip{cursor:default}
 /* v4.1: name sits in front, in a band under the product (stage scaled slightly to make room) */
 @media(min-width:861px){
  .slide:not(.s1) .stage{transform:scale(.88);transform-origin:50% 14%}
- .slide:not(.s1) .tt{top:auto;bottom:calc(70px + 3vh);z-index:6}
+ .slide:not(.s1) .tt{top:auto;bottom:calc(116px + 3vh);z-index:6}
  .slide:not(.s1) .tt .t1{font-size:min(7.4vw,calc(70vw / (var(--n) * .62)),118px)}
  .slide:not(.s1) .tt .t2{font-size:min(4.6vw,calc(70vw / (var(--n) * .62) * .62),76px);margin-top:-.5em}
  .slide:not(.s1) .tt .k{margin-bottom:.4em}
@@ -536,5 +536,5 @@ span.hchip{cursor:default}
 @media(min-width:861px){.cnote,.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .cnote{left:max(24px,4vw)!important;bottom:calc(70px + 3vh)!important;max-width:22vw;white-space:normal;text-align:left;border-radius:18px}.cnote{transform:translate3d(0,16px,0)!important}.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .cnote{transform:translate3d(0,0,0)!important}}
 @media(max-width:860px){.s4 .tt,.s5 .tt,.s8 .tt{bottom:190px}}
 @media(min-width:861px){.s1 .tt{z-index:6}}
-@media(min-width:861px) and (max-width:1100px){.s1 .tt{left:auto;right:4vw;transform:none;top:auto;bottom:calc(70px + 3vh);align-items:flex-end}.s1 .tt .t1{font-size:min(4.2vw,56px)}.s1 .tt .t2{display:none}}
+@media(min-width:861px) and (max-width:1100px){.s1 .tt{left:auto;right:4vw;transform:none;top:auto;bottom:calc(116px + 3vh);align-items:flex-end}.s1 .tt .t1{font-size:min(4.2vw,56px)}.s1 .tt .t2{display:none}}
 @media(min-width:721px) and (max-width:860px){.s1 .tt .t1{font-size:6vw}}
