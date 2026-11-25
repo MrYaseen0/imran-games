@@ -164,8 +164,7 @@ def page_shell(title, meta_desc, canonical, og_image, jsonld, body):
 <meta name="twitter:description" content="%s"/>
 <meta name="twitter:image" content="%s"/>
 <link rel="stylesheet" href="/styles.css"/>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap"/>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
+<link rel="stylesheet" href="/fonts/kanit.css"/>
 <script type="application/ld+json">%s</script>
 </head>
 <body>
