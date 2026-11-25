@@ -486,3 +486,8 @@ span.hchip{cursor:default}
 .s1 .prod img:not(.glow),.s2 .prod img:not(.glow),.s3 .prod img:not(.glow),.s4 .prod img:not(.glow),.s5 .prod img:not(.glow){filter:none}
 .prod img.glow{animation:none!important;border-radius:0!important}
 .prod img.glow{filter:none!important}
+
+/* v3.3 full-visibility margins: product must stay inside the hero and above the Hot deals sheet through bob/tilt */
+@media(min-width:861px) and (max-width:1100px){#hero .s1 .prod{--x:86%!important;--y:calc(var(--hh) + 150px)!important}.slide.s5{--u:min(60vw,66vh)}}
+@media(max-width:860px){#hero .s2 .prod{--w:min(80vw,66vh)!important}#hero .s4 .prod{--w:86vw!important}.slide.s9{--u:72vw}}
+@media(max-width:720px){.slide.s5{--u:90vw}}
