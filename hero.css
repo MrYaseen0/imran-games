@@ -435,3 +435,28 @@ span.hchip{cursor:default}
 @media(max-width:720px){.s1 .sub{bottom:104px!important;width:calc(100vw - 48px)!important;left:24px!important}.s1 .sub p{font-size:15px;margin-bottom:14px;max-width:none!important}#hero .s1 .prod{--y:calc(var(--hh) + 160px)!important}}
 @media(min-width:721px) and (max-width:860px){.s1 .hcopy{top:calc(var(--hh) + 92px)!important}}
 @media(min-width:1101px){#hero .s1 .prod{--x:81.5%!important;--w:min(21vw,25vh)!important}}
+@media(min-width:1101px){.s1 .hcopy{right:27%!important}}
+.h-count{left:auto!important;right:max(24px,5vw)}
+
+/* ---------- slides 8-10: Xbox concept skin, PS5 setup, controller stand ---------- */
+.b8{--c1:#E02BD8;--c2:#240A55;--rl:#00E5FF;--rr:#EC008C}.b9{--c1:#2E7BFF;--c2:#0B1A5E;--rl:#00AEEF;--rr:#B31CFF}.b10{--c1:#FF2FB0;--c2:#2A0B5A;--rl:#00AEEF;--rr:#FF2FB0}
+.slide.s8{--rl:#00E5FF;--rr:#EC008C;--u:min(50vw,54vh)}.slide.s9{--rl:#00AEEF;--rr:#B31CFF;--u:min(42vw,54vh)}
+#hero .s8 .p8-con{--x:calc(50% + var(--u) * -0.2248)!important;--w:calc(var(--u) * 0.5504)!important;--y:calc(var(--hh) + 11vh + var(--u) * 0.0000)!important}
+#hero .s8 .p8-ctl{--x:calc(50% + var(--u) * 0.2722)!important;--w:calc(var(--u) * 0.4555)!important;--y:calc(var(--hh) + 11vh + var(--u) * 0.3804)!important}
+#hero .s9 .p9-head{--x:calc(50% + var(--u) * -0.3360)!important;--w:calc(var(--u) * 0.3280)!important;--y:calc(var(--hh) + 6vh + var(--u) * 0.2876)!important}
+#hero .s9 .p9-ps5{--x:calc(50% + var(--u) * 0.0072)!important;--w:calc(var(--u) * 0.5549)!important;--y:calc(var(--hh) + 6vh + var(--u) * 0.0000)!important}
+#hero .s9 .p9-game{--x:calc(50% + var(--u) * 0.3728)!important;--w:calc(var(--u) * 0.2543)!important;--y:calc(var(--hh) + 6vh + var(--u) * 0.4191)!important}
+#hero .s10 .p10-stand{--x:50%!important;--w:min(382px,30vw,40vh)!important;--y:calc(var(--hh) + 12vh)!important}
+.s8 .prod .pshadow,.s9 .prod .pshadow,.s10 .prod .pshadow{display:none}
+.s8 .prod img,.s9 .prod img,.s10 .prod img{filter:drop-shadow(-7px 0 12px rgba(0,229,255,.55)) drop-shadow(7px 0 12px rgba(236,0,140,.6)) drop-shadow(0 14px 22px rgba(0,0,0,.4))}
+.s8 .p8-ctl,.s9 .p9-game{z-index:4}
+@media(max-width:860px){.slide.s8{--u:88vw}.slide.s9{--u:80vw}#hero .s8 .p8-con{--x:calc(50% + var(--u) * -0.2248)!important;--w:calc(var(--u) * 0.5504)!important;--y:calc(var(--hh) + 84px + var(--u) * 0.0000)!important}
+#hero .s8 .p8-ctl{--x:calc(50% + var(--u) * 0.2722)!important;--w:calc(var(--u) * 0.4555)!important;--y:calc(var(--hh) + 84px + var(--u) * 0.3804)!important}
+#hero .s9 .p9-head{--x:calc(50% + var(--u) * -0.3360)!important;--w:calc(var(--u) * 0.3280)!important;--y:calc(var(--hh) + 84px + var(--u) * 0.2876)!important}
+#hero .s9 .p9-ps5{--x:calc(50% + var(--u) * 0.0072)!important;--w:calc(var(--u) * 0.5549)!important;--y:calc(var(--hh) + 84px + var(--u) * 0.0000)!important}
+#hero .s9 .p9-game{--x:calc(50% + var(--u) * 0.3728)!important;--w:calc(var(--u) * 0.2543)!important;--y:calc(var(--hh) + 84px + var(--u) * 0.4191)!important}
+#hero .s10 .p10-stand{--w:min(382px,80vw)!important;--y:calc(var(--hh) + 84px)!important}}
+/* cute touch: playful squash-and-bounce when a product arrives */
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .prod img:not(.refl){animation:cutePop .9s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(.55s + var(--k,0) * .12s);transform-origin:50% 100%}
+@keyframes cutePop{0%{transform:scale(.88,1.08) translateY(-4%)}35%{transform:scale(1.05,.93)}60%{transform:scale(.98,1.03)}100%{transform:none}}
+@media(prefers-reduced-motion:reduce){.prod img{animation:none!important}}
