@@ -460,3 +460,22 @@ span.hchip{cursor:default}
 .hero2.ready .slide.on:not(.pre-r):not(.pre-l) .prod img:not(.refl){animation:cutePop .9s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(.55s + var(--k,0) * .12s);transform-origin:50% 100%}
 @keyframes cutePop{0%{transform:scale(.88,1.08) translateY(-4%)}35%{transform:scale(1.05,.93)}60%{transform:scale(.98,1.03)}100%{transform:none}}
 @media(prefers-reduced-motion:reduce){.prod img{animation:none!important}}
+
+/* v3.1 xbox emblem (official mark path, simple-icons), neon gradient behind the skin concept */
+.s8 .xlogo{position:absolute;left:50%;top:calc(var(--hh) + 3vh);width:min(40vw,56vh);height:auto;transform:translateX(-50%);opacity:.5;filter:drop-shadow(0 0 18px rgba(0,229,255,.6)) drop-shadow(0 0 40px rgba(236,0,140,.5));z-index:0;pointer-events:none}
+.s8 .prod{z-index:2}.s8 .p8-ctl{z-index:4}
+.s8.on .xlogo{animation:xlPop .9s cubic-bezier(.2,.9,.3,1.2) .1s both}
+@keyframes xlPop{from{opacity:0;transform:translateX(-50%) scale(.6) rotate(-12deg)}to{opacity:.5;transform:translateX(-50%) scale(1) rotate(0)}}
+@media(prefers-reduced-motion:reduce){.s8.on .xlogo{animation:none}}
+@media(max-width:860px){.s8 .xlogo{top:calc(var(--hh) + 70px);width:78vw}}
+#hero .s9 .p9-head,#hero .s9 .p9-ps5,#hero .s9 .p9-game{margin-top:5vh}
+.slide.s9{--u:min(40vw,50vh)}
+#hero .s10 .p10-stand{--w:min(470px,34vw,46vh)!important}
+.s8 .xlogo{left:auto;right:max(7vw,96px);top:calc(var(--hh) + 2vh);width:min(25vw,38vh);transform:none;opacity:.92;z-index:1}
+@keyframes xlPop{from{opacity:0;transform:scale(.55) rotate(-14deg)}to{opacity:.92;transform:none}}
+@media(prefers-reduced-motion:reduce){.s8.on .xlogo{animation:none}}
+.slide.s9{--u:min(46vw,56vh)}
+@media(max-width:860px){
+.s8 .xlogo{right:4vw;top:calc(var(--hh) + 64px);width:34vw}
+.slide.s9{--u:98vw}
+#hero .s10 .p10-stand{--w:min(470px,86vw)!important}}
