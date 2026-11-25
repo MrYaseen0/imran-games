@@ -248,3 +248,12 @@ fix, a migration, a deploy. Never rewrite old entries.
   Orders are not saved to Supabase (anon order INSERT blocked by RLS).
 - Old WordPress site `imrangames.pk` untouched (compromised —
   Indonesian gambling spam; SSL expires 17 Dec 2026).
+- Hero redesign: slim announcement line, transparent header with expanding search, 5-slide hero from live products, Hot Deals sheet (branch hero-redesign).
+- Hero v3 (branch hero-redesign, local, not deployed): hero now 7 slides built from the owner's own supplied pictures (background removed with rembg; derivatives, not regenerated). Slide 5 and slide 6 (helmet/headset + two controller mounts) are split into separate product layers; slide 7 is the Gamers Ultra Chair. Concept slides (GTA VI card, rumored PS5 Pro bundle) carry visible concept notes and no price/stock/cart. Typography: Unbounded (headline, counter) and Space Grotesk (nav, chips, buttons), self-hosted in /fonts. Added per-letter headline reveal, neon flicker line, nav fade-in, CTA shimmer, masked product reveals, slide counter. Reduced motion: static first slide, carousel off, reveals off. Archive tags: 7ece4e7, lighting-pass, user-images, user-images-v2, wall-mounts-6, chair-7.
+
+## Hero v3.1 (local preview, not deployed)
+- Hero is 10 slides (slides 8-10: Xbox Phantom Dust skin concept with Xbox emblem, PS5 setup, controllers on flame stand). Counter and dots are 10.
+- Product images: classical enhancement (Lanczos, denoise, unsharp, local contrast) on all slide assets; Real-ESRGAN x4plus (ONNX, CPU) on x-stand, s-game, s-headset, s-ps5, w-white, w-black, p5 disc case, p5 controller. Originals in assets/hero/u/orig/.
+- gold.css: restrained gold on icons, arrows, active dot, counter. Remove its link to revert (tag enhance-pre-gold has the pre-gold build).
+- Softer product entry bounce (cutePopSoft), disabled under reduced motion.
+- Not done: formal taste-skill gate (checker timed out), PlayStation/Nike DESIGN.md source failure stands.
