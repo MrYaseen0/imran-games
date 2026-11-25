@@ -521,7 +521,7 @@ span.hchip{cursor:default}
  .tt .t1{font-size:min(11.5vw,calc(90vw / (var(--n) * .62)),84px)}
  .tt .t2{font-size:min(7.2vw,52px)}
  .s1 .tt{left:auto;right:5vw;transform:none;bottom:276px;align-items:flex-end}
- .s1 .tt .k,.s1 .tt .t2{display:none}.s1 .tt .t1{font-size:7.4vw}
+ .s1 .tt .k{display:none}.s1 .tt .t1{font-size:7.4vw}.s1 .tt .t2{font-size:5.6vw;margin-top:-.45em}
 }
 @media(prefers-reduced-motion:reduce){.tt .k,.tt .t1 span,.tt .t2 span{opacity:1!important;animation:none!important;clip-path:none!important}.tt .t2{animation:none!important}}
 /* v4.1: name sits in front, in a band under the product (stage scaled slightly to make room) */
