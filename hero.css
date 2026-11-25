@@ -275,3 +275,4 @@ span.hchip{cursor:default}
 /* parked slides sit off-stage so an incoming product animates in instead of popping */
 .slide:not(.on):not(.out-l):not(.out-r) .prod{opacity:0;transform:translate3d(24vw,0,0) perspective(1200px) rotateY(-20deg) scale(.92)}
 .slide.pre-r .prod,.slide.pre-l .prod{transition:none!important}
+@media(max-width:380px){.hchip{padding:0 6px;font-size:10px}.h-chips{padding:3px}}
