@@ -241,7 +241,7 @@ span.hchip{cursor:default}
   .s5 .gcard.l{left:14px}
   .s5 .gcard:not(.l){left:auto;right:14px}
   .s5 .gcard .th{width:100%;height:56px}
-  .s5 .gcard .pr s,.s5 .gcard .pr em{display:none}
+  .s5 .gcard .pr s{display:none}.s5 .gcard .pr em{display:inline-block;margin:0 0 0 6px;font-size:10.5px;padding:1px 6px;white-space:nowrap}
 }
 @media(prefers-reduced-motion:reduce){
   .float,.pshadow,.h-shards i{animation:none!important}
@@ -280,3 +280,4 @@ span.hchip{cursor:default}
 .is-reduced .h-arrow,.is-reduced .h-dots{display:none!important}
 
 @media(max-width:380px){.gcard .th{display:none}.gcard .tx h3{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.s5 .gcard .th{display:block}}
+@media(max-width:720px){.s5 .gcard .add{padding:0 12px;font-size:12.5px;white-space:nowrap}}
