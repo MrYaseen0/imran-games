@@ -400,3 +400,21 @@ span.hchip{cursor:default}
 @media(max-width:860px){.h-count{display:none}}
 @media(max-width:720px){.hl{font-size:9.4vw}.sh-links a{font-size:13px}}
 @media(prefers-reduced-motion:reduce){.ch{transform:none!important;opacity:1!important;transition:none!important;animation:none!important}.ln:nth-child(2) .ch{animation:none!important}.sh-links a,.h-chips,.b-white:after,.prod .tilt,.h-count b{animation:none!important}.h-chips{opacity:1}.sh-links a{opacity:.82}}
+
+/* ---------- slide 6: wall mounts, three separate cut-out layers ---------- */
+.b6{--c1:#B31CFF;--c2:#1B0A4A;--rl:#00E5FF;--rr:#FF2FB0}
+.slide.s6{--rl:#00E5FF;--rr:#FF2FB0;--u:min(60vw,47vh)}
+#hero .s6 .prod{--y:calc(var(--hh) + 6vh)}
+#hero .s6 .p6-helm{--x:calc(50% + var(--u) * .035)!important;--w:calc(var(--u) * .695)!important;--y:calc(var(--hh) + 8vh)!important}
+#hero .s6 .p6-white{--x:calc(50% - var(--u) * .296)!important;--w:calc(var(--u) * .42)!important;--y:calc(var(--hh) + 8vh + var(--u) * .822)!important}
+#hero .s6 .p6-black{--x:calc(50% + var(--u) * .256)!important;--w:calc(var(--u) * .50)!important;--y:calc(var(--hh) + 8vh + var(--u) * .844)!important}
+.s6 .prod .pshadow{display:none}
+.s6 .prod img{filter:drop-shadow(-8px 0 12px rgba(0,229,255,.75)) drop-shadow(8px 0 12px rgba(255,47,176,.8)) drop-shadow(0 0 34px rgba(179,28,255,.55))}
+.s6 .p6-helm:before{content:"";position:absolute;left:-30%;right:-30%;top:-8%;bottom:-8%;border-radius:50%;background:radial-gradient(closest-side,rgba(255,47,176,.55),rgba(0,229,255,.22) 55%,transparent 72%);filter:blur(10px);z-index:-1;animation:halo 5s ease-in-out infinite alternate}
+@keyframes halo{from{opacity:.65;transform:scale(.96)}to{opacity:1;transform:scale(1.05)}}
+.s6 .p6-helm .float{animation-duration:7s}
+.s6 .p6-white .float{animation-delay:-2s}.s6 .p6-black .float{animation-delay:-4s}
+.slide.s6.on .p6-white{transition-delay:.14s}.slide.s6.on .p6-black{transition-delay:.24s}
+.hero2.ready .slide.s6.on .p6-white .tilt{animation-delay:.55s}.hero2.ready .slide.s6.on .p6-black .tilt{animation-delay:.75s}
+@media(max-width:860px){.slide.s6{--u:min(86vw,46vh)}#hero .s6 .p6-helm{--y:calc(var(--hh) + 74px)!important}#hero .s6 .p6-white{--y:calc(var(--hh) + 74px + var(--u) * .822)!important}#hero .s6 .p6-black{--y:calc(var(--hh) + 74px + var(--u) * .844)!important}}
+@media(prefers-reduced-motion:reduce){.s6 .p6-helm:before{animation:none}}
