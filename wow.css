@@ -94,3 +94,8 @@ html.anim .s1-orb i{opacity:0}
 @keyframes orbB{0%,100%{transform:translate3d(var(--mx,0px),var(--my,0px),0) rotate(6deg)}50%{transform:translate3d(var(--mx,0px),calc(var(--my,0px) + 14px),0) rotate(-6deg)}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.s1-orb i,.s1-orb .ring{animation:none!important}}
+/* a11y: visible focus ring everywhere (gate focus-visible) */
+:focus-visible{outline:2px solid #00e5ff;outline-offset:3px;border-radius:6px}
+.sheet :focus-visible,.sheet a:focus-visible{outline-color:#8a0057}
+.sh-search input:focus-visible{opacity:1;pointer-events:auto}
+.sh-search:focus-within{box-shadow:0 0 0 2px #00e5ff}
