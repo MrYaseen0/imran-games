@@ -248,3 +248,4 @@ fix, a migration, a deploy. Never rewrite old entries.
   Orders are not saved to Supabase (anon order INSERT blocked by RLS).
 - Old WordPress site `imrangames.pk` untouched (compromised —
   Indonesian gambling spam; SSL expires 17 Dec 2026).
+- Hero redesign: slim announcement line, transparent header with expanding search, 5-slide hero from live products, Hot Deals sheet (branch hero-redesign).
