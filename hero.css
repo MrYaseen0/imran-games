@@ -285,3 +285,26 @@ span.hchip{cursor:default}
 @media(min-width:1100px){.gcard{right:max(24px,calc((100vw - 1240px)/2))}}
 .vh1{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 @media(min-width:721px) and (max-width:860px){.s5 .gcard{width:calc(50vw - 28px);left:16px;right:auto;margin:0}.s5 .gcard:not(.l){left:auto;right:16px}.s5 .gcard .pr{flex-wrap:wrap}.s5 .gcard .pr em{white-space:nowrap}}
+
+/* ---------- lighting and depth pass: rim lights, bokeh, floor glow ---------- */
+.b1{--rl:#00AEEF;--rr:#EC008C}.b2{--rl:#00E5FF;--rr:#7B2CFF}.b3{--rl:#00AEEF;--rr:#FF2B40}.b4{--rl:#FFD060;--rr:#EC008C}.b5{--rl:#00AEEF;--rr:#EC008C}
+.bgl{background:
+ radial-gradient(34% 46% at 4% 62%,color-mix(in srgb,var(--rl) 34%,transparent),transparent 70%),
+ radial-gradient(34% 46% at 96% 58%,color-mix(in srgb,var(--rr) 38%,transparent),transparent 70%),
+ radial-gradient(44% 50% at 50% 58%,var(--c1) 0%,var(--c2) 58%,#05060C 100%)}
+.bgl:before{content:"";position:absolute;inset:-6%;pointer-events:none;opacity:.85;animation:bokeh 26s ease-in-out infinite alternate;will-change:transform;
+ background:
+ radial-gradient(circle at 12% 22%,color-mix(in srgb,var(--rl) 46%,transparent) 0,color-mix(in srgb,var(--rl) 23%,transparent) 2.3%,transparent 5.2%),
+ radial-gradient(circle at 86% 30%,color-mix(in srgb,var(--rr) 46%,transparent) 0,color-mix(in srgb,var(--rr) 23%,transparent) 2.9%,transparent 6.4%),
+ radial-gradient(circle at 74% 78%,color-mix(in srgb,var(--rl) 34%,transparent) 0,color-mix(in srgb,var(--rl) 17%,transparent) 1.9%,transparent 4.2%),
+ radial-gradient(circle at 24% 82%,color-mix(in srgb,var(--rr) 38%,transparent) 0,color-mix(in srgb,var(--rr) 19%,transparent) 2.5%,transparent 5.6%),
+ radial-gradient(circle at 38% 12%,color-mix(in srgb,var(--rr) 26%,transparent) 0,color-mix(in srgb,var(--rr) 13%,transparent) 1.5%,transparent 3.4%),
+ radial-gradient(circle at 62% 90%,color-mix(in srgb,var(--rl) 26%,transparent) 0,color-mix(in srgb,var(--rl) 13%,transparent) 1.7%,transparent 3.8%),
+ radial-gradient(circle at 94% 70%,color-mix(in srgb,var(--rl) 30%,transparent) 0,color-mix(in srgb,var(--rl) 15%,transparent) 2.1%,transparent 4.6%)}
+@keyframes bokeh{from{transform:translate3d(-1.6%,1.2%,0) scale(1)}to{transform:translate3d(1.8%,-1.4%,0) scale(1.05)}}
+.prod img:not(.refl){filter:drop-shadow(-10px 0 16px color-mix(in srgb,var(--rl) 55%,transparent)) drop-shadow(10px 0 16px color-mix(in srgb,var(--rr) 60%,transparent))}
+.slide.s1{--rl:#00AEEF;--rr:#EC008C}.slide.s2{--rl:#00E5FF;--rr:#7B2CFF}.slide.s3{--rl:#00AEEF;--rr:#FF2B40}.slide.s4{--rl:#FFD060;--rr:#EC008C}.slide.s5{--rl:#00AEEF;--rr:#EC008C}
+.pshadow{background:radial-gradient(closest-side,rgba(0,0,0,.65),transparent 70%),radial-gradient(closest-side,color-mix(in srgb,var(--rr) 45%,transparent),transparent);height:30px}
+.refl{opacity:.22}
+@media(max-width:720px){.bgl:before{opacity:.55}.prod img:not(.refl){filter:drop-shadow(-6px 0 10px color-mix(in srgb,var(--rl) 50%,transparent)) drop-shadow(6px 0 10px color-mix(in srgb,var(--rr) 55%,transparent))}}
+@media(prefers-reduced-motion:reduce){.bgl:before{animation:none!important}}
