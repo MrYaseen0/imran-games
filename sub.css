@@ -141,3 +141,8 @@ html.ftx-pre .ftx-hl .ftx-l,html.ftx-pre .ftx-sc{opacity:0}
 @media(max-width:1000px){.ftx-grid{grid-template-columns:1fr 1fr}.ftx-brand,.ftx-contact{grid-column:1/-1}}
 @media(max-width:640px){.ftx-mark{font-size:12.4vw}.ftx-stage{margin-top:36px}.ftx-hl{font-size:min(14vw,64px)}.ftx-b{margin-left:.2em}.ftx-grid{gap:14px}.ftx-panel{padding:32px 16px 18px}.ftx-mark{-webkit-text-stroke-width:1px}}
 @media(prefers-reduced-motion:reduce){html.ftx-pre .ftx-hl .ftx-l,html.ftx-pre .ftx-sc{opacity:1}.ftx-in .ftx-l,.ftx-in .ftx-sc{animation:none}}
+
+/* short category grids (1-3 products): center cards at standard size, no dead right half */
+@media(min-width:1024px){
+  .grid:has(> :last-child:nth-child(-n+3)){grid-template-columns:repeat(auto-fit,minmax(230px,300px));justify-content:center}
+}
