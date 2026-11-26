@@ -40,9 +40,9 @@ window.igSections=function(host,list){
 /* reveal engine */
 var io=null;
 function ensureIO(){if(io||!("IntersectionObserver" in window))return io;
- io=new IntersectionObserver(function(es){es.forEach(function(en){if(!en.isIntersecting)return;var t=en.target;io.unobserve(t);
+ io=new IntersectionObserver(function(es){es.forEach(function(en){if(!en.isIntersecting&&!(en.boundingClientRect.top<0))return;var t=en.target;io.unobserve(t);
   if(t.classList.contains("igsec-h")){t.classList.add("rv");return}
-  t.classList.add("rv")})},{threshold:.01,rootMargin:"0px 0px -8% 0px"});return io}
+  t.classList.add("rv")})},{threshold:0,rootMargin:"0px 0px 400px 0px"});return io}
 function fxOf(card){var h=card.closest("[data-fx]");if(h)return h.getAttribute("data-fx");var g=card.closest("#gameGrid");if(g)return "curtain";if(card.closest("#discGrid"))return "pop";if(card.closest("[data-catgrid]")){var k=card.closest("[data-catgrid]").getAttribute("data-catgrid");return k==="hardware"?"rise":k==="controls"?"flip":"slide"}return "rise"}
 function tag(root){
  root=root||document;
@@ -54,7 +54,7 @@ function tag(root){
   if(c.closest("#dealGrid")||c.closest(".dm-track"))return;
   var gr=c.parentElement;var key=gr&&(gr.id||gr.getAttribute("data-igg")||gr.getAttribute("data-catgrid")||"g");
   seen[key]=(seen[key]||0);var i=seen[key]++;
-  c.classList.add("igp");c.setAttribute("data-fx",fxOf(c));c.style.setProperty("--ig",(i%6)*85+"ms");c.style.setProperty("--igs",i%2?1:-1);
+  c.classList.add("igp");c.setAttribute("data-fx",fxOf(c));c.style.setProperty("--ig",(i%6)*35+"ms");c.style.setProperty("--igs",i%2?1:-1);
   obs?obs.observe(c):c.classList.add("rv");
  });
 }

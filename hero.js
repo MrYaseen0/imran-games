@@ -144,9 +144,9 @@ function next(){go(cur+1,1)}function prevS(){go(cur-1,-1)}
 function play(){stop();if(reduce)return;timer=setInterval(function(){if(!paused&&!document.hidden)next()},5000)}
 function stop(){if(timer){clearInterval(timer);timer=null}}
 function sync(){paused=hoverP||focusP||touchP}
-hero.addEventListener("mouseenter",function(){hoverP=true;sync()});
-hero.addEventListener("mouseleave",function(){hoverP=false;sync();resetTilt()});
-hero.addEventListener("focusin",function(){focusP=true;sync()});
+/* Autoplay keeps running while the mouse is over the hero (hover no longer pauses it). Only keyboard focus pauses, so a mouse click on a dot does not leave it stuck. */
+hero.addEventListener("mouseleave",function(){resetTilt()});
+hero.addEventListener("focusin",function(e){var t=e.target;try{focusP=!!(t&&t.matches&&t.matches(":focus-visible"))}catch(x){focusP=true}sync()});
 hero.addEventListener("focusout",function(){focusP=false;sync()});
 $(".h-prev",hero).addEventListener("click",function(){prevS();play()});
 $(".h-next",hero).addEventListener("click",function(){next();play()});
