@@ -101,3 +101,9 @@
  .card.igp.rv .imgwrap img{transition:transform .8s var(--ig-ease) var(--ig,0ms),opacity .4s}
  .card.igp .badge{transition-delay:calc(var(--ig,0ms) + 350ms)}
 }
+
+/* 9. Touch targets: bigger invisible hit areas, same look. Dots get 28x44 (6px side extension is less than the 8px gap, so hit areas never overlap); tel/mail links get 8px of vertical padding offset by negative margin so line spacing is unchanged. */
+.h-dots button:before{content:"";position:absolute;left:-3px;right:-3px;top:-20px;bottom:0}
+.annc a[href^="tel:"]{position:relative}
+.annc a[href^="tel:"]:after{content:"";position:absolute;left:-6px;right:-6px;top:-8px;bottom:-8px}
+a[href^="tel:"]:not([class]):not(.annc a),a[href^="mailto:"]:not([class]){display:inline-block;padding:8px 0;margin:-8px 0}
