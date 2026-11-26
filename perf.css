@@ -1,0 +1,30 @@
+/* Performance pass: same look, cheaper animation. Loaded last so it overrides earlier rules. */
+
+/* 1. Shine sweeps moved off `left` (forces layout every frame) onto transform (compositor). Base left:0, travel in % of own width. */
+.dd-img:after{left:0;transform:translateX(-150%) skewX(-18deg);animation:none}
+.dd:hover .dd-img:after,.dd:focus-within .dd-img:after{animation:dmShine 1.4s ease-out 1}
+@keyframes dmShine{0%,60%{transform:translateX(-150%) skewX(-18deg)}100%{transform:translateX(325%) skewX(-18deg)}}
+.b-white:after{left:0;animation-name:shine}
+@keyframes shine{0%,70%{transform:translateX(-150%) skewX(-18deg)}100%{transform:translateX(325%) skewX(-18deg)}}
+
+/* 2. Headline letters: one shared shine on the whole headline instead of an infinite filter on each of 21 letters (each was its own layer). */
+.hx i{will-change:auto}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .hx-a i{animation:hxDrop .85s cubic-bezier(.2,.9,.25,1) calc(.25s + var(--i)*45ms) both}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .hx-b i{animation:hxRise .85s cubic-bezier(.2,.9,.25,1) calc(.7s + var(--i)*55ms) both}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .hx{animation:hxShineAll 4.6s ease-in-out 3.4s infinite}
+@keyframes hxShineAll{0%,60%,100%{filter:brightness(1)}74%{filter:brightness(1.3)}88%{filter:brightness(1)}}
+
+/* 3. Neon headline: smooth glow-in. The old keyframes switched the glow off and on again (a visible flicker). */
+@keyframes neonOn{0%{text-shadow:none;color:#c9bfe8}100%{text-shadow:0 0 18px rgba(236,0,140,.85),0 0 54px rgba(0,174,239,.5);color:#fff}}
+
+/* 4. Product cards: no blur filter on reveal (blur on many cards at once repaints every frame). Slide/rotate/fade stay. */
+.card.igp[data-fx=rise]:not(.rv),.card.igp[data-fx=flip]:not(.rv),.card.igp[data-fx=drop]:not(.rv),.card.igp[data-fx=pop]:not(.rv){filter:none}
+
+/* 4b. Only the visible hero backdrop drifts (the other 10 were animating full-screen layers behind hidden slides). */
+.bgl:not(.on):before{animation:none!important}
+
+/* 5. Do not animate what nobody can see: hidden hero slides, and sections scrolled out of view (perf.js adds .ig-off). */
+.slide:not(.on):not(.out-l):not(.out-r) *,.slide:not(.on):not(.out-l):not(.out-r) *::before,.slide:not(.on):not(.out-l):not(.out-r) *::after,
+.ig-off,.ig-off *,.ig-off *::before,.ig-off *::after{animation-play-state:paused!important}
+@media(prefers-reduced-motion:reduce){.hero2 .hx{animation:none!important}}
+
