@@ -107,3 +107,8 @@
 .annc a[href^="tel:"]{position:relative}
 .annc a[href^="tel:"]:after{content:"";position:absolute;left:-6px;right:-6px;top:-8px;bottom:-8px}
 a[href^="tel:"]:not([class]):not(.annc a),a[href^="mailto:"]:not([class]){display:inline-block;padding:8px 0;margin:-8px 0}
+
+/* 10. Phones: header search button gets a 44px hit area, same look. */
+@media(max-width:860px),(pointer:coarse){
+ header.sh .sh-search .sb:before{content:"";position:absolute;left:-2px;right:-2px;top:-2px;bottom:-2px}
+}
