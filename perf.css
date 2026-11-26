@@ -28,3 +28,76 @@
 .ig-off,.ig-off *,.ig-off *::before,.ig-off *::after{animation-play-state:paused!important}
 @media(prefers-reduced-motion:reduce){.hero2 .hx{animation:none!important}}
 
+/* 7. Pacing: hero entrance and slide transitions about 30% faster (durations x0.70, delays x0.55). Generated from the originals; looping animations untouched. */
+.hcopy{transition:opacity 0.245s}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .ln>span{transition:transform 0.595s var(--ease);transition-delay:calc(var(--d,0) * 0.033s + 0.138s)}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .sub,.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .gcard{transition-delay:0.248s}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .cnote{transition-delay:0.248s}
+.slide.s5.on .p5-steel,.slide.s5.on .p5-deluxe{transition-delay:0.044s}
+.slide.s5.on .p5-ctrl{transition-delay:0.088s}
+.slide.s5.on .p5-thumb{transition-delay:0.132s}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .ch{transition:transform 0.56s var(--ease),opacity 0.28s ease;transition-delay:calc(var(--i) * 0.019s + 0.143s)}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .ln:nth-child(2) .ch{animation:neonOn 0.77s steps(1,end) both;animation-delay:calc(var(--i) * 0.019s + 0.495s)}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .prod .tilt{animation:prodReveal 0.735s var(--ease) both;animation-delay:calc(0.055s + var(--k,0) * 0.05s)}
+.slide.s6.on .p6-white{transition-delay:0.077s}
+.slide.s6.on .p6-black{transition-delay:0.132s}
+.hero2.ready .slide.s6.on .p6-white .tilt{animation-delay:0.303s}
+.hero2.ready .slide.s6.on .p6-black .tilt{animation-delay:0.413s}
+.hero2.ready .slide.s7.on .p7-chair .tilt{animation:chairIn 1.05s var(--ease) 0.055s both}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .prod img:not(.refl){animation:cutePop 0.63s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(0.303s + var(--k,0) * 0.066s)}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .tt .k{animation:ttK 0.7s var(--ease) 0.083s both}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .tt .t1 span{animation:ttT 0.735s cubic-bezier(.2,.9,.25,1) 0.154s both}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .tt .t2 span{animation:ttS 0.805s cubic-bezier(.5,0,.2,1) 0.385s both}
+.hero2.ready .slide.s1.on .s1-orb .ring{animation:kitRing 0.91s cubic-bezier(.2,.8,.2,1) 0.055s both,spin 40s linear 1.4s infinite}
+#hero.hero2.ready .slide.s1.on .s1-orb .o2{animation:kitIn 0.945s cubic-bezier(.2,.9,.25,1) 0.303s both}
+#hero.hero2.ready .slide.s1.on .s1-orb .o1{animation:kitIn 0.945s cubic-bezier(.2,.9,.25,1) 0.468s both}
+#hero.hero2.ready .slide.s1.on .s1-orb .o3{animation:kitIn 0.98s cubic-bezier(.2,.9,.25,1) 0.632s both}
+.hero2.ready .slide.s1.on .stage .prod>.tilt,.hero2.ready .slide.s1.on .stage .prod .float{animation:psIn 1.05s cubic-bezier(.3,.7,.2,1) 0.138s both}
+.hero2.ready .slide.s1.on .s1-orb:before{animation:kitBurst 0.84s ease-out 1.127s both}
+.hero2.ready .slide.s1.on .s1-orb:after{animation:kitSweep 1.05s ease-in-out 1.293s both}
+.hero2.ready .slide.s1.on .sub{transition-delay:0.88s}
+#hero .slide.s1.out-l .s1-orb,#hero .slide.s1.out-r .s1-orb{transition:opacity 0.28s ease}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .hx-a i{animation:hxDrop 0.595s cubic-bezier(.2,.9,.25,1) calc(0.138s + var(--i)*0.025s) both,hxShine 4.2s ease-in-out calc(2.2s + var(--i)*80ms) infinite}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .hx-b i{animation:hxRise 0.595s cubic-bezier(.2,.9,.25,1) calc(0.385s + var(--i)*0.03s) both,hxShine 4.2s ease-in-out calc(3s + var(--i)*80ms) infinite}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .hx-s{animation:hxWrite 0.7s cubic-bezier(.5,.1,.2,1) 0.797s both}
+.slide.s0.out-l .sx-in,.slide.s0.out-r .sx-in{transition:opacity 0.385s ease}
+.slide.s0.on:not(.pre-r):not(.pre-l) .sx-bg{animation:rxZoom 9.8s ease-out both}
+.slide.s0.on:not(.pre-r):not(.pre-l) .sx-plate{animation:rxPlate 0.77s ease-out both}
+.slide.s0.on:not(.pre-r):not(.pre-l) .sx-ch{animation:rxTopC 0.525s cubic-bezier(.22,1.15,.3,1) 0.193s both}
+.slide.s0.on:not(.pre-r):not(.pre-l) .sx-ch2{animation-delay:0.303s}
+.slide.s0.on:not(.pre-r):not(.pre-l) .sx-ch3{animation-delay:0.413s}
+.slide.s0.on:not(.pre-r):not(.pre-l) .sx-pr{animation:rxProd 0.7s cubic-bezier(.2,.9,.25,1.05) 0.825s both}
+.slide.s0.on:not(.pre-r):not(.pre-l) .sx-pr2{animation-delay:0.891s}
+.slide.s0.on:not(.pre-r):not(.pre-l) .sx-pr3{animation-delay:0.957s}
+.slide.s0.on:not(.pre-r):not(.pre-l) .rx-a{animation:rxDrop 0.63s cubic-bezier(.2,.9,.25,1) 0.44s both}
+.slide.s0.on:not(.pre-r):not(.pre-l) .rx-b{animation:rxRise 0.63s cubic-bezier(.2,.9,.25,1) 0.578s both}
+.slide.s0.on:not(.pre-r):not(.pre-l) .rx-s{animation:rxWrite 0.7s cubic-bezier(.5,.1,.2,1) 0.88s both}
+.slide.s0.on:not(.pre-r):not(.pre-l) .rx-p{animation:rxIn 0.56s 0.99s both}
+.slide.s0.on:not(.pre-r):not(.pre-l) .rx-cta{animation:rxIn 0.56s 1.1s both}
+.slide.s1.on:not(.pre-r):not(.pre-l) .prod{animation:rxTopP 0.595s cubic-bezier(.22,1.1,.3,1) 0.193s both}
+.slide.s1.on:not(.pre-r):not(.pre-l) .s1-orb .o1{animation:rxTopP 0.56s cubic-bezier(.22,1.1,.3,1) 0.33s both}
+.slide.s1.on:not(.pre-r):not(.pre-l) .s1-orb .o2{animation:rxTopP 0.56s cubic-bezier(.22,1.1,.3,1) 0.429s both}
+.slide.s1.on:not(.pre-r):not(.pre-l) .s1-orb .o3{animation:rxTopP 0.56s cubic-bezier(.22,1.1,.3,1) 0.528s both}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .hl-img{animation:hlIn 0.7s cubic-bezier(.2,.9,.2,1) 0.138s both,hlFloat 6s ease-in-out 1.3s infinite}
+@media(min-width:861px){.hero2.ready .slide.on .s1-orb i{transition:opacity 0.7s 0.44s}
+}
+
+/* 7b. Slide change: product and backdrop crossfade 0.9s -> 0.6s; neon needs real easing (the original steps(1,end) only works with its old on/off keyframes). */
+.prod{transition:transform .6s var(--ease),opacity .55s var(--ease)}
+.bgl{transition:opacity .6s var(--ease)}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .ln:nth-child(2) .ch{animation-timing-function:ease-out}
+
+/* 8. Phones and touch screens: remove the effects that cost the most on a phone GPU (backdrop blur over moving content, big blur filters, 3D card flips). Same layout, colours and motion style. */
+@media(max-width:860px),(pointer:coarse){
+ header.sh:before{backdrop-filter:none;-webkit-backdrop-filter:none;background:rgba(8,9,18,.94)}
+ body>header:not(.sh){backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:rgba(10,11,24,.94)!important}
+ .sh-btn,.sh-search,.h-chips,.gcard,.h-arrow,.cnote,.b-glass,.dh-arr,.sh-head a.dh-all,.rx-sec,.dd,.pill,.hero-search,.floatcard,.sh-res{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+ .h-chips,.gcard,.cnote{background:rgba(24,26,44,.82)}
+ .dd:before{display:none}
+ .s6 .p6-helm:before,.s7 .p7-chair:before{filter:none}
+ .card.igp[data-fx]:not(.rv){transform:translateY(26px);clip-path:none;filter:none}
+ .card.igp:not(.rv) .imgwrap img{transform:scale(1.08)}
+ .card.igp.rv{transition:opacity .45s ease var(--ig,0ms),transform .6s var(--ig-ease) var(--ig,0ms),border-color .3s,box-shadow .3s}
+ .card.igp.rv .imgwrap img{transition:transform .8s var(--ig-ease) var(--ig,0ms),opacity .4s}
+ .card.igp .badge{transition-delay:calc(var(--ig,0ms) + 350ms)}
+}

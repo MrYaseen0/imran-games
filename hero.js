@@ -137,7 +137,7 @@ function go(n,dir){
   prev.classList.remove("on");prev.classList.add(dir>0?"out-l":"out-r");
   next.classList.remove("pre-r","pre-l");
   cur=n;setActiveUI(n);
-  setTimeout(function(){prev.classList.remove("out-l","out-r");busy=false},940);
+  setTimeout(function(){prev.classList.remove("out-l","out-r");busy=false},650);
   lazyLoad(n+1);
 }
 function next(){go(cur+1,1)}function prevS(){go(cur-1,-1)}
