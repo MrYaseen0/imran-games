@@ -133,3 +133,8 @@ html.anim .reveal .sec-head h2{transition:opacity .4s ease,transform .45s cubic-
 
 /* 12. Hero: hidden slides keep no promoted layers (the visible one and the fading-out one still do). */
 .slide:not(.on):not(.out-l):not(.out-r) .tilt,.slide:not(.on):not(.out-l):not(.out-r) .prod{will-change:auto}
+
+/* 13. Slide change without an empty moment: the outgoing products hold for a beat while the new ones start sooner, so the two overlap instead of leaving a gap. Same artwork, same motion, different sequencing. */
+.slide.out-l .prod,.slide.out-r .prod{transition:transform .5s var(--ease),opacity .3s ease .18s}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .prod .tilt{animation-delay:calc(var(--k,0) * 0.04s)}
+.hero2.ready .slide.on:not(.pre-r):not(.pre-l) .prod img:not(.refl){animation-delay:calc(0.04s + var(--k,0) * 0.05s)}
