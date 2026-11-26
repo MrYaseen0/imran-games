@@ -551,7 +551,7 @@ function renderAll(){
   applyFilters();
   refreshStaticPhotos();
 }
-var igRowsRaw=null;
+var igRowsRaw=null,igCacheOnly=false;
 function applyRows(rows){
     var maxId=0;
     PRODUCTS=rows.map(function(r){
@@ -569,7 +569,9 @@ function applyRows(rows){
 async function loadProducts(){
   var tg=document.getElementById("topGrid");
   /* repeat visit: paint the last known products at once, then check the server and only redraw if something changed */
-  if(!productsLoaded&&!PRODUCTS.length){try{var cs=localStorage.getItem("ig_rows_v1");if(cs){var cr=JSON.parse(cs);if(cr&&cr.length){igRowsRaw=cs;applyRows(cr)}}}catch(e){}}
+  if(!productsLoaded&&!PRODUCTS.length){try{var cs=localStorage.getItem("ig_rows_v1"),ct=+localStorage.getItem("ig_rows_t")||0;
+    /* only a recent, well-formed copy is used; anything else is ignored and the page waits for the server as before */
+    if(cs&&Date.now()-ct<30*60*1000){var cr=JSON.parse(cs);if(Array.isArray(cr)&&cr.length&&cr.every(function(r){return r&&typeof r.name==="string"&&typeof r.slug==="string"&&typeof r.price==="number"&&(r.image_urls==null||Array.isArray(r.image_urls))})){igRowsRaw=cs;igCacheOnly=true;applyRows(cr)}}}catch(e){igCacheOnly=false}}
   if(!productsLoaded&&tg&&!PRODUCTS.length)tg.innerHTML='<p style="color:#fff;padding:30px;text-align:center">Loading products… 🎮</p>';
   try{
     igRpc("release_expired_reservations",{}).catch(function(){}); /* v13: lazy cleanup of expired holds on every load */
@@ -578,10 +580,11 @@ async function loadProducts(){
     if(!res||!res.ok)res=await fetch(SB_URL+"/rest/v1/products?select=*&order=created_at",{headers:{"apikey":SB_ANON,"Authorization":"Bearer "+SB_ANON}});
     if(!res.ok)throw new Error("Supabase answered HTTP "+res.status);
     var raw=await res.text();
-    if(raw===igRowsRaw&&productsLoaded)return;
+    igCacheOnly=false;
+    if(raw===igRowsRaw&&productsLoaded){try{localStorage.setItem("ig_rows_t",String(Date.now()))}catch(e){}return}
     var rows=JSON.parse(raw);
     igRowsRaw=raw;
-    try{localStorage.setItem("ig_rows_v1",raw)}catch(e){}
+    try{localStorage.setItem("ig_rows_v1",raw);localStorage.setItem("ig_rows_t",String(Date.now()))}catch(e){}
     applyRows(rows);
   }catch(err){
     if(tg&&!PRODUCTS.length)tg.innerHTML='<p style="color:#fff;padding:30px;text-align:center">⚠ Products could not load — check your connection and refresh. ('+escHtml(String(err.message||err).slice(0,90))+')</p>';
@@ -715,6 +718,7 @@ var igCheckoutBusy=false;
 document.getElementById("checkoutBtn").addEventListener("click",async function(){
   if(igCheckoutBusy)return;
   if(!cartQty()){showToast("Cart is empty — add something first 🎮");return}
+  if(igCacheOnly){showToast("Confirming the latest prices and stock… if this stays, check your connection and tap Checkout again.");loadProducts();return}
   var items=Object.keys(cart).map(function(id){var p=PRODUCTS.find(function(x){return x.id==id});return p?{p:p,qty:cart[id]}:null}).filter(Boolean);
   if(!items.length){showToast("Cart is empty — add something first 🎮");return}
   igCheckoutBusy=true;

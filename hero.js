@@ -191,9 +191,12 @@ hero.addEventListener("pointerup",endDrag);hero.addEventListener("pointercancel"
 hero.style.touchAction="pan-y";
 
 /* ---- lazy image load for slides 2-5 ---- */
+$$("img",hero).forEach(function(im){if(im.getAttribute("src"))warm(im)});
+/* decode hero photos before their slide shows, so the entrance does not stall on image decoding */
+function warm(im){try{if(im.decode)im.decode().catch(function(){})}catch(e){}}
 function lazyLoad(i){
   var s=slides[(i+N)%N];if(!s)return;
-  $$("img[data-src]",s).forEach(function(im){im.src=im.dataset.src;im.removeAttribute("data-src")});
+  $$("img[data-src]",s).forEach(function(im){im.src=im.dataset.src;im.removeAttribute("data-src");warm(im)});
 }
 /* staggered so the Hot deals photos (first 6 are high priority) are not queued behind every hero slide image on a slow connection */
 function loadRest(){var i=1;(function nx(){if(i>=N)return;lazyLoad(i++);setTimeout(nx,900)})()}

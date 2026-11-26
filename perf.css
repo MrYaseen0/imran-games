@@ -130,3 +130,6 @@ html.anim .reveal .sec-head h2{transition:opacity .4s ease,transform .45s cubic-
 .igsec-h.rv .igsec-tx>*,.igsec-h.rv .igsec-meta>*{transition:opacity .4s ease,transform .5s var(--ig-ease)}
 .igsec-h.rv .igsec-tx>:nth-child(1){transition-delay:.05s}.igsec-h.rv .igsec-tx>:nth-child(2){transition-delay:.1s}.igsec-h.rv .igsec-tx>:nth-child(3){transition-delay:.18s}
 .igsec-h.rv .igsec-meta>*{transition-delay:.2s}
+
+/* 12. Hero: hidden slides keep no promoted layers (the visible one and the fading-out one still do). */
+.slide:not(.on):not(.out-l):not(.out-r) .tilt,.slide:not(.on):not(.out-l):not(.out-r) .prod{will-change:auto}
