@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Hero 2 — Animated Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@1,900&family=Poppins:ital,wght@1,800;1,900&family=Kanit:ital,wght@1,900&family=Mr+Dafoe&family=Yellowtail&family=Sacramento&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+html,body{margin:0;padding:0;background:#0b0616}
+body{font-family:system-ui,sans-serif}
+#stage{
+  position:relative;width:100%;aspect-ratio:1600/685;overflow:hidden;
+  container-type:inline-size;background:#0b0616;
+}
+.ly{position:absolute;pointer-events:none}
+.ly img{width:100%;height:auto;display:block}
+.px>img{width:100%;height:auto}
+.px{position:absolute;pointer-events:none;will-change:auto}
+.px-full{inset:0;width:100%;height:100%}
+.plate{inset:0;width:100%;height:100%;object-fit:cover}
+.rings{inset:0;width:100%;height:100%}
+/* layer placement (% of 1600x685) */
+.p-rockA{left:32.00%;top:63.21%;width:6.94%}
+.p-rockB{left:96.06%;top:26.86%;width:3.94%}
+.p-head{left:58.13%;top:12.55%;width:15.56%}
+.p-console{left:66.69%;top:3.50%;width:22.38%}
+.p-hand{left:41.81%;top:52.26%;width:22.63%}
+.p-ctl{left:67.75%;top:56.50%;width:14.25%}
+/* ---------- live text ---------- */
+.hlwrap{left:6.9%;top:17.2%;width:62%;z-index:8}
+.hl{
+  font-style:italic;font-weight:900;line-height:.96;letter-spacing:.01em;
+  font-size:8.2cqw;margin:0;white-space:nowrap;
+  -webkit-text-stroke:.26cqw #fff;paint-order:stroke fill;
+  text-shadow:0 0 .7cqw rgba(255,64,205,.8),0 0 2cqw rgba(255,30,180,.4);
+}
+.hl.l1{background:linear-gradient(180deg,#ffffff 40%,#efe4ff 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hl.l2{background:linear-gradient(180deg,#ff8ae2 15%,#ff1f9e 85%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.wipe{display:block;width:fit-content;overflow:hidden}
+.wipe.l2{margin-left:3.75cqw}
+.wipe>span{display:inline-block;will-change:transform}
+.script{
+  position:absolute;left:23.5%;top:28.5%;z-index:9;
+  font-size:3.9cqw;color:#fff;transform:rotate(-4deg);
+  text-shadow:0 .2cqw .8cqw rgba(20,0,40,.75),0 0 1cqw rgba(255,120,220,.35);
+}
+.neon{right:3.2%;bottom:4%;text-align:right;z-index:8}
+.neonps5{
+  font-style:italic;font-weight:900;font-size:3.5cqw;line-height:1;color:#fff;
+  -webkit-text-stroke:.1cqw rgba(255,90,215,.9);paint-order:stroke fill;
+  text-shadow:0 0 .7cqw rgba(255,64,205,.85),0 0 1.8cqw rgba(255,30,180,.4);
+}
+.neons{font-size:2.3cqw;color:#fff;text-shadow:0 .15cqw .7cqw rgba(20,0,40,.7)}
+.subbox{left:4%;bottom:4.5%;z-index:8;max-width:34%}
+.subbox p{
+  margin:0 0 1cqw;color:#e8e2f5;font-size:1.15cqw;line-height:1.45;
+  text-shadow:0 1px 8px rgba(0,0,0,.6);
+}
+.cta{display:flex;gap:.9cqw}
+.cta a{
+  font-weight:700;font-size:1.1cqw;text-decoration:none;padding:.6cqw 1.4cqw;border-radius:99px;
+}
+.cta .bw{background:#fff;color:#16101f}
+.cta .bg2{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.35)}
+.glowpulse{
+  inset:0;z-index:7;opacity:0;mix-blend-mode:screen;
+  background:radial-gradient(ellipse 70% 90% at 62% 45%,rgba(255,120,225,.5),rgba(160,40,200,.18) 55%,transparent 80%);
+}
+.particles{inset:0;z-index:6;overflow:hidden}
+.particles i{position:absolute;width:.35cqw;height:.35cqw;border-radius:50%;background:#ffd9f6;opacity:0}
+/* ---------- fonts candidates ---------- */
+.f-montserrat .hl,.f-montserrat .neonps5{font-family:'Montserrat',sans-serif}
+.f-poppins .hl,.f-poppins .neonps5{font-family:'Poppins',sans-serif}
+.f-kanit .hl,.f-kanit .neonps5{font-family:'Kanit',sans-serif}
+.s-dafoe .script,.s-dafoe .neons{font-family:'Mr Dafoe',cursive}
+.s-yellowtail .script,.s-yellowtail .neons{font-family:'Yellowtail',cursive}
+.s-sacramento .script,.s-sacramento .neons{font-family:'Sacramento',cursive}
+/* ---------- arrival ---------- */
+.arriving .plate{animation:aPlate .5s var(--ease-out) both}
+@keyframes aPlate{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:scale(1)}}
+.arriving .rings{animation:aRings .6s var(--ease-out) .1s both}
+@keyframes aRings{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+.arriving .p-console .ly{animation:aConsole .7s var(--ease-out) .15s both}
+@keyframes aConsole{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+.arriving .l1{animation:aWipeO .5s var(--ease-out) .25s both}
+.arriving .l1>span{animation:aWipeI .5s var(--ease-out) .25s both}
+.arriving .l2{animation:aWipeO .5s var(--ease-out) .4s both}
+.arriving .l2>span{animation:aWipeI .5s var(--ease-out) .4s both}
+@keyframes aWipeO{from{transform:translateX(-101%)}to{transform:translateX(0)}}
+@keyframes aWipeI{from{transform:translateX(101%)}to{transform:translateX(0)}}
+.arriving .p-ctl .ly{animation:aCtl .6s var(--ease-out) .3s both}
+@keyframes aCtl{from{opacity:0;transform:translate(48px,42px) rotate(3deg)}to{opacity:1;transform:translate(0,0) rotate(0)}}
+.arriving .p-head .ly{animation:aHead .7s var(--ease-out) .4s both}
+@keyframes aHead{0%{opacity:0;transform:translate(150px,-95px) rotate(-4deg)}55%{opacity:1;transform:translate(34px,-18px) rotate(-1deg)}100%{opacity:1;transform:translate(0,0) rotate(0)}}
+.arriving .p-hand .ly{animation:aHand .7s var(--ease-out) .5s both}
+@keyframes aHand{0%{opacity:0;transform:translate(-120px,66px) rotate(3deg)}60%{opacity:1;transform:translate(-26px,12px) rotate(.8deg)}100%{opacity:1;transform:translate(0,0) rotate(0)}}
+.arriving .script{animation:aScript .5s var(--ease-out) .8s both}
+@keyframes aScript{from{opacity:0;transform:rotate(-4deg) translateX(-26px)}to{opacity:1;transform:rotate(-4deg) translateX(0)}}
+.arriving .neonps5{animation:aNeon .45s var(--ease-out) .9s both}
+@keyframes aNeon{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+.arriving .neons{animation:aNeon .35s var(--ease-out) 1.02s both}
+.arriving .p-rockA .ly,.arriving .p-rockB .ly{animation:aRock .5s var(--ease-out) .9s both}
+@keyframes aRock{from{opacity:0}to{opacity:1}}
+.arriving .subbox{animation:aSub .5s var(--ease-out) .95s both}
+@keyframes aSub{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.arriving .glowpulse{animation:aPulse .6s var(--ease-in-out) 1.5s both}
+@keyframes aPulse{0%{opacity:0}45%{opacity:.5}100%{opacity:0}}
+/* ---------- idle ---------- */
+.rest .p-console .ly{animation:fA 5.4s var(--ease-in-out) infinite}
+.rest .p-ctl .ly{animation:fB 4.6s var(--ease-in-out) .5s infinite}
+.rest .p-head .ly{animation:fC 4.9s var(--ease-in-out) .9s infinite}
+.rest .p-hand .ly{animation:fD 5.9s var(--ease-in-out) .3s infinite}
+@keyframes fA{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fB{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes fC{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-9px) rotate(.5deg)}}
+@keyframes fD{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-7px) rotate(-.5deg)}}
+.rest .rings{animation:ringSpin 120s linear infinite}
+@keyframes ringSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.rest .p-rockA .ly{animation:rA 9s var(--ease-in-out) infinite}
+.rest .p-rockB .ly{animation:rB 11s var(--ease-in-out) 1s infinite}
+@keyframes rA{0%,100%{transform:translate(0,0)}50%{transform:translate(6px,-10px)}}
+@keyframes rB{0%,100%{transform:translate(0,0)}50%{transform:translate(-5px,-8px)}}
+.rest .particles i{animation:pt linear infinite}
+@keyframes pt{0%{transform:translateY(0);opacity:0}12%{opacity:.28}85%{opacity:.18}100%{transform:translateY(-46cqh);opacity:0}}
+.rest .particles i:nth-child(1){left:12%;bottom:8%;animation-duration:11s}
+.rest .particles i:nth-child(2){left:23%;bottom:4%;animation-duration:13s;animation-delay:-4s}
+.rest .particles i:nth-child(3){left:34%;bottom:10%;animation-duration:9s;animation-delay:-2s}
+.rest .particles i:nth-child(4){left:47%;bottom:5%;animation-duration:14s;animation-delay:-7s}
+.rest .particles i:nth-child(5){left:56%;bottom:12%;animation-duration:10s;animation-delay:-1s}
+.rest .particles i:nth-child(6){left:66%;bottom:6%;animation-duration:12s;animation-delay:-5s}
+.rest .particles i:nth-child(7){left:74%;bottom:9%;animation-duration:9.5s;animation-delay:-3s}
+.rest .particles i:nth-child(8){left:82%;bottom:3%;animation-duration:13.5s;animation-delay:-8s}
+.rest .particles i:nth-child(9){left:90%;bottom:11%;animation-duration:11.5s;animation-delay:-6s}
+.rest .particles i:nth-child(10){left:8%;bottom:14%;animation-duration:12.5s;animation-delay:-9s}
+.rest .particles i:nth-child(11){left:52%;bottom:2%;animation-duration:10.5s;animation-delay:-2.5s}
+.rest .particles i:nth-child(12){left:70%;bottom:13%;animation-duration:14.5s;animation-delay:-10s}
+/* ---------- toolbar ---------- */
+#bar{position:fixed;top:8px;right:8px;z-index:99;display:flex;gap:6px;font:12px system-ui}
+#bar button,#bar select{background:#1d1230;color:#e8e2f5;border:1px solid #4a2a6e;border-radius:6px;padding:5px 9px;cursor:pointer}
+.shot #bar{display:none}
+@media (max-width:520px){
+  .rest .particles i:nth-child(n+7){display:none}
+}
+@media (prefers-reduced-motion: reduce){
+  #stage *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body class="f-montserrat s-dafoe">
+<div id="stage" aria-label="Gaming gear, delivered. Neon PS5">
+  <div class="px px-full" style="--d:.06"><img class="ly plate" src="plate.png" alt="" aria-hidden="true"></div>
+  <div class="px px-full" style="--d:.1"><svg class="ly rings" viewBox="0 0 1600 685" preserveAspectRatio="none" aria-hidden="true">
+    <defs>
+      <filter id="rg" x="-40%" y="-40%" width="180%" height="180%">
+        <feGaussianBlur stdDeviation="5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <g filter="url(#rg)" fill="none" stroke="#ff4fd8" stroke-width="2.4" opacity=".85">
+      <ellipse cx="1015" cy="305" rx="298" ry="308"/>
+      <ellipse cx="1160" cy="250" rx="132" ry="296" transform="rotate(76 1160 250)"/>
+      <ellipse cx="1178" cy="412" rx="118" ry="300" transform="rotate(97 1178 412)"/>
+    </g>
+  </svg></div>
+  <div class="px p-rockA" style="--d:.2"><img class="ly" src="cut-rockA.png" alt="" aria-hidden="true"></div>
+  <div class="px p-rockB" style="--d:.25"><img class="ly" src="cut-rockB.png" alt="" aria-hidden="true"></div>
+  <div class="px p-head" style="--d:.3"><img class="ly prod-headphones" src="cut-headphones.png" alt="White gaming headphones with glowing blue ear ring" aria-hidden="true"></div>
+  <div class="px p-console" style="--d:.35"><img class="ly prod-console" src="cut-console.png" alt="White PS5 console with neon lighting on dark base" aria-hidden="true"></div>
+  <div class="px p-hand" style="--d:.28"><img class="ly prod-handheld" src="cut-handheld.png" alt="Handheld gaming console with glowing game library screen" aria-hidden="true"></div>
+  <div class="px p-ctl" style="--d:.4"><img class="ly prod-controller" src="cut-controller.png" alt="White DualSense controller" aria-hidden="true"></div>
+  <div class="ly hlwrap">
+    <h1 style="margin:0">
+      <span class="wipe l1"><span class="hl l1">GAMING GEAR,</span></span>
+      <span class="wipe l2"><span class="hl l2">DELIVERED.</span></span>
+    </h1>
+    <div class="script">Imran Games</div>
+  </div>
+  <div class="ly neon"><div class="neonps5">NEON PS5</div><div class="neons">Neon lit</div></div>
+  <div class="ly subbox">
+    <p>PS4, games and accessories from a shop in Peshawar. Cash on delivery across Pakistan.</p>
+    <div class="cta"><a class="bw" href="#shop">Shop now</a><a class="bg2" href="#deals">See hot deals</a></div>
+  </div>
+  <div class="ly glowpulse" aria-hidden="true"></div>
+  <div class="ly particles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+</div>
+<div id="bar">
+  <button id="replay">Replay</button>
+  <select id="hlfont">
+    <option value="f-montserrat">Montserrat 900 i</option>
+    <option value="f-poppins">Poppins 900 i</option>
+    <option value="f-kanit">Kanit 900 i</option>
+  </select>
+  <select id="scfont">
+    <option value="s-dafoe">Mr Dafoe</option>
+    <option value="s-yellowtail">Yellowtail</option>
+    <option value="s-sacramento">Sacramento</option>
+  </select>
+  <button id="idlet">Idle: on</button>
+</div>
+<script>
+const stage = document.getElementById('stage');
+const q = new URLSearchParams(location.search);
+if (q.get('shot') === '1') document.body.classList.add('shot');
+if (q.get('hl')) { document.body.classList.remove('f-montserrat','f-poppins','f-kanit'); document.body.classList.add('f-'+q.get('hl')); }
+if (q.get('sc')) { document.body.classList.remove('s-dafoe','s-yellowtail','s-sacramento'); document.body.classList.add('s-'+q.get('sc')); }
+let idleOn = true, arriving = false, restTimer = null;
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function startArrival(){
+  if (reduced) { stage.classList.add('rest'); window.__arrivalDone = Date.now(); recordRest(); return; }
+  clearTimeout(restTimer);
+  stage.style.transition = 'opacity .16s ease';
+  stage.style.opacity = '0';
+  setTimeout(()=>{
+    stage.classList.remove('rest');
+    stage.classList.add('arriving');
+    arriving = true;
+    stage.style.opacity = '1';
+    setTimeout(()=>{ stage.style.transition=''; }, 200);
+    window.__arrivalStart = Date.now();
+    restTimer = setTimeout(()=>{
+      stage.classList.remove('arriving');
+      if (idleOn) stage.classList.add('rest');
+      arriving = false;
+      window.__arrivalDone = Date.now();
+      recordRest();
+    }, 2250);
+  }, 170);
+}
+function recordRest(){
+  const r = {};
+  document.querySelectorAll('.prod-console,.prod-controller,.prod-headphones,.prod-handheld').forEach(el=>{
+    const b = el.getBoundingClientRect();
+    r[el.className.split(' ')[1]] = {x:b.x,y:b.y,w:b.width,h:b.height};
+  });
+  window.__restRects = r;
+}
+function fitText(){
+  const sw = stage.clientWidth;
+  [['.hl.l1',.519],['.hl.l2',.44],['.script',.22]].forEach(([sel,frac])=>{
+    const el = document.querySelector(sel);
+    el.style.fontSize = '';
+    const w0 = el.getBoundingClientRect().width;
+    if (!w0) return;
+    const cur = parseFloat(getComputedStyle(el).fontSize);
+    el.style.fontSize = (cur * (frac*sw / w0)).toFixed(1) + 'px';
+  });
+}
+document.fonts.ready.then(fitText);
+addEventListener('resize', fitText);
+document.getElementById('replay').onclick = ()=>{fitText();startArrival()};
+document.getElementById('hlfont').onchange = e=>{document.body.classList.remove('f-montserrat','f-poppins','f-kanit');document.body.classList.add(e.target.value);document.fonts.ready.then(fitText)};
+document.getElementById('scfont').onchange = e=>{document.body.classList.remove('s-dafoe','s-yellowtail','s-sacramento');document.body.classList.add(e.target.value);document.fonts.ready.then(fitText)};
+document.getElementById('idlet').onclick = e=>{idleOn=!idleOn;e.target.textContent='Idle: '+(idleOn?'on':'off');if(!idleOn)stage.classList.remove('rest');else if(!arriving)stage.classList.add('rest')};
+/* parallax (pointer:fine only, max 12px) */
+if (matchMedia('(pointer:fine)').matches && !reduced){
+  let tx=0, ty=0, cx=0, cy=0;
+  addEventListener('mousemove', e=>{
+    tx = (e.clientX/innerWidth - .5) * 2;
+    ty = (e.clientY/innerHeight - .5) * 2;
+  });
+  const layers = [...document.querySelectorAll('.px')];
+  (function loop(){
+    cx += (tx-cx)*.06; cy += (ty-cy)*.06;
+    layers.forEach(l=>{
+      const d = parseFloat(l.style.getPropertyValue('--d'))||0;
+      l.style.transform = `translate(${(-cx*12*d).toFixed(2)}px, ${(-cy*12*d).toFixed(2)}px)`;
+    });
+    requestAnimationFrame(loop);
+  })();
+}
+/* boot: wait for decode, max 2s, else static final state */
+const imgs = [...document.querySelectorAll('#stage img')];
+const ready = Promise.all(imgs.map(i=>i.decode().catch(()=>{})));
+const timeout = new Promise(r=>setTimeout(()=>r('timeout'), 2000));
+Promise.race([ready.then(()=>'ok'), timeout]).then(res=>{
+  window.__assetsReady = res;
+  if (res === 'timeout') { stage.classList.add('rest'); window.__arrivalDone = Date.now(); recordRest(); }
+  else if (q.get('auto') !== '0') startArrival();
+  else recordRest();
+});
+</script>
+</body>
+</html>
