@@ -40,7 +40,7 @@
   font-size:3.9cqw;color:#fff;transform:rotate(-4deg);
   text-shadow:0 .2cqw .8cqw rgba(20,0,40,.75),0 0 1cqw rgba(255,120,220,.35);
 }
-.h2-neon{right:3.2%;bottom:11%;text-align:right;z-index:8}
+.h2-neon{right:3.2%;bottom:17%;text-align:right;z-index:8}
 .h2-neonps5{
   font-style:italic;font-weight:900;font-size:3.5cqw;line-height:1;color:#fff;
   -webkit-text-stroke:.1cqw rgba(255,90,215,.9);paint-order:stroke fill;
