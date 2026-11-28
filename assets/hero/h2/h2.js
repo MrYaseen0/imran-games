@@ -5,7 +5,7 @@ if(!root)return;
 var reduce=matchMedia("(prefers-reduced-motion: reduce)").matches,timer=null,was=false;
 function fit(){
   var sw=root.clientWidth;if(!sw)return;
-  [[".h2-hl.h2-l1",.519],[".h2-hl.h2-l2",.44],[".h2-script",.22]].forEach(function(p){
+  (root.clientHeight>sw*.8?[[".h2-hl.h2-l1",.86],[".h2-hl.h2-l2",.72],[".h2-script",.34]]:[[".h2-hl.h2-l1",.519],[".h2-hl.h2-l2",.44],[".h2-script",.22]]).forEach(function(p){
     var el=root.querySelector(p[0]);el.style.fontSize="";
     var w0=el.getBoundingClientRect().width;if(!w0)return;
     el.style.fontSize=(parseFloat(getComputedStyle(el).fontSize)*(p[1]*sw/w0)).toFixed(1)+"px";
