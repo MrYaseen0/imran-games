@@ -1,0 +1,125 @@
+.h2{position:absolute;left:0;right:0;top:var(--hh,0px);bottom:0;container-type:size;overflow:hidden;background:radial-gradient(120% 60% at 50% 30%,#2a0f4d,#0b0616 70%);z-index:1}
+.h2s{position:absolute;left:50%;top:50%;width:100cqw;aspect-ratio:1600/685;transform:translate(-50%,-50%);container-type:inline-size;overflow:hidden}
+@container (aspect-ratio < 2.1){.h2s{-webkit-mask-image:linear-gradient(transparent,#000 7%,#000 93%,transparent);mask-image:linear-gradient(transparent,#000 7%,#000 93%,transparent)}}
+.slide.out-l .h2s,.slide.out-r .h2s{opacity:0;transition:opacity .45s ease}
+.slide.s1 .sub{z-index:6}
+.h2s .h2-hl,.h2s .h2-neonps5{font-family:Kanit,sans-serif}
+.h2s .h2-script,.h2s .h2-neons{font-family:'Mr Dafoe',cursive}
+
+:root{
+  --h2eo: cubic-bezier(0.22, 1, 0.36, 1);
+  --h2eio: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.h2-ly{position:absolute;pointer-events:none}
+.h2-ly img{width:100%;height:auto;display:block}
+.h2-px>img{width:100%;height:auto}
+.h2-px{position:absolute;pointer-events:none;will-change:auto}
+.h2-px-full{inset:0;width:100%;height:100%}
+.h2-plate{inset:0;width:100%;height:100%;object-fit:cover}
+.h2-rings{inset:0;width:100%;height:100%}
+/* layer placement (% of 1600x685) */
+.h2-p-rockA{left:32.00%;top:63.21%;width:6.94%}
+.h2-p-rockB{left:96.06%;top:26.86%;width:3.94%}
+.h2-p-head{left:58.13%;top:12.55%;width:15.56%}
+.h2-p-console{left:66.69%;top:3.50%;width:22.38%}
+.h2-p-hand{left:41.81%;top:52.26%;width:22.63%}
+.h2-p-ctl{left:67.75%;top:56.50%;width:14.25%}
+/* ---------- live text ---------- */
+.h2-hlwrap{left:6.9%;top:17.2%;width:62%;z-index:8;filter:drop-shadow(.14cqw 0 0 #fff) drop-shadow(-.14cqw 0 0 #fff) drop-shadow(0 .14cqw 0 #fff) drop-shadow(0 -.14cqw 0 #fff) drop-shadow(0 0 .8cqw rgba(255,64,205,.9)) drop-shadow(0 0 1.8cqw rgba(255,30,180,.5))}
+.h2-hlwrap .h2-script{filter:none}
+.h2-hl{
+  font-style:italic;font-weight:900;line-height:.96;letter-spacing:.01em;
+  font-size:8.2cqw;margin:0;white-space:nowrap;
+  
+}
+.h2-hl.h2-l1{background:linear-gradient(180deg,#ffffff 40%,#efe4ff 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.h2-hl.h2-l2{background:linear-gradient(180deg,#ff8ae2 15%,#ff1f9e 85%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.h2-wipe{display:block;width:fit-content;overflow:hidden}
+.h2-wipe.h2-l2{margin-left:3.75cqw}
+.h2-wipe>span{display:inline-block;will-change:transform}
+.h2-script{
+  position:absolute;left:23.5%;top:26.5%;z-index:9;
+  font-size:3.9cqw;color:#fff;transform:rotate(-4deg);
+  text-shadow:0 .2cqw .8cqw rgba(20,0,40,.75),0 0 1cqw rgba(255,120,220,.35);
+}
+.h2-neon{right:3.2%;bottom:11%;text-align:right;z-index:8}
+.h2-neonps5{
+  font-style:italic;font-weight:900;font-size:3.5cqw;line-height:1;color:#fff;
+  -webkit-text-stroke:.1cqw rgba(255,90,215,.9);paint-order:stroke fill;
+  text-shadow:0 0 .7cqw rgba(255,64,205,.85),0 0 1.8cqw rgba(255,30,180,.4);
+}
+.h2-neons{font-size:2.3cqw;color:#fff;text-shadow:0 .15cqw .7cqw rgba(20,0,40,.7)}
+.h2-glowpulse{
+  inset:0;z-index:7;opacity:0;mix-blend-mode:screen;
+  background:radial-gradient(ellipse 70% 90% at 62% 45%,rgba(255,120,225,.5),rgba(160,40,200,.18) 55%,transparent 80%);
+}
+.h2-particles{inset:0;z-index:6;overflow:hidden}
+.h2-particles i{position:absolute;width:.35cqw;height:.35cqw;border-radius:50%;background:#ffd9f6;opacity:0}
+/* ---------- fonts candidates ---------- */
+/* ---------- arrival ---------- */
+.h2-arriving .h2-plate{animation:aPlate .6s var(--h2eo) both}
+@keyframes aPlate{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:scale(1)}}
+.h2-arriving .h2-rings{animation:aRings .75s var(--h2eo) .1s both}
+@keyframes aRings{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+.h2-arriving .h2-p-console .h2-ly{animation:aConsole .85s var(--h2eo) .15s both}
+@keyframes aConsole{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+.h2-arriving .h2-l1{animation:aWipeO .6s var(--h2eo) .25s both}
+.h2-arriving .h2-l1>span{animation:aWipeI .6s var(--h2eo) .25s both}
+.h2-arriving .h2-l2{animation:aWipeO .6s var(--h2eo) .4s both}
+.h2-arriving .h2-l2>span{animation:aWipeI .6s var(--h2eo) .4s both}
+@keyframes aWipeO{from{transform:translateX(-101%)}to{transform:translateX(0)}}
+@keyframes aWipeI{from{transform:translateX(101%)}to{transform:translateX(0)}}
+.h2-arriving .h2-p-ctl .h2-ly{animation:aCtl .75s var(--h2eo) .3s both}
+@keyframes aCtl{from{opacity:0;transform:translate(48px,42px) rotate(3deg)}to{opacity:1;transform:translate(0,0) rotate(0)}}
+.h2-arriving .h2-p-head .h2-ly{animation:aHead .85s var(--h2eo) .4s both}
+@keyframes aHead{0%{opacity:0;transform:translate(150px,-95px) rotate(-4deg)}55%{opacity:1;transform:translate(34px,-18px) rotate(-1deg)}100%{opacity:1;transform:translate(0,0) rotate(0)}}
+.h2-arriving .h2-p-hand .h2-ly{animation:aHand .85s var(--h2eo) .6s both}
+@keyframes aHand{0%{opacity:0;transform:translate(-120px,66px) rotate(3deg)}60%{opacity:1;transform:translate(-26px,12px) rotate(.8deg)}100%{opacity:1;transform:translate(0,0) rotate(0)}}
+.h2-arriving .h2-script{animation:aScript .6s var(--h2eo) .8s both}
+@keyframes aScript{from{opacity:0;transform:rotate(-4deg) translateX(-26px)}to{opacity:1;transform:rotate(-4deg) translateX(0)}}
+.h2-arriving .h2-neonps5{animation:aNeon .45s var(--h2eo) .9s both}
+@keyframes aNeon{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:translateX(0)}}
+.h2-arriving .h2-neons{animation:aNeon .35s var(--h2eo) 1.02s both}
+.h2-arriving .h2-p-rockA .h2-ly,.h2-arriving .h2-p-rockB .h2-ly{animation:aRock .6s var(--h2eo) .9s both}
+@keyframes aRock{from{opacity:0}to{opacity:1}}
+@keyframes aSub{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.h2-arriving .h2-glowpulse{animation:aPulse .75s var(--h2eio) 1.6s both}
+@keyframes aPulse{0%{opacity:0}45%{opacity:.5}100%{opacity:0}}
+/* ---------- idle ---------- */
+.h2-rest .h2-p-console .h2-ly{animation:fA 5.4s var(--h2eio) infinite}
+.h2-rest .h2-p-ctl .h2-ly{animation:fB 4.6s var(--h2eio) .5s infinite}
+.h2-rest .h2-p-head .h2-ly{animation:fC 4.9s var(--h2eio) .9s infinite}
+.h2-rest .h2-p-hand .h2-ly{animation:fD 5.9s var(--h2eio) .3s infinite}
+@keyframes fA{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes fB{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes fC{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-9px) rotate(.5deg)}}
+@keyframes fD{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-7px) rotate(-.5deg)}}
+.h2-rest .h2-rings{animation:ringSpin 120s linear infinite}
+@keyframes ringSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.h2-rest .h2-p-rockA .h2-ly{animation:rA 9s var(--h2eio) infinite}
+.h2-rest .h2-p-rockB .h2-ly{animation:rB 11s var(--h2eio) 1s infinite}
+@keyframes rA{0%,100%{transform:translate(0,0)}50%{transform:translate(6px,-10px)}}
+@keyframes rB{0%,100%{transform:translate(0,0)}50%{transform:translate(-5px,-8px)}}
+.h2-rest .h2-particles i{animation:pt linear infinite}
+@keyframes pt{0%{transform:translateY(0);opacity:0}12%{opacity:.28}85%{opacity:.18}100%{transform:translateY(-46cqh);opacity:0}}
+.h2-rest .h2-particles i:nth-child(1){left:12%;bottom:8%;animation-duration:11s}
+.h2-rest .h2-particles i:nth-child(2){left:23%;bottom:4%;animation-duration:13s;animation-delay:-4s}
+.h2-rest .h2-particles i:nth-child(3){left:34%;bottom:10%;animation-duration:9s;animation-delay:-2s}
+.h2-rest .h2-particles i:nth-child(4){left:47%;bottom:5%;animation-duration:14s;animation-delay:-7s}
+.h2-rest .h2-particles i:nth-child(5){left:56%;bottom:12%;animation-duration:10s;animation-delay:-1s}
+.h2-rest .h2-particles i:nth-child(6){left:66%;bottom:6%;animation-duration:12s;animation-delay:-5s}
+.h2-rest .h2-particles i:nth-child(7){left:74%;bottom:9%;animation-duration:9.5s;animation-delay:-3s}
+.h2-rest .h2-particles i:nth-child(8){left:82%;bottom:3%;animation-duration:13.5s;animation-delay:-8s}
+.h2-rest .h2-particles i:nth-child(9){left:90%;bottom:11%;animation-duration:11.5s;animation-delay:-6s}
+.h2-rest .h2-particles i:nth-child(10){left:8%;bottom:14%;animation-duration:12.5s;animation-delay:-9s}
+.h2-rest .h2-particles i:nth-child(11){left:52%;bottom:2%;animation-duration:10.5s;animation-delay:-2.5s}
+.h2-rest .h2-particles i:nth-child(12){left:70%;bottom:13%;animation-duration:14.5s;animation-delay:-10s}
+/* ---------- toolbar ---------- */
+@media (max-width:520px){
+  .h2-rest .h2-particles i:nth-child(n+7){display:none}
+}
+@media (prefers-reduced-motion: reduce){
+  .h2s *{animation:none!important;transition:none!important}
+}
+@container (aspect-ratio < 1){.h2s{top:5%;transform:translateX(-50%)}}
